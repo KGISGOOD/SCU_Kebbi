@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>架構介紹 – RAG 與 LLM</title>
+    <style>
+        body {font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; line-height:1.6; margin:0; padding:2rem; background:#f9f9f9; color:#333;}
+        h1, h2 {color:#2c3e50;}
+        .container {max-width:800px; margin:auto; background:#fff; padding:2rem; box-shadow:0 2px 8px rgba(0,0,0,.1);}
+        ul {margin-left:1.5rem;}
+        li {margin-bottom:0.3rem;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>架構介紹</h1>
+    <p>本專案採用 Retrieval‑Augmented Generation (RAG) 與 Large Language Model (LLM) 結合的方式，分為以下兩大部分：</p>
+
+    <h2>RAG 部分</h2>
+    <ul>
+        <li><code>config.py</code> – 讀取環境變數，設定向量資料夾、Embedding 模型、Top‑K、Fetch‑K 等。</li>
+        <li><code>embeddings.py</code> – HuggingFace Embeddings 包裝 (BAAI/bge-m3)。</li>
+        <li><code>vectorstores.py</code> – 載入本地 FAISS 向量庫。</li>
+        <li><code>retriever.py</code> – MultiStoreRetriever，負責相似度搜尋並回傳 top‑k 結果。</li>
+        <li><code>vector_store_dept/</code> – 知識來源 (chunks.txt) 與已建好的 FAISS index (index.faiss, index.pkl)。</li>
+    </ul>
+
+    <h2>LLM 部分</h2>
+    <ul>
+        <li><code>llm/ollama.py</code> – 與本地 Ollama API (/api/generate) 互動的 LLM 包裝 (ChatOllamaLLM)。</li>
+        <li><code>orchestrator.py</code> – RAG 與 LLM 的橋梁：retrieve_only() 取得上下文；ask() 將問題與檢索結果送給 LLM。</li>
+        <li><code>service.py</code> – 對外介面 ChatService.handle：相關性檢查、呼叫 orchestrator、計時、OpenCC 簡體→繁體、組裝最終回覆。</li>
+        <li><code>relevance.py</code> – 簡單詞彙重疊相關性判斷 (閾值 30%).</li>
+        <li><code>prompts.py</code> – (保留) Prompt 模板，未來可擴充。</li>
+    </ul>
+
+    <p>資料流程：使用者問題 → Service → Relevance 檢查 → Orchestrator.retrieve_only (向量檢索) → （如需要）Orchestrator.ask (傳送 Prompt 給 LLM) → LLM 產生答案 → Service 後處理 (簡體→繁體、組裝來源與時間) → 回傳給使用者。</p>
+</div>
+</body>
+</html>
