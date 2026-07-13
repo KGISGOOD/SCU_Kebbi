@@ -213,8 +213,8 @@ def main(input_output_pairs):
         print("-----------------------------")
         
 if __name__ == "__main__":
-    input_dir = r"D:\Ray DB\SCU\SCU_Kebbi\robot\data"
-    output_dir = r"D:\Ray DB\SCU\SCU_Kebbi\robot\vector_store_dept"
+    input_dir = r".\data"
+    output_dir = r".\vector_store_dept"
     documents = load_documents(input_dir)
     print(f"Loaded documents: {len(documents)}")
     chunks = split_documents(documents)
