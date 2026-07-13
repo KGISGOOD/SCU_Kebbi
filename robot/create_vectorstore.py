@@ -157,11 +157,11 @@ def create_FAISS_vectorstore(chunks, vectorstore_path=None, batch_size=100, max_
             torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
             # 重新加載向量庫和嵌入
-            #if vectorstore_path and os.path.exists(vectorstore_path):
-                #embeddings = create_embeddings(use_cpu)
-                #vectorstore = FAISS.load_local(vectorstore_path, embeddings, allow_dangerous_deserialization=True)
-            #else:
-                #embeddings = create_embeddings(use_cpu)
+            if vectorstore_path and os.path.exists(vectorstore_path):
+                embeddings = create_embeddings(use_cpu)
+                vectorstore = FAISS.load_local(vectorstore_path, embeddings, allow_dangerous_deserialization=True)
+            else:
+                embeddings = create_embeddings(use_cpu)
 
         print("Vector store creation completed")
         return vectorstore
@@ -169,6 +169,7 @@ def create_FAISS_vectorstore(chunks, vectorstore_path=None, batch_size=100, max_
     except Exception as e:
         print(f"An error occurred while creating the vector store: {str(e)}")
         return None
+
 def load_FAISS_vectorstore(vectorstore_path):
     embeddings = create_embeddings()
     if os.path.exists(vectorstore_path):
@@ -182,18 +183,6 @@ def load_FAISS_vectorstore(vectorstore_path):
         print(f"Vector store not found at {vectorstore_path}")
         vectorstore = None
     return vectorstore
-  
-def generate_input_output_pairs(input_root, output_root):
-    subfolders = [
-        name for name in os.listdir(input_root)
-        if os.path.isdir(os.path.join(input_root, name))
-    ]
-    
-    pairs = [
-        (os.path.join(input_root, name), os.path.join(output_root, name))
-        for name in subfolders
-    ]
-    return pairs
 
 # 執行建立向量庫主程式
 def main(input_output_pairs):
@@ -208,10 +197,10 @@ def main(input_output_pairs):
         print(f"Number of chunks: {len(chunks)}")
 
         # 創建向量庫
-        create_FAISS_vectorstore(chunks, output_dir, batch_size=8, use_cpu=True)
+        create_FAISS_vectorstore(chunks, output_dir, batch_size=32)
         print(f"Vector store created and saved to: {output_dir}")
         print("-----------------------------")
-        
+
 if __name__ == "__main__":
     input_dir = r".\data"
     output_dir = r".\vector_store_dept"
@@ -219,5 +208,5 @@ if __name__ == "__main__":
     print(f"Loaded documents: {len(documents)}")
     chunks = split_documents(documents)
     print(f"Number of chunks: {len(chunks)}")
-    create_FAISS_vectorstore(chunks, output_dir, batch_size=8, use_cpu=True)
+    create_FAISS_vectorstore(chunks, output_dir, batch_size=32)
     print(f"Vector store created and saved to: {output_dir}")
