@@ -197,7 +197,7 @@ def main(input_output_pairs):
         print(f"Number of chunks: {len(chunks)}")
 
         # 創建向量庫
-        create_FAISS_vectorstore(chunks, output_dir, batch_size=32)
+        create_FAISS_vectorstore(chunks, output_dir, batch_size=8, use_cpu=True)
         print(f"Vector store created and saved to: {output_dir}")
         print("-----------------------------")
 
@@ -208,5 +208,5 @@ if __name__ == "__main__":
     print(f"Loaded documents: {len(documents)}")
     chunks = split_documents(documents)
     print(f"Number of chunks: {len(chunks)}")
-    create_FAISS_vectorstore(chunks, output_dir, batch_size=32)
+    create_FAISS_vectorstore(chunks, output_dir, batch_size=8, use_cpu=True)
     print(f"Vector store created and saved to: {output_dir}")
