@@ -199,16 +199,16 @@ def generate_input_output_pairs(input_root, output_root):
 def main(input_output_pairs):
     for input_dir, output_dir in input_output_pairs:
         print(f"Processing directory: {input_dir}")
-        
+
         # 加載文件(Podcast逐字稿)
         documents = load_documents(input_dir)
         print(f"Loaded documents: {len(documents)}")
         # 分割成文本塊
         chunks = split_documents(documents)
         print(f"Number of chunks: {len(chunks)}")
-        
+
         # 創建向量庫
-        create_FAISS_vectorstore(chunks, output_dir, batch_size=32)
+        create_FAISS_vectorstore(chunks, output_dir, batch_size=8, use_cpu=True)
         print(f"Vector store created and saved to: {output_dir}")
         print("-----------------------------")
         
@@ -219,5 +219,5 @@ if __name__ == "__main__":
     print(f"Loaded documents: {len(documents)}")
     chunks = split_documents(documents)
     print(f"Number of chunks: {len(chunks)}")
-    create_FAISS_vectorstore(chunks, output_dir, batch_size=32)
+    create_FAISS_vectorstore(chunks, output_dir, batch_size=8, use_cpu=True)
     print(f"Vector store created and saved to: {output_dir}")
