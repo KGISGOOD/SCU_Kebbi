@@ -107,7 +107,7 @@ try:
         time.sleep(random.uniform(3.5, 6.0))
 
     # ==================== 5. 儲存成 CSV ====================
-    csv_filename = 'dcard_stealth_results.csv'
+    csv_filename = 'a_dcard.csv'
     print(f"\n正在將數據寫入 {csv_filename} ...")
     
     with open(csv_filename, 'w', encoding='utf-8-sig', newline='') as csvfile:

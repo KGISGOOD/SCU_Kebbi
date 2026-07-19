@@ -83,7 +83,7 @@ try:
     print(f"\n🎯 網址蒐集階段結束！最終共取得 {len(post_urls)} 篇獨立文章網址。")
     
     # ==================== 3. 逐一深入內頁爬取 + 即時寫入 CSV ====================
-    csv_filename = 'dcard_stealth_results_200.csv'
+    csv_filename = 'b_dcard.csv'
     print(f"\n建立檔案 {csv_filename}，準備開始逐篇爬取與即時儲存...\n")
     
     with open(csv_filename, 'w', encoding='utf-8-sig', newline='') as csvfile:
