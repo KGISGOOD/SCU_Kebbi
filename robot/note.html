@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PLD 演算法紀錄</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 2rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .content {
+            margin-left: 0;
+        }
+
+        a {
+            color: #1a0dab;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        pre {
+            background: #f8f8f8;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>紀錄</h1>
+
+    <div class="section">
+        <span class="content">
+            腳本1: run_speed_test.py<br>
+            方法: baseline<br>
+            說明: 用來測試原始 Ollama 模型的推論速度（不加入任何 PLD 參數），作為比較的基準。<br>
+            白話說明: 這只是跑一次原始的 Ollama 模型來看它需要多久，不做任何加速，為了給其他腳本一個參考基準。<hr><br><br>
+
+            腳本2: test_pld.py<br>
+            方法: PLD + Greedy Decoding（lossless greedy verification）<br>
+            說明: 這個腳本會先把你的問題送進現有的 RAG 檢索系統，取出相關段落組成 Prompt（就像你平時問 Ollama 時喂給模型的那串文字）。接著它會做兩件事：第一次把這個 Prompt 直接送給你原本的 Ollama 模型，記錄它產答案需要多久；第二次把同樣的 Prompt 送給一個 HuggingFace 模型，但在呼叫 model.generate 時另外加入兩個 PLD 參數（prompt_lookup_num_tokens 與 max_ngram_size）。這樣模型在產每個字時會先去看看 Prompt 裡有沒有可以直接抄的句子，若有就直接使用，否則才用模型自己預測。這樣可以讓產答案的速度變快。最後腳本會把兩種方式的花費時間記下來，算出平均 Ollama 時間、平均 PLD‑HF 時間、加速比（Ollama 時間 ÷ PLD‑HF 時間）以及兩種答案的相似度，讓你一眼看清 PLD 是否真的提升速度且不會改變答案。<br>
+            白話說明: 簡單來說，這會先用現有的知識庫找出相關資料，再讓兩個模型回答同一個問題：一個是原始的 Ollama，另一個是加了 PLD 技術的 HuggingFace 模型。比較它們的速度與答案相似度，看看 PLD 是否真的讓回答更快而不改變內容。<hr><br><br>
+
+            腳本3: test_pld_tree.py<br>
+            方法: PLD + Tree‑based Verification<br>
+            說明: 此腳本同樣先使用 RAG 把問題與檢索段落組成 Prompt。接著以 PLD 在 Prompt 中尋找重疊的 n‑gram 作為第一層候選詞，對每個第一層候選詞再進行一次 PLD 產生第二層候選詞，形成深度為 2 的小樹。然後使用目標 HuggingFace 模型逐層驗證：先比較模型在「根」處的最高機率 token，只有與第一層候選相同者才通過；對通過的第一層節點再比較第二層的最高機率 token，只有與第二層候選相同者才再被接受。每一輪可接受 0、1 或 2 個 token，未通則退回到該層重新草擬。如此在保持答案與 Ollama 基線近似相似度的同時，透過樹狀驗證一次核實多種可能續詞，提升生成速度。最後腳本會記錄兩種方式的延遲、加速比與答案相似度，讓你可以觀察 PLD + Tree‑based Verification 是否在不損失正確性的前提下獲得明顯的速度提升。<br>
+            白話說明: 這個腳本先用 PLD 從 Prompt 裡找出可能的接續詞當作「第一層選項」，再對每個選項再找出可能的第二個字形成小樹。接著讓模型一次檢查根節點和每層的最高機率字，只有匹配的路徑才被接受；若不匹配就從該節點重新開始找選項。這樣可以在不影響答案正確性的前提下，一次驗證多種可能，提升產文字的速度。<br><br>
+        </span>
+    </div>
+
+    <div class="section">
+        <span class="label">原始程式碼庫：</span>
+        <span class="content">
+            <br>
+            <a href="https://github.com/apoorvumang/prompt-lookup-decoding/" target="_blank">
+                https://github.com/apoorvumang/prompt-lookup-decoding/
+            </a>
+            <br>
+            <a href="https://github.com/SafeAILab/EAGLE" target="_blank">
+                https://github.com/SafeAILab/EAGLE
+            </a>
+        </span>
+    </div>
+
+    <hr>
+    <p><small>備註：此紀錄僅供個人參考，隨時可依實驗結果補充或修正。</small></p>
+</body>
+
+</html>
