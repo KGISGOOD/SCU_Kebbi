@@ -53,20 +53,49 @@
 
     <div class="section">
         <span class="content">
-            腳本1: run_speed_test.py<br>
-            方法: baseline<br>
-            說明: 用來測試原始 Ollama 模型的推論速度（不加入任何 PLD 參數），作為比較的基準。<br>
-            白話說明: 這只是跑一次原始的 Ollama 模型來看它需要多久，不做任何加速，為了給其他腳本一個參考基準。<hr><br><br>
+腳本1: test_pld.py<br>
+方法: baseline vs PLD+Greedy Decoding（論文中的 PLD 概念）<br>
+說明: 此腳本會先把問題送入現有的 RAG 檢索系統，取出相關段落組成 Prompt（就像平時問 Ollama 時喂給模型的文字）。接著它會做兩件事：第一次直接將這個 Prompt 送給原本的 Ollama 模型（不加速），記錄它產答案所需的時間；第二次把同樣的 Prompt 送給一個 HuggingFace 模型（此處使用 uer/gpt2-chinese-cluecorpussmall），但在呼叫 model.generate 時額外加入兩個 PLD 參數（prompt_lookup_num_tokens 與 max_ngram_size），這讓模型在產生每個 token 前會先去 Prompt 中尋找可以直接複製的字串（最長匹配的 n-gram），若找到則直接使用該字串，否則才使用模型自己的預測。這樣可以在不影響最終答案的前提下，讓模型一次產出多個 token，從而提升速度。腳本最後會記錄兩種方式的花費時間，計算平均 Ollama 時間、平均 PLD‑HF 時間、加速比（Ollama 時間 ÷ PLD‑HF 時間）以及兩個答案的相似度，讓您一眼看到 PLD 是否真的提升速度且答案幾乎不變。<br>
+白話說明: 簡單來說，我們先用知識庫找出相關資料，組成一段提示文字。然後讓兩個模型回答同一個問題：一個是原始的 Ollama（不加速），另一個是加了 PLD 技術的 HuggingFace 模型。比較它們的速度與答案相似度，就能看到 PLD 是否真的讓回答更快，同時答案基本不會改變。<hr><br><br>
 
-            腳本2: test_pld.py<br>
-            方法: PLD + Greedy Decoding（lossless greedy verification）<br>
-            說明: 這個腳本會先把你的問題送進現有的 RAG 檢索系統，取出相關段落組成 Prompt（就像你平時問 Ollama 時喂給模型的那串文字）。接著它會做兩件事：第一次把這個 Prompt 直接送給你原本的 Ollama 模型，記錄它產答案需要多久；第二次把同樣的 Prompt 送給一個 HuggingFace 模型，但在呼叫 model.generate 時另外加入兩個 PLD 參數（prompt_lookup_num_tokens 與 max_ngram_size）。這樣模型在產每個字時會先去看看 Prompt 裡有沒有可以直接抄的句子，若有就直接使用，否則才用模型自己預測。這樣可以讓產答案的速度變快。最後腳本會把兩種方式的花費時間記下來，算出平均 Ollama 時間、平均 PLD‑HF 時間、加速比（Ollama 時間 ÷ PLD‑HF 時間）以及兩種答案的相似度，讓你一眼看清 PLD 是否真的提升速度且不會改變答案。<br>
-            白話說明: 簡單來說，這會先用現有的知識庫找出相關資料，再讓兩個模型回答同一個問題：一個是原始的 Ollama，另一個是加了 PLD 技術的 HuggingFace 模型。比較它們的速度與答案相似度，看看 PLD 是否真的讓回答更快而不改變內容。<hr><br><br>
+腳本2: test_pld.py<br>
+方法: PLD（白箱實作）<br>
+說明:
+<h4>什麼是 Prompt Lookup Decoding (PLD)？</h4>
+PLD 是一種「自草擬（self-speculative）」投機解碼技術，核心概念是：<br>
+<b>在每一步生成 token 時，先從已知的「提示詞（Prompt）」裡尋找可以直接複製的現成文字（n‑gram），若找到則當作草稿（draft token）一次送進模型驗證；若驗證通過則一次接受多個 token，否則退回標準逐個 token 的貪婪預測。</b><br>
+因為驗證只需要一次模型前向傳遞（不管草稿長度），PLD 能將多個 token 的檢測壓縮到同一次計算中，從而在「輸入與輸出高度相似」的任務（如摘要、RAG 問答）上顯著減少模型呼叫次數，提升吞吐量.<br>
+<br>
+<h4>PLD 的實作步驟（僅使用單一模型）</h4>
+<ol>
+<li>產生階段（與一般自回歸生成相同）<br>
+模型先生成一個 token（貪婪或採 <strong>產生階段（和一般自回歸生成一樣）</strong><br>
+模型先生成一個 token（用標準的貪婪或採樣方式），這是「已生成後綴」。
+<li><strong>在 Prompt 中尋找匹配的 n‑gram（草擬步驟）</strong><br>
+　　- 已知：提示詞（Prompt）（包含問題+檢索內容）是固定的。<br>
+　　- 模型已生成的後綴（例如：「今天天氣很好，適合去」）會被拿去和 提示詞的末尾 比對。<br>
+　　- 找出最長的尾綴，該尾綴恰好出現在提示詞中（例如提示詞結尾是 “…適合去公園野餐。”，那「適合去」就是一個匹配）。<br>
+　　- 然後取這個匹配之後的提示詞片段（例如“公園野餐。野餐時應該帶什麼東西？”）作為「草擬 token 草稿」——因為這些 token 已經存在於提示詞裡，模型可以直接考慮複製它們。
+<li><strong>一次前向傳遞驗證所有草擬 token（關鍵加速點）</strong><br>
+　　- 模型不會逐個 token 預測並等待；而是把「已生成後綴 + 草擬 token 草稿」當作一個序列，一次送入模型取得所有位置的 logits。<br>
+　　- 比對模型對草擬位置的預測（取 argmax）與草擬 token 本身：<br>
+　　　　- 全部匹配 → 接受全部草擬 token（相當於一次生成了多個 token）<br>
+　　　‑ 有不匹配 → 只接受到第一個不匹配之前的部分，然後從不匹配位置重新開始標準生成（退回一步）。<br>
+　　- 這一步只需要一次模型前向傳遞，無論草擬長度是 1 還是 5，驗證成本相同——這就是 PLD 能提升吞吐量的原因。
+<li><strong>循環</strong><br>
+　用接受的 token 更新已生成後綴，重複第 1~3 步，直到產生足夠的 token。
+</ol>
 
-            腳本3: test_pld_tree.py<br>
-            方法: PLD + Tree‑based Verification<br>
-            說明: 此腳本同樣先使用 RAG 把問題與檢索段落組成 Prompt。接著以 PLD 在 Prompt 中尋找重疊的 n‑gram 作為第一層候選詞，對每個第一層候選詞再進行一次 PLD 產生第二層候選詞，形成深度為 2 的小樹。然後使用目標 HuggingFace 模型逐層驗證：先比較模型在「根」處的最高機率 token，只有與第一層候選相同者才通過；對通過的第一層節點再比較第二層的最高機率 token，只有與第二層候選相同者才再被接受。每一輪可接受 0、1 或 2 個 token，未通則退回到該層重新草擬。如此在保持答案與 Ollama 基線近似相似度的同時，透過樹狀驗證一次核實多種可能續詞，提升生成速度。最後腳本會記錄兩種方式的延遲、加速比與答案相似度，讓你可以觀察 PLD + Tree‑based Verification 是否在不損失正確性的前提下獲得明顯的速度提升。<br>
-            白話說明: 這個腳本先用 PLD 從 Prompt 裡找出可能的接續詞當作「第一層選項」，再對每個選項再找出可能的第二個字形成小樹。接著讓模型一次檢查根節點和每層的最高機率字，只有匹配的路徑才被接受；若不匹配就從該節點重新開始找選項。這樣可以在不影響答案正確性的前提下，一次驗證多種可能，提升產文字的速度。<br><br>
+<h4>為什麼必須是「白箱」模型？</h4>
+PLD 的核心在於「一次前向驗證所有草擬 token」——我們需要比較模型在草擬位置的預測（logits 或機率）與草擬 token 本身，以決定是否接受。若只能取得模型最終產出的文字（例如 Ollama 的 /api/generate 只回傳 response），則無法知道模型在中間步驟「本來想預測什麼」的分數，也就無法進行接受/拒絕的判斷。這種僅輸出最終文字的介紹稱為「黑箱」；而能直接呼叫 <code>model.forward()</code> 取得完整 logits 的介紹則是「白箱」。只有在白箱情況下，我們才能執行步驟 3 的比對，才能真正實現 PLD 帶來的一次驗證多個 token 的加速效果。<br>
+<br>
+<h4>在實驗中的意義</h4>
+使用白箱模型（例如本地載入的 HuggingFace 權重）時，我們可以：<ul>
+<li>同時測試「標準自回歸生成」（baseline）與「加入 PLD」的兩種解碼方式，模型權重完全相同，這樣觀測到的延遲差異純粹來自 PLD 本身；</li>
+<li>計算兩版輸出的相似度（使用 SequenceMatcher），驗證 PLD 是否在不犧牲正確性的前提下提升速度。</li>
+</ul>
+若僅保留 Ollama 基線作為外部參考，則同時看到「模型不同」與「是否使用 PLD」兩個因素的混合效果，無法單獨評估 PLD 的貢獻。<br>
+<hr><br><br>
         </span>
     </div>
 
@@ -78,8 +107,8 @@
                 https://github.com/apoorvumang/prompt-lookup-decoding/
             </a>
             <br>
-            <a href="https://github.com/SafeAILab/EAGLE" target="_blank">
-                https://github.com/SafeAILab/EAGLE
+            <a href="https://github.com/SafeAilab/EAGLE" target="_blank">
+                https://github.com/SafeAilab/EAGLE
             </a>
         </span>
     </div>
@@ -87,5 +116,4 @@
     <hr>
     <p><small>備註：此紀錄僅供個人參考，隨時可依實驗結果補充或修正。</small></p>
 </body>
-
 </html>
