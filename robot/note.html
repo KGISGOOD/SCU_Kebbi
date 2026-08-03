@@ -104,53 +104,7 @@
     </div>
 
     <div class="section">
-        <h2>腳本2: test_pld.py</h2>
-        <span class="content">
-方法: PLD（白箱實作）<br>
-說明:
-<h4>什麼是 Prompt Lookup Decoding (PLD)？</h4>
-PLD 是一種「自草擬（self-speculative）」投機解碼技術，核心概念是：<br>
-<b>在每一步生成 token 時，先從已知的「提示詞（Prompt）」裡尋找可以直接複製的現成文字（n‑gram），若找到則當作草稿（draft token）一次送進模型驗證；若驗證通過則一次接受多個 token，否則退回標準逐個 token 的貪婪預測。</b><br>
-因為驗證只需要一次模型前向傳遞（不管草稿長度），PLD 能將多個 token 的檢測壓縮到同一次計算中，從而在「輸入與輸出高度相似」的任務（如摘要、RAG 問答）上顯著減少模型呼叫次數，提升吞吐量.<br>
-<br>
-<h4>PLD 的實作步驟（僅使用單一模型）</h4>
-<ol>
-<li>產生階段（與一般自回歸生成相同）<br>
-模型先生成一個 token（貪婪或採 <strong>產生階段（和一般自回歸生成一樣）</strong><br>
-模型先生成一個 token（用標準的貪婪或採樣方式），這是「已生成後綴」。</li>
-<li><strong>在 Prompt 中尋找匹配的 n‑gram（草擬步驟）</strong><br>
-　　- 已知：提示詞（Prompt）（包含問題+檢索內容）是固定的。<br>
-　　- 模型已生成的後綴（例如：「今天天氣很好，適合去」）會被拿去和 提示詞的末尾 比對。<br>
-　　- 找出最長的尾綴，該尾綴恰好出現在提示詞中（例如提示詞結尾是 “…適合去公園野餐。”，那「適合去」就是一個匹配）。<br>
-　　- 然後取這個匹配之後的提示詞片段（例如“公園野餐。野餐時應該帶什麼東西？”）作為「草擬 token 草稿」——因為這些 token 已經存在於提示詞裡，模型可以直接考慮複製它們。
-</li>
-<li><strong>一次前向傳遞驗證所有草擬 token（關鍵加速點）</strong><br>
-　　- 模型不會逐個 token 預測並等待；而是把「已生成後綴 + 草擬 token 草稿」當作一個序列，一次送入模型取得所有位置的 logits。<br>
-　　- 比對模型對草擬位置的預測（取 argmax）與草擬 token 本身：<br>
-　　　　- 全部匹配 → 接受全部草擬 token（相當於一次生成了多個 token）<br>
-　　　‑ 有不匹配 → 只接受到第一個不匹配之前的部分，然後從不匹配位置重新開始標準生成（退回一步）。<br>
-　　- 這一步只需要一次模型前向傳遞，無論草擬長度是 1 還是 5，驗證成本相同——這就是 PLD 能提升吞吐量的原因。
-</li>
-<li><strong>循環</strong><br>
-　　用接受的 token 更新已生成後綴，重複第 1~3 步，直到產生足夠的 token。
-</li>
-</ol>
-
-<h4>為什麼必須是「白箱」模型？</h4>
-PLD 的核心在於「一次前向驗證所有草擬 token」——我們需要比較模型在草擬位置的預測（logits 或機率）與草擬 token 本身，以決定是否接受。若只能取得模型最終產出的文字（例如 Ollama 的 /api/generate 只回傳 response），則無法知道模型在中間步驟「本來想預測什麼」的分數，也就無法進行接受/拒絕的判斷。這種僅輸出最終文字的介紹稱為「黑箱」；而能直接呼叫 <code>model.forward()</code> 取得完整 logits 的介誌則是「白箱」。只有在白箱情況下，我們才能執行步驟 3 的比對，才能真正實現 PLD 帶來的一次驗證多個 token 的加速效果。<br>
-<br>
-<h4>在實驗中的意義</h4>
-使用白箱模型（例如本地載入的 HuggingFace 權重）時，我們可以：<ul>
-<li>同時測試「標準自回歸生成」（baseline）與「加入 PLD」的兩種解碼方式，模型權重完全相同，這樣觀測到的延遲差異純粹來自 PLD 本身；</li>
-<li>計算兩版輸出的相似度（使用 SequenceMatcher），驗證 PLD 是否在不犧牲正確性的前提下提升速度。</li>
-</ul>
-若僅保留 Ollama 基線作為外部參考，則同時看到「模型不同」與「是否使用 PLD」兩個因素的混合效果，無法單獨評估 PLD 的貢獻。<br>
-<hr><br><br>
-        </span>
-    </div>
-
-    <div class="section">
-        <h2>腳本3: test_smartcache.py</h2>
+        <h2>腳本2: test_smartcache.py</h2>
         <span class="content">
 方法: 語義森林快取操作（演算法 1）<br>
 說明:
@@ -173,8 +127,42 @@ PLD 的核心在於「一次前向驗證所有草擬 token」——我們需要�
 持久化快取 (寫回)
 </div>
 <div class="note">
-技術說明: 此腳本實作了 SmartCache 的語義快取（簡化版：僅全域回退），將每個問題的 Prompt 向量化後，在 FAISS IndexFlatIP 中進行最近鄰搜尋（k=1），若相似度 ≥ 0.75 則判定為快取命中，直接使用先前儲存的答案；否則呼叫 Ollama LLM 產生答案，並將新產出的 (Prompt, Answer) 寫入快取。透過此機制，可測量快取命中率與平均延遲減少，驗證語義快取是否能在不影響答案正確性的前提下提升多輪對話推論效率。<br>
+技術說明: 此腳本實作了 SmartCache 的語義快取（簡化版：僅全域回退），將每個問題的 Prompt 向量化後，在 FAISS IndexFlatIP 中進行最近鄰搜尋（k=1），若相似度 ≥ 0.75 則判定為快取命中，直接使用先前儲存的答案；否則呼叫 Ollama LLM 產出答案，並將新產出的 (Prompt, Answer) 寫入快取。透過此機制，可測量快取命中率與平均延遲減少，驗證語義快取是否能在不影響答案正確性的前提下提升多輪對話推論效率。<br>
 白話說明: 簡單來說，我們把每個使用者的問題轉成向量，看看和以前問過的問題有多像。如果相似度夠高（超過 0.75），那就直接用以前的答案，不需要再跑一次大模型；如果不夠像，就真的跑一次 LLM 得到答案，並把這個新問題和答案存起來，以供下次類似的問題使用。執行時會把每題的問題、是否命中、花費時間以及完整答案印出來，這樣你可以直接看到快取是否真的在工作，以及答案內容。這樣就能省掉很多重複的模型運算，讓回答更快。
+</div>
+<hr><br><br>
+        </span>
+    </div>
+
+    <div class="section">
+        <h2>腳本3: test_attention_topic.py</h2>
+        <span class="content">
+方法: 演算法二：自注意力機制話題識別（前綴‑後綴比例）<br>
+說明:
+<div class="flowchart">
+讀取問題列表
+       ↓
+主迴圈 (每題):
+   1. 建立 Prompt (透過 RAG → MultiStoreRetriever)
+   2. 取得模型 self-attention (output_attentions=True) 並平均層/head
+   3. Tokenize 問題，取得其在 Prompt 中的 token 範圍 [q_start, q_end)
+   4. 計算問題 token 對 Prompt 部分（系統說明+檢索段落）的平均注意力
+        attn_q_to_prompt = mean(attn_avg[q_start:q_end, :prompt_len])
+   5. 計算問題 token 對自己的平均注意力（對角線）
+        attn_q_to_self = mean(attn_avg[q_start:q_end, q_start:q_end])
+   6. ratio = attn_q_to_prompt / (attn_q_to_prompt + attn_q_to_self)
+   7. 若 ratio < 0.40 → 標記為話題切換
+      否則 若前一 ratio 差異 > 0.12 → 標記為話題切換
+   8. 輸出題目、ratio、topic_shift                                                                                     ↓
+彙總結果: 話題切換比率
+</div>
+<div class="note">
+技術說明: 此腳本實作演算法二的改進版——使用「問題對 Prompt 的注意力比例」來偵測話題切換。在 LLM prefill 階段啟用 output_attentions=True，取得 self‑attention 矩陣並平均層/head。透過 tokenizer 對齊，取得問題 token 在完整 Prompt 中的索引範圍，計算：<br>
+ • 問題對 Prompt 部分的平均注意力（代表模型仍關注先前上下文）<br>
+ • 問題對自身的平均注意力（對角線）<br>
+比例越低表示問題較少關注先前上下文，可能表示話題已改變。當比例低於經驗門檻 (0.40) 或與前一題的比例變化超過 0.12 時，判定為話題切換。每輪輸出題目、ratio 以及 topic_shift 標記，最後統計切換比率。<br>
+※ 實際使用時請將 DummyRetriever 換成專案的 MultiStoreRetriever，並使用真實的 BGE‑M3 embedding（雖然此腳本目前不直接使用 embedding，但未來整合時可加入）。<br>
+白話說明: 就像老師在聽學生提問時，會觀察學生的注意力是否仍停在先前的筆記上。如果學生的目光（注意力）大多落在當前問題本身，而很少回顧之前的內容，則代表他可能已切換話題。此時老師會清空先前的筆記，重新開始記錄新問題；反之則繼續在同一頁上筆記。如此可避免用錯的舊資料回答新問題，同時在話題連續時利用注意力資訊提前偵測話題轉變。
 </div>
 <hr><br><br>
         </span>
