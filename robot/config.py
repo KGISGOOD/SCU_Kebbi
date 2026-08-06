@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class AppSettings:
-    parent_vector_dir: str = os.getenv("PODCAST_VECTOR_DIR", "./vector_store")
+    parent_vector_dir: str = os.getenv("PODCAST_VECTOR_DIR", "vector_store_dept")
     model_name: str = os.getenv("EMBEDDING_MODEL", "BAAI/bge-m3")
     use_cpu: bool = os.getenv("USE_CPU", "false").lower() == "true"
     top_k: int = int(os.getenv("TOP_K", "5"))
