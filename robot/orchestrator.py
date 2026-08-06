@@ -1,9 +1,11 @@
 from __future__ import annotations
 import time
-from typing import List, Tuple, Optional
+from typing import List, Tuple
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
 from langchain.schema import BaseRetriever
 from llm.ollama import ChatOllamaLLM
-from prompts import PromptFactory  # kept for compatibility, not used
+from prompts import PromptFactory
 
 
 class QAOrchestrator:
@@ -15,7 +17,22 @@ class QAOrchestrator:
     ) -> None:
         self._retriever = retriever
         self._llm = llm_facade
-        self._prompt_factory = prompt_factory  # kept for compatibility, not used
+        self._prompt_factory = prompt_factory
+        self._memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
+        self._qa_chain = ConversationalRetrievalChain.from_llm(
+            llm=self._llm,  # ChatOllamaLLM implements generate(), compatible
+            retriever=self._retriever,
+            memory=self._memory,
+            combine_docs_chain_kwargs={
+                "prompt": self._prompt_factory.context_prompt(),
+                "document_variable_name": "context",
+                "document_prompt": self._prompt_factory.document_prompt(),
+            },
+        )
+
+    def clear_memory(self) -> None:
+        self._memory.clear()
 
     def retrieve_only(self, query: str) -> Tuple[str, List[Tuple[str, str]], float]:
         t1 = time.time()
@@ -31,23 +48,11 @@ class QAOrchestrator:
             ctx_lines.append(f"內容：{page}\n來源：{ep}, {pod}")
             uniq.add((ep, pod))
         src = "\n可參考下方節目集數：\n" + "".join([f"Result {i}: {e}, {p}\n" for i, (e, p) in enumerate(uniq, 1)])
-        out = "\n--- 向量資料庫檢索結果 ---\n" + "\n\n".join(ctx_lines[:5]) + "\n\n" + src
+        out = "\n--- 向量資料庫�檢索結果 ---\n" + "\n\n".join(ctx_lines[:5]) + "\n\n" + src
         return out, list(uniq), elapsed
 
-    def ask(
-        self,
-        question: str,
-        context: str,
-        history: Optional[List[Tuple[str, str]]] = None,
-    ) -> Tuple[str, float]:
-        """
-        Combine the raw question with the retrieved context (no extra prompt template)
-        and send it to the LLM.
-        """
-        # Simple concatenation: question first, then retrieved information
-        combined = f"問題：{question}\n\n檢索資訊：{context}"
+    def ask(self, question: str, history: List[Tuple[str, str]]) -> Tuple[str, float]:
         t3 = time.time()
-        # The LLM facade's _call expects a plain string prompt
-        ans = self._llm._call(combined)
+        resp = self._qa_chain.invoke({"question": question, "chat_history": history})
         t4 = time.time()
-        return ans.strip(), (t4 - t3)
+        return resp.get("answer", ""), (t4 - t3)
