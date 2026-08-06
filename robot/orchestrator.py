@@ -19,6 +19,12 @@ class QAOrchestrator:
         self._llm = llm_facade
         self._prompt_factory = prompt_factory
         self._memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+        # Debug: show number of vectorstores if MultiStoreRetriever
+        if hasattr(retriever, "vectorstores"):
+            try:
+                print(f"[DEBUG] Loaded {len(retriever.vectorstores)} vectorstores")
+            except Exception:
+                pass
 
         self._qa_chain = ConversationalRetrievalChain.from_llm(
             llm=self._llm,  # ChatOllamaLLM implements generate(), compatible
