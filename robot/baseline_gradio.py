@@ -82,7 +82,6 @@ def main():
     demo.queue()  # enable queuing for better handling
     demo.launch(
         server_name="127.0.0.1",
-        server_port=0,
         share=False,
         debug=False,
         prevent_thread_lock=False
