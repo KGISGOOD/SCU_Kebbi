@@ -64,16 +64,16 @@ def main():
             chat_history.append({"role": "assistant", "content": response})
             return "", chat_history
         except Exception as e:
-            err_msg = f"發生�錯�誤: {e}"
+            err_msg = f"發生錯誤: {e}"
             chat_history.append({"role": "user", "content": message})
             chat_history.append({"role": "assistant", "content": err_msg})
             return "", chat_history
 
-    with gr.Blocks(title="Podcast LLM Baseline (Gradio)") as demo:
-        gr.Markdown("# Podcast LLM Baseline – Interactive Query")
+    with gr.Blocks(title="系上資訊 LLM Baseline (Gradio)") as demo:
+        gr.Markdown("# 系上資訊 LLM Baseline – Interactive Query")
         chatbot = gr.Chatbot(label="對話紀錄", height=400)
         with gr.Row():
-            txt = gr.Textbox(label="�請�輸入問題", placeholder="�輸入您的問題後按 Enter", lines=1)
+            txt = gr.Textbox(label="請輸入問題", placeholder="輸入您的問題後按 Enter", lines=1)
             submit_btn = gr.Button("送出")
         # Bind events
         txt.submit(respond, [txt, chatbot], [txt, chatbot])
