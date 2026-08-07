@@ -45,16 +45,19 @@ class QAOrchestrator:
         docs = self._retriever.invoke(query)
         t2 = time.time()
         elapsed = t2 - t1
+        print(f"[DEBUG retrieve_only] query={query}, num_docs={len(docs)}")
         uniq: set[Tuple[str, str]] = set()
         ctx_lines: List[str] = []
         for d in docs:
             page = d.page_content.strip()
             ep = d.metadata.get("episode_name", "Unknown Episode")
             pod = d.metadata.get("Podcast_name", "Unknown Podcast")
+            print(f"[DEBUG retrieve_only] doc metadata: {d.metadata}")
             ctx_lines.append(f"內容：{page}\n來源：{ep}, {pod}")
             uniq.add((ep, pod))
         src = "\n可參考下方節目集數：\n" + "".join([f"Result {i}: {e}, {p}\n" for i, (e, p) in enumerate(uniq, 1)])
-        out = "\n--- 向量資料庫�檢索結果 ---\n" + "\n\n".join(ctx_lines[:5]) + "\n\n" + src
+        out = "\n--- 向量資料庫檢索結果 ---\n" + "\n\n".join(ctx_lines[:5]) + "\n\n" + src
+        print(f"[DEBUG retrieve_only] uniq={uniq}")
         return out, list(uniq), elapsed
 
     def ask(self, question: str, history: List[Tuple[str, str]]) -> Tuple[str, float]:
