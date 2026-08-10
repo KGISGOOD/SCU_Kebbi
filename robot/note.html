@@ -82,92 +82,133 @@
     <div class="section">
         <h2>腳本1: run_speed_test.py</h2>
         <span class="content">
-方法: baseline（Ollama）<br>
-說明:
-<div class="flowchart">
-讀取問題列表
-       ↓
-主迴圈 (每題):
-   1. 建立 Prompt (透過 RAG 檢索)
-   2. 呼叫 Ollama 模型產出答案
-   3. 記錄 latency
-   4. 輸出問題、答案、延遲
-       ↓
-彙總結果: 平均延遲
-</div>
-<div class="note">
-技術說明: 此腳本僅使用原始的 Ollama 模型作為基準測試。它會先把問題送入現有的 RAG 檢索系統，取出相關段落組成 Prompt（就像平時問 Ollama 時喂給模型的文字），然後直接將這個 Prompt 送給 Ollama 模型（不加速），記錄它產答案所需的時間。腳本最後會輸出每題的回答時間以及平均延遲，讓您了解在不使用任何加速技術的情況下，模型回答問題所需的時間。<br>
-白話說明: 簡單來說，我們先用知識庫找出相關資料，組成一段提示文字，然後直接傳給 Ollama 模型得到答案，並記錄所花時間。這給出一個基準（baseline），之後可以和其他加速技術（如 PLD 或快取）進行比較。
-</div>
-<hr><br><br>
+            方法: baseline（Ollama）<br>
+            說明:
+            <div class="flowchart">
+                讀取問題列表
+                ↓
+                主迴圈 (每題):
+                1. 建立 Prompt (透過 RAG 檢索)
+                2. 呼叫 Ollama 模型產出答案
+                3. 記錄 latency
+                4. 輸出問題、答案、延遲
+                ↓
+                彙總結果: 平均延遲
+            </div>
+            <div class="note">
+                技術說明: 此腳本僅使用原始的 Ollama 模型作為基準測試。它會先把問題送入現有的 RAG 檢索系統，取出相關段落組成 Prompt（就像平時問 Ollama 時喂給模型的文字），然後直接將這個
+                Prompt 送給 Ollama 模型（不加速），記錄它產答案所需的時間。腳本最後會輸出每題的回答時間以及平均延遲，讓您了解在不使用任何加速技術的情況下，模型回答問題所需的時間。<br>
+                白話說明: 簡單來說，我們先用知識庫找出相關資料，組成一段提示文字，然後直接傳給 Ollama 模型得到答案，並記錄所花時間。這給出一個基準（baseline），之後可以和其他加速技術（如 PLD
+                或快取）進行比較。
+            </div>
+            <hr><br><br>
         </span>
     </div>
 
     <div class="section">
         <h2>腳本2: test_smartcache.py</h2>
         <span class="content">
-方法: 語義森林快取操作（演算法 1）<br>
-說明:
-<div class="flowchart">
-讀取既有快取 (smartcache.index + smartcache.store)
-       ↓
-初始化設定、Embed 向量、檢索器、LLM
-       ↓
-讀取問題列表
-       ↓
-主迴圈 (每題):
-   1. 建立 Prompt
-   2. 向量化問題 + L2 正規化
-   3. FAISS 搜尋 (k=1)
-   4. 若相似度≥0.75 → HIT: 使用快取答案, latency≈0
-      否則 → MISS: 呼叫 LLM 產出答案, 記錄 latency, 將 (prompt,answer) 加入快取
-       ↓
-彙總結果: 命中率, 平均延遲
-       ↓
-持久化快取 (寫回)
-</div>
-<div class="note">
-技術說明: 此腳本實作了 SmartCache 的語義快取（簡化版：僅全域回退），將每個問題的 Prompt 向量化後，在 FAISS IndexFlatIP 中進行最近鄰搜尋（k=1），若相似度 ≥ 0.75 則判定為快取命中，直接使用先前儲存的答案；否則呼叫 Ollama LLM 產出答案，並將新產出的 (Prompt, Answer) 寫入快取。透過此機制，可測量快取命中率與平均延遲減少，驗證語義快取是否能在不影響答案正確性的前提下提升多輪對話推論效率。<br>
-白話說明: 簡單來說，我們把每個使用者的問題轉成向量，看看和以前問過的問題有多像。如果相似度夠高（超過 0.75），那就直接用以前的答案，不需要再跑一次大模型；如果不夠像，就真的跑一次 LLM 得到答案，並把這個新問題和答案存起來，以供下次類似的問題使用。執行時會把每題的問題、是否命中、花費時間以及完整答案印出來，這樣你可以直接看到快取是否真的在工作，以及答案內容。這樣就能省掉很多重複的模型運算，讓回答更快。
-</div>
-<hr><br><br>
+            方法: 語義森林快取操作（演算法 1）<br>
+            說明:
+            <div class="flowchart">
+                讀取既有快取 (smartcache.index + smartcache.store)
+                ↓
+                初始化設定、Embed 向量、檢索器、LLM
+                ↓
+                讀取問題列表
+                ↓
+                主迴圈 (每題):
+                1. 建立 Prompt
+                2. 向量化問題 + L2 正規化
+                3. FAISS 搜尋 (k=1)
+                4. 若相似度≥0.75 → HIT: 使用快取答案, latency≈0
+                否則 → MISS: 呼叫 LLM 產出答案, 記錄 latency, 將 (prompt,answer) 加入快取
+                ↓
+                彙總結果: 命中率, 平均延遲
+                ↓
+                持久化快取 (寫回)
+            </div>
+            <div class="note">
+                技術說明: 此腳本實作了 SmartCache 的語義快取（簡化版：僅全域回退），將每個問題的 Prompt 向量化後，在 FAISS IndexFlatIP 中進行最近鄰搜尋（k=1），若相似度 ≥
+                0.75 則判定為快取命中，直接使用先前儲存的答案；否則呼叫 Ollama LLM 產出答案，並將新產出的 (Prompt, Answer)
+                寫入快取。透過此機制，可測量快取命中率與平均延遲減少，驗證語義快取是否能在不影響答案正確性的前提下提升多輪對話推論效率。<br>
+                白話說明: 簡單來說，我們把每個使用者的問題轉成向量，看看和以前問過的問題有多像。如果相似度夠高（超過 0.75），那就直接用以前的答案，不需要再跑一次大模型；如果不夠像，就真的跑一次 LLM
+                得到答案，並把這個新問題和答案存起來，以供下次類似的問題使用。執行時會把每題的問題、是否命中、花費時間以及完整答案印出來，這樣你可以直接看到快取是否真的在工作，以及答案內容。這樣就能省掉很多重複的模型運算，讓回答更快。
+            </div>
+            <hr><br><br>
         </span>
     </div>
 
     <div class="section">
         <h2>腳本3: test_attention_topic.py</h2>
         <span class="content">
-方法: 演算法二：自注意力機制話題識別（前綴‑後綴比例）<br>
-說明:
-<div class="flowchart">
-讀取問題列表
-       ↓
-主迴圈 (每題):
-   1. 建立 Prompt (透過 RAG → MultiStoreRetriever)
-   2. 取得模型 self-attention (output_attentions=True) 並平均層/head
-   3. Tokenize 問題，取得其在 Prompt 中的 token 範圍 [q_start, q_end)
-   4. 計算問題 token 對 Prompt 部分（系統說明+檢索段落）的平均注意力
-        attn_q_to_prompt = mean(attn_avg[q_start:q_end, :prompt_len])
-   5. 計算問題 token 對自己的平均注意力（對角線）
-        attn_q_to_self = mean(attn_avg[q_start:q_end, q_start:q_end])
-   6. ratio = attn_q_to_prompt / (attn_q_to_prompt + attn_q_to_self)
-   7. 若 ratio < 0.40 → 標記為話題切換
-      否則 若前一 ratio 差異 > 0.12 → 標記為話題切換
-   8. 輸出題目、ratio、topic_shift                                                                                     ↓
-彙總結果: 話題切換比率
-</div>
-<div class="note">
-技術說明: 此腳本實作演算法二的改進版——使用「問題對 Prompt 的注意力比例」來偵測話題切換。在 LLM prefill 階段啟用 output_attentions=True，取得 self‑attention 矩陣並平均層/head。透過 tokenizer 對齊，取得問題 token 在完整 Prompt 中的索引範圍，計算：<br>
- • 問題對 Prompt 部分的平均注意力（代表模型仍關注先前上下文）<br>
- • 問題對自身的平均注意力（對角線）<br>
-比例越低表示問題較少關注先前上下文，可能表示話題已改變。當比例低於經驗門檻 (0.40) 或與前一題的比例變化超過 0.12 時，判定為話題切換。每輪輸出題目、ratio 以及 topic_shift 標記，最後統計切換比率。<br>
-※ 實際使用時請將 DummyRetriever 換成專案的 MultiStoreRetriever，並使用真實的 BGE‑M3 embedding（雖然此腳本目前不直接使用 embedding，但未來整合時可加入）。<br>
-白話說明: 就像老師在聽學生提問時，會觀察學生的注意力是否仍停在先前的筆記上。如果學生的目光（注意力）大多落在當前問題本身，而很少回顧之前的內容，則代表他可能已切換話題。此時老師會清空先前的筆記，重新開始記錄新問題；反之則繼續在同一頁上筆記。如此可避免用錯的舊資料回答新問題，同時在話題連續時利用注意力資訊提前偵測話題轉變。
-</div>
-<hr><br><br>
+            方法: 演算法二：自注意力機制話題識別（前綴‑後綴比例）<br>
+            說明:
+            <div class="flowchart">
+                讀取問題列表
+                ↓
+                主迴圈 (每題):
+                1. 建立 Prompt (透過 RAG → MultiStoreRetriever)
+                2. 取得模型 self-attention (output_attentions=True) 並平均層/head
+                3. Tokenize 問題，取得其在 Prompt 中的 token 範圍 [q_start, q_end)
+                4. 計算問題 token 對 Prompt 部分（系統說明+檢索段落）的平均注意力
+                attn_q_to_prompt = mean(attn_avg[q_start:q_end, :prompt_len])
+                5. 計算問題 token 對自己的平均注意力（對角線）
+                attn_q_to_self = mean(attn_avg[q_start:q_end, q_start:q_end])
+                6. ratio = attn_q_to_prompt / (attn_q_to_prompt + attn_q_to_self)
+                7. 若 ratio < 0.40 → 標記為話題切換 否則 若前一 ratio 差異> 0.12 → 標記為話題切換
+                    8. 輸出題目、ratio、topic_shift ↓
+                    彙總結果: 話題切換比率
+            </div>
+            <div class="note">
+                技術說明: 此腳本實作演算法二的改進版——使用「問題對 Prompt 的注意力比例」來偵測話題切換。在 LLM prefill 階段啟用 output_attentions=True，取得
+                self‑attention 矩陣並平均層/head。透過 tokenizer 對齊，取得問題 token 在完整 Prompt 中的索引範圍，計算：<br>
+                 • 問題對 Prompt 部分的平均注意力（代表模型仍關注先前上下文）<br>
+                 • 問題對自身的平均注意力（對角線）<br>
+                比例越低表示問題較少關注先前上下文，可能表示話題已改變。當比例低於經驗門檻 (0.40) 或與前一題的比例變化超過 0.12 時，判定為話題切換。每輪輸出題目、ratio 以及 topic_shift
+                標記，最後統計切換比率。<br>
+                ※ 實際使用時請將 DummyRetriever 換成專案的 MultiStoreRetriever，並使用真實的 BGE‑M3 embedding（雖然此腳本目前不直接使用
+                embedding，但未來整合時可加入）。<br>
+                白話說明:
+                就像老師在聽學生提問時，會觀察學生的注意力是否仍停在先前的筆記上。如果學生的目光（注意力）大多落在當前問題本身，而很少回顧之前的內容，則代表他可能已切換話題。此時老師會清空先前的筆記，重新開始記錄新問題；反之則繼續在同一頁上筆記。如此可避免用錯的舊資料回答新問題，同時在話題連續時利用注意力資訊提前偵測話題轉變。
+            </div>
+            <hr><br><br>
         </span>
     </div>
-
+    <div class="section">
+        <h2>腳本4: baseline_gradio.py</h2>
+        <span class="content">
+            方法: 基於 Gradio 的互動式 QA 介面<br>
+            說明:
+            <div class="flowchart">
+                使用者輸入問題
+                ↓
+                Gradio 介面 (baseline_gradio.py)
+                ↓
+                respond() 回調函數
+                ↓
+                轉換聊天歷史格式
+                ↓
+                呼叫 ChatService.handle()
+                ↓
+                相關性檢查 (RelevancePolicy)
+                ↓
+                若不相關 → 清除對話記憶
+                ↓
+                若相關 → 執行檢索與回答生成
+                ↓
+                返回答案至 Gradio 介面
+                ↓
+                更新對話紀錄
+            </div>
+            <div class="note">
+                技術說明: 此腳本提供基於 Gradio 的互動式網頁介面，用於系上資訊問答系統。它提供即時聊天互動，主要流程包括：使用者輸入 → Gradio 介面 → respond() 回調函數 → 轉換聊天歷史格式
+                → 呼叫 ChatService → 相關性檢查 → (若不相關清除記憶) → 執行檢索與回答生成 → 返回答案 → 更新對話紀錄。介面包含聊天紀錄顯示、輸入框與送出按鈕，支援 Enter
+                鍵與按鈕雙重觸發方式。
+            </div>
+            <hr><br><br>
+        </span>
+    </div>
     <hr>
     <p><small>備註：此紀錄僅供個人參考，隨時可依實驗結果補充或修正。</small></p>
 </body>
