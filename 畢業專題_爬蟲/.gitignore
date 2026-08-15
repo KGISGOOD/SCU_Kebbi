@@ -1,0 +1,26 @@
+# 環境變數與金鑰檔案 (最重要：防止 API Key 外洩)
+.env
+.env.*
+*.env
+
+# Python 虛擬環境
+venv/
+.venv/
+env/
+ENV/
+
+# Python 快取與暫存檔
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 本地 FAISS 向量資料庫儲存區 (避免大檔案同步)
+faiss_db_store/
+
+# 系統暫存檔案
+.DS_Store
+Thumbs.db
+
+# VS Code 設定
+.vscode/
