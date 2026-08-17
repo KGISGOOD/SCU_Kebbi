@@ -1,12 +1,13 @@
 # ==============================================================================
 # 📦 Windows 環境安裝套件指令 (請在命令提示字元 CMD 或 PowerShell 執行)：
-# pip install torch pandas numpy tqdm pydantic faiss-cpu sentence-transformers langchain langchain-core langchain-community langchain-huggingface langchain-text-splitters langchain-groq
+# pip install torch pandas numpy tqdm pydantic faiss-cpu sentence-transformers langchain-core langchain-community langchain-huggingface langchain-text-splitters langchain-groq
 # ==============================================================================
 
 import os
 import sys
 import time
 import random
+import pickle
 import warnings
 import pandas as pd
 import numpy as np
@@ -28,17 +29,18 @@ if sys.platform == "win32":
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
 
-# LangChain 模組
+# LangChain 模組 (全面使用 langchain_core，完全不依賴 langchain.chains)
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_core.retrievers import BaseRetriever
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_groq import ChatGroq
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 
 # ==========================================
@@ -175,8 +177,43 @@ def split_documents(documents: list[Document]) -> list[Document]:
 
 
 # ==========================================
-# 2. FAISS 向量庫動態索引建構模組
+# 2. FAISS 向量庫動態索引建構模組 (相容 Windows 中文路徑)
 # ==========================================
+
+def safe_save_faiss(vectorstore: FAISS, folder_path: str):
+    """自訂安全儲存 FAISS 向量庫（避開 Windows C++ fopen 無法解析中文路徑之問題）"""
+    os.makedirs(folder_path, exist_ok=True)
+    index_file = os.path.join(folder_path, "index.faiss")
+    pkl_file = os.path.join(folder_path, "index.pkl")
+
+    chunk = faiss.serialize_index(vectorstore.index)
+    with open(index_file, "wb") as f:
+        f.write(chunk.tobytes())
+
+    with open(pkl_file, "wb") as f:
+        pickle.dump((vectorstore.docstore, vectorstore.index_to_docstore_id), f)
+
+
+def safe_load_faiss(folder_path: str, embeddings_model: HuggingFaceEmbeddings) -> FAISS:
+    """自訂安全載入 FAISS 向量庫（避開 Windows C++ fopen 無法解析中文路徑之問題）"""
+    index_file = os.path.join(folder_path, "index.faiss")
+    pkl_file = os.path.join(folder_path, "index.pkl")
+
+    with open(index_file, "rb") as f:
+        index_data = f.read()
+    chunk = np.frombuffer(index_data, dtype=np.uint8)
+    index = faiss.deserialize_index(chunk)
+
+    with open(pkl_file, "rb") as f:
+        docstore, index_to_docstore_id = pickle.load(f)
+
+    return FAISS(
+        embedding_function=embeddings_model,
+        index=index,
+        docstore=docstore,
+        index_to_docstore_id=index_to_docstore_id
+    )
+
 
 def create_embeddings(use_cpu: bool = False) -> HuggingFaceEmbeddings:
     """建立 Embeddings 模型（Windows 支援 NVIDIA CUDA GPU 與 CPU）"""
@@ -269,7 +306,7 @@ class MultiVectorstoreRetriever(BaseRetriever, BaseModel):
 
 
 # ==========================================
-# 4. RAG QA Chain 系統建置 (資科系學長 Prompt)
+# 4. RAG QA Chain 系統建置 (LCEL 架構)
 # ==========================================
 
 def load_all_vectorstores(parent_directory: str, embeddings_model: HuggingFaceEmbeddings) -> list[FAISS]:
@@ -278,7 +315,7 @@ def load_all_vectorstores(parent_directory: str, embeddings_model: HuggingFaceEm
     for root, dirs, files in os.walk(parent_directory):
         if "index.faiss" in files and ("index.pkl" in files or "index.pki" in files):
             try:
-                vs = FAISS.load_local(root, embeddings_model, allow_dangerous_deserialization=True)
+                vs = safe_load_faiss(root, embeddings_model)
                 vectorstores.append(vs)
                 print(f"✅ 成功載入向量庫: {root}")
             except Exception as e:
@@ -289,8 +326,13 @@ def load_all_vectorstores(parent_directory: str, embeddings_model: HuggingFaceEm
 load_dotenv()
 
 
+def format_docs(docs: list[Document]) -> str:
+    """將檢索到的 Document 轉為純文字 Context"""
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
 def setup_qa_chain(vectorstores: list[FAISS]):
-    """設定 Conversational RAG QA Chain (從 .env 讀取 API Key)"""
+    """設定基於 LCEL 的 Conversational RAG QA Chain"""
     retriever = MultiVectorstoreRetriever(vectorstores=vectorstores, top_k=5)
 
     # 從環境變數讀取金鑰清單
@@ -309,18 +351,23 @@ def setup_qa_chain(vectorstores: list[FAISS]):
         temperature=1.0
     )
 
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    # 1. 歷史對話改寫檢索 Query 的 Prompt
+    contextualize_q_system_prompt = (
+        "請根據對話歷史與使用者的最新問題，將其改寫為一個不依賴上下文、獨立完整的檢索問題。"
+        "不要回答問題，只需改寫，若不需要改寫則原樣返回。"
+    )
+    contextualize_q_prompt = ChatPromptTemplate.from_messages([
+        ("system", contextualize_q_system_prompt),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ])
+    history_query_chain = contextualize_q_prompt | llm | StrOutputParser()
 
-    prompt_template = """你現在是「東吳大學資料科學系（資科系）」熱心、專業且親切的「學長」。請根據下方檢索到的參考資料與對話歷史，以學長的口吻回答學弟妹（使用者）的問題。
-
-對話歷史：
-{chat_history}
+    # 2. 學長角色問答 Prompt
+    system_prompt = """你現在是「東吳大學資料科學系（資科系）」熱心、專業且親切的「學長」。請根據下方檢索到的參考資料與對話歷史，以學長的口吻回答學弟妹（使用者）的問題。
 
 參考資料：
 {context}
-
-使用者問題：
-{question}
 
 回答指南：
 1. **依據資料回答**：優先且嚴格根據「參考資料」內容來回答。如果資料庫裡沒有足夠的資訊，請親切且誠實地告知：「拍謝，學長手邊的資料庫裡目前沒有足夠的資訊可以回答這個問題喔！」
@@ -328,20 +375,32 @@ def setup_qa_chain(vectorstores: list[FAISS]):
 3. **校系比較立場**：當學弟妹詢問東吳資科與其他校系比較時，請充分展現東吳資科的特色與優勢（如扎實課程、實務資源與系友網絡），表達對系上的肯定；但請保持學長客觀分享的態度，切勿出現「建議你選哪間」或「哪間比較好」等硬性下結論的說辭。
 4. **回答方式**:用聊天口語敘述的方式呈現，字數不超過100字且不要是條列式呈現！！！
 
-請以學長的身份開始回答，並且開頭不用自我介紹，直接針對問題用敘述方式回答：
-"""
-    prompt = ChatPromptTemplate.from_template(prompt_template)
+請以學長的身份開始回答，並且開頭不用自我介紹，直接針對問題用敘述方式回答："""
 
-    qa_chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriever,
-        memory=memory,
-        combine_docs_chain_kwargs={
-            "prompt": prompt,
-            "document_variable_name": "context"
-        }
+    qa_prompt = ChatPromptTemplate.from_messages([
+        ("system", system_prompt),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ])
+
+    # 動態判斷是否需要經過歷史改寫並執行檢索
+    def retrieve_context(input_data: dict) -> str:
+        if input_data.get("chat_history"):
+            query = history_query_chain.invoke(input_data)
+        else:
+            query = input_data["input"]
+        docs = retriever.invoke(query)
+        return format_docs(docs)
+
+    # 組合 LCEL Pipeline
+    rag_chain = (
+        RunnablePassthrough.assign(context=RunnableLambda(retrieve_context))
+        | qa_prompt
+        | llm
+        | StrOutputParser()
     )
-    return qa_chain, retriever
+
+    return rag_chain, retriever
 
 
 # ==========================================
@@ -357,16 +416,19 @@ def main_build_and_launch():
     # 1. 建立 Embedding 模型
     embeddings_model = create_embeddings(use_cpu=False)
 
-    # 2. 檢查向量庫是否存在，不存在則掃描當前目錄（包含 dcard、txt、訪談 等）
-    if not os.path.exists(DB_SAVE_DIR):
-        print("\n🔨 向量庫不存在，開始掃描本機目錄下的檔案...")
+    # 2. 檢查向量庫檔案是否完整存在，若任一檔案遺失則重新掃描建庫
+    index_file = os.path.join(DB_SAVE_DIR, "index.faiss")
+    pkl_file = os.path.join(DB_SAVE_DIR, "index.pkl")
+
+    if not (os.path.exists(index_file) and os.path.exists(pkl_file)):
+        print("\n🔨 向量庫索引檔案不存在或不完整，開始掃描本機目錄下的檔案...")
 
         raw_documents = load_documents_from_directory(DATA_DIR)
 
         if raw_documents:
             chunks = split_documents(raw_documents)
             vectorstore = build_adaptive_faiss_vectorstore(chunks, embeddings_model)
-            vectorstore.save_local(DB_SAVE_DIR)
+            safe_save_faiss(vectorstore, DB_SAVE_DIR)
             print(f"💾 向量庫已成功儲存至: {DB_SAVE_DIR}")
         else:
             print("\n⚠️ 未在目錄中找到任何 `.txt` 或 `.csv` 檔案！")
@@ -389,6 +451,8 @@ def main_build_and_launch():
     print("💡 提示：輸入 'exit'、'quit' 或 'q' 即可結束對話。")
     print("=" * 50 + "\n")
 
+    chat_history = []
+
     while True:
         try:
             user_input = input("學弟妹：").strip()
@@ -402,9 +466,15 @@ def main_build_and_launch():
 
             start_time = time.perf_counter()
 
-            # 使用標準 invoke 避免 DeprecationWarning
-            response = qa_chain.invoke({"question": user_input})
-            answer = response.get('answer', '')
+            # LCEL invoke 直接輸出模型回應字串
+            answer = qa_chain.invoke({
+                "input": user_input,
+                "chat_history": chat_history
+            })
+
+            # 更新對話紀錄
+            chat_history.append(HumanMessage(content=user_input))
+            chat_history.append(AIMessage(content=answer))
 
             elapsed_time = time.perf_counter() - start_time
 
