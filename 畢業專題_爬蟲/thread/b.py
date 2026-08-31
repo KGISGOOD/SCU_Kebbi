@@ -21,8 +21,8 @@ WAIT_SECONDS = 5
 
 OUTPUT_TXT = "東吳資料科學系_threads_texts.txt"
 OUTPUT_CSV = "東吳資料科學系_threads_texts.csv"
-OUTPUT_HTML = "東吳資料科學系_threads_raw.html"
-OUTPUT_JSON_TEXTS = "東吳資料科學系_threads_extracted_texts_debug.json"
+# OUTPUT_HTML = "東吳資料科學系_threads_raw.html"
+# OUTPUT_JSON_TEXTS = "東吳資料科學系_threads_extracted_texts_debug.json"
 
 # 你的搜尋關鍵字，可自行增加
 KEYWORDS = [
