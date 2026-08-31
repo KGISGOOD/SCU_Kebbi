@@ -12,11 +12,11 @@ import html as ihtml
 # 基本設定
 # ============================================================
 
-THREADS_URL = "https://www.threads.com/search?q=%E6%9D%B1%E5%90%B3%E8%B3%87%E6%96%99%E7%A7%91%E5%AD%B8%E7%B3%BB&serp_type=default&hl=zh-tw"
+THREADS_URL = "https://www.threads.com/@scu_data_science?hl=zh-tw"
 
 STATE_FILE = "threads_state.json"
 
-SCROLL_TIMES = 100
+SCROLL_TIMES = 30
 WAIT_SECONDS = 5
 
 OUTPUT_TXT = "東吳資料科學系_threads_texts.txt"
