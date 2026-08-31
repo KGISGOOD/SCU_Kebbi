@@ -1,9 +1,0 @@
-/* Custom Site Logo Front Page CSS */
-
-#csl-customsite-logo{
-	cursor: pointer;
-}
-#csl-logo-block-link{
-	box-shadow: none !important;
-    display: inline-block;
-}
