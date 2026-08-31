@@ -749,7 +749,7 @@ if __name__ == "__main__":
     print(f"\n共抽取到 {len(results)} 筆可能的 Threads 貼文內文\n")
 
     for i, item in enumerate(results, 1):
-        print(f"{i}. [{item['source']}]")
+        # print(f"{i}. [{item['source']}]")
         print(item["text"])
         print("-" * 80)
 
@@ -761,7 +761,7 @@ if __name__ == "__main__":
     # 輸出 CSV
     df = pd.DataFrame({
         "id": range(1, len(results) + 1),
-        "source": [item["source"] for item in results],
+        # "source": [item["source"] for item in results],
         "text": [item["text"] for item in results],
     })
 
