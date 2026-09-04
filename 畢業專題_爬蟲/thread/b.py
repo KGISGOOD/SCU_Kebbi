@@ -93,6 +93,9 @@ def is_probably_ui_text(text):
 
     if not one:
         return True
+    # 排除 IG / Threads 自動生成的圖片描述文字
+    if re.match(r"^Photo by[\s\xa0]", one, flags=re.IGNORECASE):
+        return True
 
     blacklist_exact = {
         "Threads",

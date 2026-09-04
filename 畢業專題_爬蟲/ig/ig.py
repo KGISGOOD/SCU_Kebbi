@@ -297,16 +297,16 @@ if __name__ == "__main__":
         exit()
 
     # 1. 儲存 TXT 檔
-    with open(OUTPUT_TXT, "w", encoding="utf-8") as f:
-        for idx, post in enumerate(posts, 1):
-            f.write(f"【第 {idx} 篇】\n")
-            if post["url"]:
-                f.write(f"貼文網址：{post['url']}\n")
-            if post["date"]:
-                f.write(f"發布時間：{post['date']}\n")
-            f.write("內文：\n")
-            f.write(post["text"])
-            f.write("\n" + "=" * 60 + "\n\n")
+    # with open(OUTPUT_TXT, "w", encoding="utf-8") as f:
+    #     for idx, post in enumerate(posts, 1):
+    #         f.write(f"【第 {idx} 篇】\n")
+    #         if post["url"]:
+    #             f.write(f"貼文網址：{post['url']}\n")
+    #         if post["date"]:
+    #             f.write(f"發布時間：{post['date']}\n")
+    #         f.write("內文：\n")
+    #         f.write(post["text"])
+    #         f.write("\n" + "=" * 60 + "\n\n")
 
     # 2. 儲存 CSV 檔
     df = pd.DataFrame({
@@ -317,7 +317,7 @@ if __name__ == "__main__":
     })
     df.to_csv(OUTPUT_CSV, index=False, encoding="utf-8-sig")
 
-    print(f"[+] TXT 檔案已儲存：{os.path.abspath(OUTPUT_TXT)}")
+    # print(f"[+] TXT 檔案已儲存：{os.path.abspath(OUTPUT_TXT)}")
     print(f"[+] CSV 檔案已儲存：{os.path.abspath(OUTPUT_CSV)}")
 
     # 預覽前 2 筆抓取結果
