@@ -24,5 +24,7 @@ Thumbs.db
 
 # VS Code 設定
 .vscode/
+.json
+.JSONXS
 
 東吳資科_IG圖片
