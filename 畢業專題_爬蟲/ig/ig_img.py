@@ -422,15 +422,11 @@ if __name__ == "__main__":
         for post in posts:
             post["local_files"] = []
 
-    # 儲存 CSV 檔
+    # 儲存 CSV 檔（僅保留 id, publish_date, caption）
     df = pd.DataFrame({
         "id": range(1, len(posts) + 1),
-        "post_url": [p["url"] for p in posts],
         "publish_date": [p["date"] for p in posts],
-        "image_count": [len(p.get("image_urls", [])) for p in posts],
-        "caption": [p["text"] for p in posts],
-        "image_urls": ["\n".join(p.get("image_urls", [])) for p in posts],
-        "local_images": ["\n".join(p.get("local_files", [])) for p in posts]
+        "caption": [p["text"] for p in posts]
     })
     df.to_csv(OUTPUT_CSV, index=False, encoding="utf-8-sig")
 
