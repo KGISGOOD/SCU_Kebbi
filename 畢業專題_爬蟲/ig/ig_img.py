@@ -4,6 +4,7 @@ import json
 import time
 import html as ihtml
 from datetime import datetime
+import urllib.request
 import pandas as pd
 from playwright.sync_api import sync_playwright
 
@@ -17,13 +18,17 @@ STATE_FILE = "instagram_state.json"
 SCROLL_TIMES = 25
 WAIT_SECONDS = 3.5
 
+# 圖片儲存設定
+DOWNLOAD_IMAGES = True            # 是否自動下載圖片檔案至本地
+IMAGE_DIR = "東吳資科_IG圖片"      # 圖片儲存資料夾名稱
+
 # 輸出檔案名稱
 OUTPUT_CSV = "東吳資科_IG貼文.csv"
 OUTPUT_TXT = "東吳資科_IG貼文.txt"
 
 
 # ============================================================
-# 文字清理工具
+# 工具函式：文字清理與圖片下載
 # ============================================================
 def clean_post_text(text):
     """
@@ -37,7 +42,6 @@ def clean_post_text(text):
     text = text.replace("\u2028", "\n").replace("\u2029", "\n")
 
     lines = [line.strip() for line in text.splitlines()]
-    # 去除連續超過兩行的空白行
     cleaned_lines = []
     blank_count = 0
     for line in lines:
@@ -52,13 +56,78 @@ def clean_post_text(text):
     return "\n".join(cleaned_lines).strip()
 
 
+def download_image(url, save_path):
+    """
+    下載單張圖片並儲存至指定路徑。
+    """
+    try:
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+            "Referer": "https://www.instagram.com/"
+        }
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as response:
+            with open(save_path, "wb") as f:
+                f.write(response.read())
+        return True
+    except Exception:
+        return False
+
+
+def extract_images_from_node(node):
+    """
+    從貼文節點中抽取圖片網址（支援多圖輪播與單圖）。
+    """
+    images = []
+
+    # 1. 處理輪播貼文 (GraphQL: edge_sidecar_to_children)
+    if "edge_sidecar_to_children" in node and isinstance(node["edge_sidecar_to_children"], dict):
+        edges = node["edge_sidecar_to_children"].get("edges", [])
+        for edge in edges:
+            c_node = edge.get("node", {})
+            d_url = c_node.get("display_url")
+            if d_url:
+                images.append(d_url)
+
+    # 2. 處理輪播貼文 (Mobile / Feed API: carousel_media)
+    elif "carousel_media" in node and isinstance(node["carousel_media"], list):
+        for item in node["carousel_media"]:
+            candidates = item.get("image_versions2", {}).get("candidates", [])
+            if candidates and isinstance(candidates, list):
+                images.append(candidates[0].get("url"))
+            elif item.get("display_url"):
+                images.append(item.get("display_url"))
+
+    # 3. 單圖貼文（或非輪播的頂層預覽圖）
+    if not images:
+        if "image_versions2" in node and isinstance(node["image_versions2"], dict):
+            candidates = node["image_versions2"].get("candidates", [])
+            if candidates and isinstance(candidates, list):
+                images.append(candidates[0].get("url"))
+        elif node.get("display_url"):
+            images.append(node.get("display_url"))
+
+    # 去除重複網址並保留原順序
+    seen = set()
+    cleaned_images = []
+    for img in images:
+        if img and img not in seen:
+            seen.add(img)
+            cleaned_images.append(img)
+
+    return cleaned_images
+
+
 # ============================================================
-# 從 Instagram API / GraphQL JSON 遞迴提取貼文內文
+# 從 Instagram API / GraphQL JSON 遞迴提取貼文內文與圖片
 # ============================================================
 def extract_posts_from_json(obj):
     """
-    遞迴走訪 Instagram 前端 API 回傳的 JSON，
-    精準抽取 shortcode、內文 (caption)、時間 (timestamp)。
+    遞迴走訪 Instagram 前端 API 回傳的 JSON，抽取 shortcode、內文、時間與圖片。
     """
     posts = []
 
@@ -82,8 +151,10 @@ def extract_posts_from_json(obj):
                 elif isinstance(cap, str):
                     caption_text = cap
 
-            if caption_text and isinstance(caption_text, str) and len(caption_text.strip()) > 0:
-                raw_time = node.get("taken_at_timestamp") or node.get("taken_at")
+            # 檢查是否為貼文節點（具有 shortcode/code 且具有內文或時間戳記）
+            has_timestamp = node.get("taken_at_timestamp") or node.get("taken_at")
+            if shortcode and (caption_text is not None or has_timestamp):
+                raw_time = has_timestamp
                 date_str = ""
                 if raw_time:
                     try:
@@ -91,13 +162,17 @@ def extract_posts_from_json(obj):
                     except Exception:
                         date_str = ""
 
-                cleaned = clean_post_text(caption_text)
-                if cleaned:
+                cleaned_caption = clean_post_text(caption_text) if caption_text else ""
+                image_urls = extract_images_from_node(node)
+
+                # 只要有內文或圖片即視為有效資料
+                if cleaned_caption or image_urls:
                     posts.append({
-                        "shortcode": shortcode or "",
-                        "url": f"https://www.instagram.com/p/{shortcode}/" if shortcode else "",
+                        "shortcode": shortcode,
+                        "url": f"https://www.instagram.com/p/{shortcode}/",
                         "date": date_str,
-                        "text": cleaned
+                        "text": cleaned_caption,
+                        "image_urls": image_urls
                     })
 
             for val in node.values():
@@ -116,7 +191,7 @@ def extract_posts_from_json(obj):
 # ============================================================
 def ensure_login_state():
     """
-    若本地無 instagram_state.json，自動打開瀏覽器讓使用者手動登入一次並保存 Cookie。
+    若本地無 instagram_state.json，自動打開瀏覽器讓使用者手動登入一次並保存狀態。
     """
     if os.path.exists(STATE_FILE):
         print(f"[*] 找到既有登入狀態檔：{STATE_FILE}")
@@ -157,7 +232,7 @@ def crawl_instagram_profile():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=False,  # 設為 False 便於觀察與通過基礎反爬
+            headless=False,
             args=[
                 "--disable-blink-features=AutomationControlled",
                 "--disable-infobars"
@@ -178,12 +253,11 @@ def crawl_instagram_profile():
 
         page = context.new_page()
 
-        # 監聽 Network Response 攔截 GraphQL / Feed API
+        # 攔截 Network Response
         def handle_response(response):
             url = response.url.lower()
             content_type = response.headers.get("content-type", "").lower()
 
-            # 辨識 IG 貼文載入的 API 標徵
             if any(k in url for k in ["graphql", "query", "feed", "user"]):
                 if "json" in content_type or "javascript" in content_type:
                     try:
@@ -200,7 +274,7 @@ def crawl_instagram_profile():
         page.goto(TARGET_URL, wait_until="domcontentloaded", timeout=60000)
         page.wait_for_timeout(5000)
 
-        # 處理常見彈窗（例如：開啟通知、儲存資訊）
+        # 關閉彈窗
         dismiss_buttons = ["稍後再說", "Not Now", "取消", "Cancel"]
         for btn_text in dismiss_buttons:
             try:
@@ -211,7 +285,7 @@ def crawl_instagram_profile():
             except Exception:
                 pass
 
-        # 檢測是否有登入牆中斷
+        # 檢測登入狀態
         if "accounts/login" in page.url:
             print("\n[!] 登入狀態已過期，請重新登入...")
             input("登入完成後按 Enter 繼續...")
@@ -223,7 +297,7 @@ def crawl_instagram_profile():
             page.wait_for_timeout(int(WAIT_SECONDS * 1000))
             print(f"    - 完成第 {i + 1}/{SCROLL_TIMES} 次滾動，目前已累積捕捉 {len(captured_posts)} 筆資料片段")
 
-        # 備援機制：如果網路封包沒有捕捉到足夠貼文，走訪頁面上的貼文彈窗（Modal）
+        # 備援機制：點擊 DOM 燈箱走訪
         if len(captured_posts) < 5:
             print("[*] 啟動 DOM 點擊遍歷備援機制...")
             post_links = page.locator('a[href^="/p/"], a[href^="/reel/"]')
@@ -235,20 +309,35 @@ def crawl_instagram_profile():
 
                 for _ in range(min(count, 30)):
                     try:
-                        # IG 燈箱中的貼文內文通常置於 h1 內
-                        caption_el = page.locator('div[role="dialog"] h1')
-                        if caption_el.count() > 0:
-                            raw_text = caption_el.first.inner_text()
-                            text_clean = clean_post_text(raw_text)
-                            current_url = page.url
-                            captured_posts.append({
-                                "shortcode": current_url.strip("/").split("/")[-1],
-                                "url": current_url,
-                                "date": "",
-                                "text": text_clean
-                            })
+                        current_url = page.url
+                        current_shortcode = current_url.strip("/").split("/")[-1]
 
-                        # 點擊「下一篇」箭頭按鈕
+                        caption_el = page.locator('div[role="dialog"] h1')
+                        raw_text = caption_el.first.inner_text() if caption_el.count() > 0 else ""
+                        text_clean = clean_post_text(raw_text)
+
+                        # 抽取燈箱中的圖片網址（排除大頭貼）
+                        dialog_imgs = page.locator('div[role="dialog"] article img')
+                        if dialog_imgs.count() == 0:
+                            dialog_imgs = page.locator('div[role="dialog"] img')
+
+                        dom_img_urls = []
+                        for img_idx in range(dialog_imgs.count()):
+                            src = dialog_imgs.nth(img_idx).get_attribute("src")
+                            alt = dialog_imgs.nth(img_idx).get_attribute("alt") or ""
+                            if src and "profile" not in alt.lower() and "個人檔案" not in alt:
+                                if src not in dom_img_urls:
+                                    dom_img_urls.append(src)
+
+                        captured_posts.append({
+                            "shortcode": current_shortcode,
+                            "url": current_url,
+                            "date": "",
+                            "text": text_clean,
+                            "image_urls": dom_img_urls
+                        })
+
+                        # 下一篇
                         next_btn = page.locator('div[role="dialog"] button:has(svg[aria-label="下一步"]), div[role="dialog"] button:has(svg[aria-label="Next"])')
                         if next_btn.count() > 0:
                             next_btn.first.click()
@@ -261,24 +350,30 @@ def crawl_instagram_profile():
         browser.close()
 
     # ============================================================
-    # 資料去重整理
+    # 資料去重與圖片清單合併
     # ============================================================
     print("\n[*] 正在清洗與去除重複貼文...")
+    posts_by_code = {}
     unique_posts = []
-    seen_texts = set()
 
     for item in captured_posts:
-        text = item["text"]
-        if not text or len(text) < 10:
+        code = item.get("shortcode")
+        if not code:
             continue
 
-        # 建立去重特徵（忽略空白後的前 50 個字）
-        sim_key = re.sub(r"\s+", "", text)[:50]
-        if sim_key in seen_texts:
-            continue
+        if code not in posts_by_code:
+            posts_by_code[code] = item
+            unique_posts.append(item)
+        else:
+            # 合併可能在不同封包中抽到的更多圖片網址
+            existing_imgs = posts_by_code[code].get("image_urls", [])
+            for u in item.get("image_urls", []):
+                if u not in existing_imgs:
+                    existing_imgs.append(u)
+            posts_by_code[code]["image_urls"] = existing_imgs
 
-        seen_texts.add(sim_key)
-        unique_posts.append(item)
+            if not posts_by_code[code].get("text") and item.get("text"):
+                posts_by_code[code]["text"] = item.get("text")
 
     return unique_posts
 
@@ -290,41 +385,67 @@ if __name__ == "__main__":
     ensure_login_state()
     posts = crawl_instagram_profile()
 
-    print(f"\n[+] 爬取完成！成功抽取 {len(posts)} 篇不重複貼文內文\n")
+    print(f"\n[+] 爬取完成！成功抽取 {len(posts)} 篇不重複貼文\n")
 
     if not posts:
         print("[!] 未抓取到貼文，請確認帳號登入狀態是否正常。")
         exit()
 
-    # 1. 儲存 TXT 檔
-    # with open(OUTPUT_TXT, "w", encoding="utf-8") as f:
-    #     for idx, post in enumerate(posts, 1):
-    #         f.write(f"【第 {idx} 篇】\n")
-    #         if post["url"]:
-    #             f.write(f"貼文網址：{post['url']}\n")
-    #         if post["date"]:
-    #             f.write(f"發布時間：{post['date']}\n")
-    #         f.write("內文：\n")
-    #         f.write(post["text"])
-    #         f.write("\n" + "=" * 60 + "\n\n")
+    # 下載圖片至本地
+    if DOWNLOAD_IMAGES:
+        print(f"[*] 開始下載貼文圖片至資料夾：{IMAGE_DIR} ...")
+        os.makedirs(IMAGE_DIR, exist_ok=True)
+        total_images = sum(len(p.get("image_urls", [])) for p in posts)
+        downloaded_count = 0
 
-    # 2. 儲存 CSV 檔
+        for post_idx, post in enumerate(posts, 1):
+            local_files = []
+            code = post["shortcode"] or f"post_{post_idx}"
+            img_list = post.get("image_urls", [])
+
+            for img_idx, img_url in enumerate(img_list, 1):
+                filename = f"{post_idx:03d}_{code}_{img_idx}.jpg"
+                filepath = os.path.join(IMAGE_DIR, filename)
+
+                if download_image(img_url, filepath):
+                    local_files.append(filepath)
+                    downloaded_count += 1
+
+                time.sleep(0.15)  # 避免過度頻繁請求觸發防爬
+
+            post["local_files"] = local_files
+            if img_list:
+                print(f"    - 第 {post_idx}/{len(posts)} 篇 ({code})：完成 {len(local_files)}/{len(img_list)} 張圖片下載")
+
+        print(f"[+] 圖片下載完成！共成功下載 {downloaded_count}/{total_images} 張圖片。\n")
+    else:
+        for post in posts:
+            post["local_files"] = []
+
+    # 儲存 CSV 檔
     df = pd.DataFrame({
         "id": range(1, len(posts) + 1),
         "post_url": [p["url"] for p in posts],
         "publish_date": [p["date"] for p in posts],
-        "caption": [p["text"] for p in posts]
+        "image_count": [len(p.get("image_urls", [])) for p in posts],
+        "caption": [p["text"] for p in posts],
+        "image_urls": ["\n".join(p.get("image_urls", [])) for p in posts],
+        "local_images": ["\n".join(p.get("local_files", [])) for p in posts]
     })
     df.to_csv(OUTPUT_CSV, index=False, encoding="utf-8-sig")
 
-    # print(f"[+] TXT 檔案已儲存：{os.path.abspath(OUTPUT_TXT)}")
     print(f"[+] CSV 檔案已儲存：{os.path.abspath(OUTPUT_CSV)}")
+    if DOWNLOAD_IMAGES:
+        print(f"[+] 圖片資料夾位置：{os.path.abspath(IMAGE_DIR)}")
 
     # 預覽前 2 筆抓取結果
     print("\n" + "=" * 30 + " 最新貼文預覽 " + "=" * 30)
     for p in posts[:2]:
         print(f"網址: {p['url']}")
         print(f"時間: {p['date']}")
-        print("內文前 120 字：")
-        print(p["text"][:120] + ("..." if len(p["text"]) > 120 else ""))
+        print(f"圖片張數: {len(p.get('image_urls', []))}")
+        if p.get("local_files"):
+            print(f"本地檔案: {p['local_files'][0]} 等")
+        print("內文前 100 字：")
+        print(p["text"][:100] + ("..." if len(p["text"]) > 100 else ""))
         print("-" * 60)
