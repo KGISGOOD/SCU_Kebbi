@@ -12,6 +12,7 @@ def main():
     lora_adapter_path = os.path.join(
         os.path.dirname(__file__),
         "lora_output"
+        "checkpoint-36"
     )
 
     test_questions = [
