@@ -9,21 +9,17 @@ import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-def get_token_spans(tokenizer, prompt, question):
+def get_token_spans(input_ids_list, question_ids):
     """
-    Return (start, end) token indices for `question` inside `prompt`.
-    Assumes question appears exactly once in prompt.
+    Return (start, end) token indices for `question_ids` inside `input_ids_list`.
+    Assumes question_ids appears exactly once.
     """
-    # Tokenize prompt and question separately
-    prompt_ids = tokenizer.encode(prompt, add_special_tokens=False)
-    question_ids = tokenizer.encode(question, add_special_tokens=False)
     q_len = len(question_ids)
-    # Find the question token sequence in prompt_ids
-    for i in range(len(prompt_ids) - q_len + 1):
-        if prompt_ids[i:i+q_len] == question_ids:
+    for i in range(len(input_ids_list) - q_len + 1):
+        if input_ids_list[i:i+q_len] == question_ids:
             return i, i+q_len
     # Fallback: assume question is at the end
-    return len(prompt_ids)-q_len, len(prompt_ids)
+    return len(input_ids_list)-q_len, len(input_ids_list)
 
 def main():
     model_name = "meta-llama/Llama-3.2-3B-Instruct"
@@ -116,18 +112,19 @@ def main():
 
         # Get token spans for q1 (history) and q2 (current query) in the prompt
         # Note: prompt includes special tokens from chat template; we need to map.
-        # We'll compute spans on the tokenized prompt (excluding special? include them)
-        input_ids = inputs["input_ids"][0].tolist()
-        # Tokenize q1 and q2 alone to get their token ids
+        input_ids_tensor = inputs["input_ids"]  # shape [1, seq_len]
+        input_ids_list = input_ids_tensor[0].tolist()
+        seq_len = input_ids_tensor.shape[-1]
+        # Tokenize q1 and q2 alone to get their token ids (no special tokens)
         q1_ids = tokenizer.encode(q1, add_special_tokens=False)
         q2_ids = tokenizer.encode(q2, add_special_tokens=False)
 
-        # Find spans
-        h_start, h_end = get_token_spans(tokenizer, prompt, q1)
-        q_start, q_end = get_token_spans(tokenizer, prompt, q2)
+        # Find spans in the tokenized prompt (excluding special tokens? the prompt from apply_chat_template includes special tokens,
+        # but we encoded without special tokens, so we need to map. We'll search directly in input_ids_list.)
+        h_start, h_end = get_token_spans(input_ids_list, q1_ids)
+        q_start, q_end = get_token_spans(input_ids_list, q2_ids)
 
         # Safety: ensure spans are within seq_len
-        seq_len = input_ids.shape[0]
         h_start = max(0, min(h_start, seq_len-1))
         h_end = max(h_start+1, min(h_end, seq_len))
         q_start = max(0, min(q_start, seq_len-1))
