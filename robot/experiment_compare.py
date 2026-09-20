@@ -119,20 +119,22 @@ def main():
                 print()
                 continue
         # Cache miss (includes case where index not ready)
-        # Obtain answer via baseline path (service.handle does retrieve+LLM)
-        ans = service.handle(q, [])
+        # Perform RAG once: get context, build prompt, call LLM
+        ctx, _, _ = orch.retrieve_only(q)                     # <-- Single RAG
+        prompt = prompts.context_prompt().format(
+            context=ctx,
+            question=q
+        )                                                     # <-- Build prompt
+        ans = orch._llm._call(prompt)                         # <-- LLM call, get answer
         t1 = time.perf_counter()
         latency = t1 - t0
         cache_latencies.append(latency)
         cache_hits.append(False)
-        # Build prompt to store in cache
-        ctx, _, _ = orch.retrieve_only(q)
-        prompt = prompts.context_prompt().format(context=ctx, question=q)
-        # Add to cache
+        # Store the prompt and answer from this single RAG+LLM into cache
         if cache_index is None:
-            # Initialize index with correct dimension
+            # Initialize index with correct dimension (first miss)
             sample_dim = q_vec.shape[1]
-            cache_index = faiss.IndexFlatIP(sample_dim)  # inner product == cosine after L2 norm
+            cache_index = faiss.IndexFlatIP(sample_dim)      # inner product == cosine after L2 norm
         cache_index.add(q_vec)
         cache_store.append((prompt, ans.strip()))
         print(f"[{idx:03d}/{len(questions)}] Q: {q}")
