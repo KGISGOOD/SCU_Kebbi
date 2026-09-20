@@ -51,6 +51,13 @@ def main():
     relevance = RelevancePolicy()
     service = ChatService(orch, relevance, retrieve_only=False)
 
+    # Warm-up question to load Llama 3.2 into memory (not timed)
+    warmup_q = "Warm-up question for model loading."
+    try:
+        _ = service.handle(warmup_q, [])
+    except Exception:
+        pass  # ignore warm-up failures
+
     # ---------- 1. Prepare questions ----------
     questions_path = os.path.join(os.path.dirname(__file__), "experiment_questions.txt")
     if not os.path.exists(questions_path):
@@ -75,6 +82,12 @@ def main():
         print(f"      Latency: {latency:.3f}s")
         print(f"      Answer: {ans[:80]}{'...' if len(ans)>80 else ''}")
         print()
+
+    # Warm-up again before cache experiment to ensure model stays warm
+    try:
+        _ = service.handle(warmup_q, [])
+    except Exception:
+        pass
 
     # ---------- 3. Simple Semantic Cache experiment ----------
     print("\n=== Running Simple Semantic Cache ===")
