@@ -313,5 +313,47 @@ def main():
     else:
         print("Difference: (cannot compute)")
 
+    # ===== Threshold Analysis =====
+    print("\n=== Threshold Analysis ===")
+    # Prepare data
+    all_ratios = same_ratios + topic_ratios
+    # label: 1 for same_topic, 0 for topic_shift
+    all_labels = [1]*len(same_ratios) + [0]*len(topic_ratios)
+    total = len(all_ratios)
+    thresholds = [round(0.20 + i*0.01, 2) for i in range(21)]  # 0.20 to 0.40 inclusive
+    results = []
+    for th in thresholds:
+        preds = [1 if r >= th else 0 for r in all_ratios]
+        # compute confusion matrix
+        tp = sum(1 for p, l in zip(preds, all_labels) if p == 1 and l == 1)
+        tn = sum(1 for p, l in zip(preds, all_labels) if p == 0 and l == 0)
+        fp = sum(1 for p, l in zip(preds, all_labels) if p == 1 and l == 0)
+        fn = sum(1 for p, l in zip(preds, all_labels) if p == 0 and l == 1)
+        accuracy = (tp + tn) / total if total > 0 else 0.0
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        results.append({
+            "threshold": th,
+            "tp": tp, "tn": tn, "fp": fp, "fn": fn,
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1
+        })
+    # Print table
+    print(f"{'Threshold':>8} {'TP':>4} {'TN':>4} {'FP':>4} {'FN':>4} {'Acc':>7} {'Prec':>7} {'Rec':>7} {'F1':>7}")
+    for r in results:
+        print(f"{r['threshold']:8.2f} {r['tp']:4d} {r['tn']:4d} {r['fp']:4d} {r['fn']:4d} "
+              f"{r['accuracy']:7.4f} {r['precision']:7.4f} {r['recall']:7.4f} {r['f1']:7.4f}")
+    # Find best accuracy and f1
+    max_acc = max(r["accuracy"] for r in results)
+    max_f1 = max(r["f1"] for r in results)
+    best_acc_thresholds = [r["threshold"] for r in results if abs(r["accuracy"] - max_acc) < 1e-9]
+    best_f1_thresholds = [r["threshold"] for r in results if abs(r["f1"] - max_f1) < 1e-9]
+    print(f"\n最高 Accuracy: {max_acc:.4f} 在 threshold = {best_acc_thresholds}")
+    print(f"最高 F1: {max_f1:.4f} 在 threshold = {best_f1_thresholds}")
+    print("註：此 threshold 為本實驗資料分析所得，並非 SmartCache 論文原始規則。")
+
 if __name__ == "__main__":
     main()
