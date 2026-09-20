@@ -28,8 +28,8 @@ except Exception as e:
 
 def build_prompt_with_retriever_and_history(question: str, retriever, history: list):
     """使用真實的 Retriever 取得相關文件並組成包含對話歷史的 Prompt"""
-    retrieved_docs = retriever.get_relevant_documents(question)
-    context = "\n".join(retrieved_docs)
+    retrieved_docs = retriever.invoke(question)
+    context = "\n".join(doc.page_content for doc in retrieved_docs)
 
     # Build conversation history string
     history_str = ""
@@ -88,7 +88,7 @@ def main():
     # 若仍未取得 retriever，則使用簡易的 DummyRetriever（僅純問題作為 prompt）
     if retriever is None:
         class DummyRetriever:
-            def get_relevant_documents(self, question):
+            def invoke(self, question):
                 return []  # 無檢索內容
         retriever = DummyRetriever()
 
