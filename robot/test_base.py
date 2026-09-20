@@ -1,27 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-測試微調後的 Llama 3.2 3B Instruct + LoRA。
-僅載入 LoRA adapter，不與 Base model 進行比較。
+測試微調前的 Llama 3.2 3B Instruct（Base model）。
+不載入任何 LoRA adapter。
 """
 import os
 import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
 
 def main():
     base_model_name = "meta-llama/Llama-3.2-3B-Instruct"
-    lora_adapter_path = os.path.join(os.path.dirname(__file__), "lora_output", "checkpoint-36")
     questions = [
         "為什麼學校要特別成立「巨量資料管理學院（巨資學院）」呢？",
         "巨資學院跟一般的「資工系」有什麼不同？",
         "那巨資學院跟一般的「資管系」差別在哪裡？"
     ]
-
-    if not os.path.isdir(lora_adapter_path):
-        print(f"[錯誤] LoRA adapter 目錄不存在: {lora_adapter_path}")
-        return
 
     print(f"[診斷] 載入 tokenizer: {base_model_name}")
     tokenizer = AutoTokenizer.from_pretrained(base_model_name, trust_remote_code=True)
@@ -35,10 +29,6 @@ def main():
     )
     base_model.eval()
 
-    print(f"[診斷] 載入 LoRA adapter 從: {lora_adapter_path}")
-    lora_model = PeftModel.from_pretrained(base_model, lora_adapter_path)
-    lora_model.eval()
-
     gen_kwargs = {
         "do_sample": False,
         "max_new_tokens": 256,
@@ -47,7 +37,7 @@ def main():
 
     times = []
 
-    print("\n=== LoRA Llama 3.2 ===\n")
+    print("\n=== Base Llama 3.2 ===\n")
     for idx, question in enumerate(questions, start=1):
         messages = [{"role": "user", "content": question}]
         prompt = tokenizer.apply_chat_template(
@@ -63,7 +53,7 @@ def main():
         torch.cuda.synchronize() if torch.cuda.is_available() else None
         start = time.time()
         with torch.no_grad():
-            output_ids = lora_model.generate(**inputs, **gen_kwargs)
+            output_ids = base_model.generate(**inputs, **gen_kwargs)
         torch.cuda.synchronize() if torch.cuda.is_available() else None
         elapsed = time.time() - start
         times.append(elapsed)
