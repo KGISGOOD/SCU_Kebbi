@@ -3,7 +3,7 @@
 """
 測試演算法二：自注意力機制話題識別（整合真實 RAG 檢索器）
 目的：透過取得模型 self-attention 分數，計算當前 query token
-對歷史 token（系統說明 + 檢索段落）的注意力比例，以判斷是否為話題切換。
+對歷史 token（系統說明 + 檢索段落 + 對話歷史）的注意力比例，以判斷是否為話題切換。
 """
 
 import torch
@@ -26,14 +26,27 @@ except Exception as e:
     AppSettings = None
 
 
-def build_prompt_with_retriever(question: str, retriever):
-    """使用真實的 Retriever 取得相關文件並組成 Prompt"""
+def build_prompt_with_retriever_and_history(question: str, retriever, history: list):
+    """使用真實的 Retriever 取得相關文件並組成包含對話歷史的 Prompt"""
     retrieved_docs = retriever.get_relevant_documents(question)
     context = "\n".join(retrieved_docs)
-    prompt = f"""你是一個友好的助理。請根據以下背景資料回答問題。
+
+    # Build conversation history string
+    history_str = ""
+    if history:
+        history_parts = []
+        for q, a in history:
+            history_parts.append(f"問題：{q}\n答案：{a}")
+        history_str = "\n".join(history_parts)
+
+    prompt = f"""你是一個友好的助理。請根據以下背景資料和對話歷史回答問題。
 
 背景資料：
 {context}
+
+
+對話歷史：
+{history_str}
 
 問題：{question}
 答案："""
@@ -52,7 +65,6 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME,
         torch_dtype=torch.float16,
-        device_map="auto",
         trust_remote_code=True,
         output_attentions=True,   # 關鍵：啟用 attentions
     )
@@ -80,21 +92,27 @@ def main():
                 return []  # 無檢索內容
         retriever = DummyRetriever()
 
-    # --- 讀取測試問題 ---
-    questions_path = os.path.join(os.path.dirname(__file__), "speed_test_questions.txt")
-    with open(questions_path, encoding="utf-8") as f:
-        lines = [line.strip() for line in f if line.strip()]
-    questions = lines
+    # --- 使用指定的 5 個問題進行多輪對話測試 ---
+    questions = [
+        "請問資料科學系有哪些課程？",
+        "那證照要怎麼申請？",
+        "這個申請需要準備什麼資料？",
+        "那畢業後有哪些發展方向？",
+        "另外，學校有哪些社團？"
+    ]
 
     topic_shift_count = 0
     prev_ratio = None
+    history = []  # 儲存對話歷史：[(question, answer), ...]
+
+    print("\n=== 開始多輪對話 Attention-based Topic Identification 測試 ===\n")
 
     for idx, q in enumerate(questions, start=1):
-        # 1. 建立 Prompt (透過真實 RAG)
-        prompt, _ = build_prompt_with_retriever(q, retriever)
+        # 1. 建立 Prompt (透過真實 RAG 和對話歷史)
+        prompt, _ = build_prompt_with_retriever_and_history(q, retriever, history)
 
         # 2. 取得模型 self-attention (僅 forward，不產出 token)
-        inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+        inputs = tokenizer(prompt, return_tensors="pt")
         with torch.no_grad():
             outputs = model(**inputs)
 
@@ -102,11 +120,19 @@ def main():
         attn = torch.stack(outputs.attentions)          # [L, B, H, S, S]
         attn_avg = attn.mean(dim=(0, 1, 2))             # [S, S]，每行和 = 1
 
-        # ------- 取得「純問題」的 token 範圍（不含系統 Prompt 與答案說明） -------
-        # 假設 prompt 格式為： 「你是一個友好的助理。請根據以下背景資料回答問題。
-        # 背景資料：{context}
+        # ------- 取得「純問題」的 token 範圍（不含系統 Prompt、檢索段落、對話歷史與答案說明） -------
+        # 假設 prompt 格式為：
+        # 你是一個友好的助理。請根據以下背景資料和對話歷史回答問題。
+        #
+        # 背景資料：
+        # {context}
+        #
+        #
+        # 對話歷史：
+        # {history_str}
+        #
         # 問題：{question}
-        # 答案：」
+        # 答案：
         # 我們只要把「問題：{question}」那段切出來。
         # 先Tokenizer整個prompt，再找出「問題：」的起始位置。
         prompt_ids = inputs.input_ids[0].tolist()
@@ -124,7 +150,7 @@ def main():
             q_start = len(prompt_ids) - q_len
         q_end = q_start + q_len
 
-        # prompt 長度（不包括問題本身）＝ 系統說明 + 背景資料 + 「問題：」等固定前綴
+        # prompt 長度（不包括問題本身）＝ 系統說明 + 背景資料 + 空行 + 對話歷史 + 空行 + 「問題：」等固定前綴
         prompt_len = q_start                # 這裡把「問題：」之前的所有 token 視為「prompt」
 
         # ------- 計算問題對 prompt 的注意力 vs 問題對自己的注意力 -------
@@ -142,18 +168,32 @@ def main():
         elif prev_ratio is not None and abs(ratio - prev_ratio) > DELTA_THRESHOLD:   # 變化大 → 可能切換
             topic_shift = True
 
+        # 計算 delta（與前一次 ratio 的差異）
+        delta = abs(ratio - prev_ratio) if prev_ratio is not None else 0.0
+
         if topic_shift:
             topic_shift_count += 1
 
-        print(f"[{idx:03d}/{len(questions)}] Q: {q}")
-        print(f"      q→prompt ratio = {ratio:.4f} -> topic_shift = {topic_shift}")
+        # 輸出所需資訊
+        print(f"[Turn {idx}]")
+        print(f"Question: {q}")
+        print(f"Attention ratio: {ratio:.4f}")
+        print(f"Previous ratio: {prev_ratio:.4f if prev_ratio is not None else 'None'}")
+        print(f"Delta: {delta:.4f}")
+        print(f"Topic Shift: {topic_shift}")
         print()
 
         prev_ratio = ratio
 
+        # 5. 產生假答案並更新對話歷史（為了讓後續輪次有歷史可用）
+        # 在真實系統中，這裡會呼叫 LLM 產生答案
+        # 為了測試目的，我們使用一個簡單的 placeholder 答案
+        dummy_answer = f"這是問題 '{q}' 的Placeholder答案。"
+        history.append((q, dummy_answer))
+
     # --- 結果彙總 ---
     shift_rate = topic_shift_count / len(questions) if questions else 0
-    print("\n=== 測試結果 ===")
+    print("=== 測試結果 ===")
     print(f"總問題數      : {len(questions)}")
     print(f"話題切換次數 : {topic_shift_count}")
     print(f"話題切換比率 : {shift_rate:.2%}")
