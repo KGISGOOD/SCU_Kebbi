@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 """
+# -*- coding: utf-8 -*-
+"""
 Diagnostic script: verify that a trained LoRA adapter actually changes model logits
 for a fixed input, using the Llama 3.2 native chat template.
 Does not train, does not generate full answers, does not modify any existing files.
