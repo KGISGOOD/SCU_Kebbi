@@ -1,15 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 """
-Validation script: compare base Llama-3.2-3B-Instruct vs LoRA-adapted model on the FAQ validation set.
-- Loads base model and tokenizer.
-- Loads LoRA adapter from ./lora_output/checkpoint-36.
-- Iterates over every sample in faq_dataset/validation (messages column).
-- For each sample, builds a prompt using Llama chat template (user only, with generation prompt).
-- Generates answer from both base and LoRA models.
-- Prints: Question, Validation standard answer, Base Model answer, LoRA Model answer.
-- No training, no modification of existing files.
-"""
-
 import os
 import torch
 from datasets import load_from_disk
