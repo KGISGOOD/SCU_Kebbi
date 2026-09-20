@@ -84,7 +84,7 @@ def main():
         max_length=512,
         fp16=True,
         # evaluation and saving per epoch
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         save_strategy="epoch",
         # 使用原生 chat template (SFTTrainer 會內部處理)
         # 不設定 assistant_only_loss，保持標準 loss
