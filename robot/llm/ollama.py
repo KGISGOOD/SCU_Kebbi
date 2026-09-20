@@ -6,6 +6,7 @@ from langchain.llms.base import BaseLLM
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLMResult
 
+
 class ChatOllamaLLM(BaseLLM):
     model_name: str
     url: str
@@ -23,6 +24,7 @@ class ChatOllamaLLM(BaseLLM):
         **kwargs: Any,
     ) -> str:
         payload = {"model": self.model_name, "prompt": prompt, "stream": self.do_stream}
+        payload["options"] = {"think": False}
         try:
             resp = requests.post(
                 self.url,
@@ -73,5 +75,3 @@ class ChatOllamaLLM(BaseLLM):
     @property
     def _llm_type(self) -> str:
         return "chat_ollama"
-
-

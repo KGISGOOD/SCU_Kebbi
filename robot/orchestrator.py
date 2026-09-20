@@ -1,8 +1,6 @@
 from __future__ import annotations
 import time
 from typing import List, Tuple
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
 from langchain.schema import BaseRetriever
 from llm.ollama import ChatOllamaLLM
 from prompts import PromptFactory
@@ -18,27 +16,12 @@ class QAOrchestrator:
         self._retriever = retriever
         self._llm = llm_facade
         self._prompt_factory = prompt_factory
-        self._memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         # Debug: show number of vectorstores if MultiStoreRetriever
         if hasattr(retriever, "vectorstores"):
             try:
                 print(f"[DEBUG] Loaded {len(retriever.vectorstores)} vectorstores")
             except Exception:
                 pass
-
-        self._qa_chain = ConversationalRetrievalChain.from_llm(
-            llm=self._llm,  # ChatOllamaLLM implements generate(), compatible
-            retriever=self._retriever,
-            memory=self._memory,
-            combine_docs_chain_kwargs={
-                "prompt": self._prompt_factory.context_prompt(),
-                "document_variable_name": "context",
-                "document_prompt": self._prompt_factory.document_prompt(),
-            },
-        )
-
-    def clear_memory(self) -> None:
-        self._memory.clear()
 
     def retrieve_only(self, query: str) -> Tuple[str, List[Tuple[str, str]], float]:
         t1 = time.time()
@@ -58,10 +41,37 @@ class QAOrchestrator:
         src = "\n可參考下方節目集數：\n" + "".join([f"Result {i}: {e}, {p}\n" for i, (e, p) in enumerate(uniq, 1)])
         out = "\n--- 向量資料庫檢索結果 ---\n" + "\n\n".join(ctx_lines[:5]) + "\n\n" + src
         print(f"[DEBUG retrieve_only] uniq={uniq}")
+        # Debug: context size and per-doc size
+        print(f"[DEBUG] context chars = {len(out)}")
+        for i, d in enumerate(docs[:5]):
+            print(f"[DEBUG] doc {i+1} chars = {len(d.page_content)}")
         return out, list(uniq), elapsed
 
-    def ask(self, question: str, history: List[Tuple[str, str]]) -> Tuple[str, float]:
-        t3 = time.time()
-        resp = self._qa_chain.invoke({"question": question, "chat_history": history})
-        t4 = time.time()
-        return resp.get("answer", ""), (t4 - t3)
+    def ask(self, question: str, history: List[Tuple[str, str]] = None) -> Tuple[str, float]:
+        t_total_start = time.time()
+        # RAG time
+        t_rag_start = time.time()
+        ctx, _, _ = self.retrieve_only(question)
+        t_rag_end = time.time()
+        rag_time = t_rag_end - t_rag_start
+
+        prompt = self._prompt_factory.context_prompt().format(
+            context=ctx,
+            question=question
+        )
+        prompt_chars = len(prompt)
+
+        t_llm_start = time.time()
+        answer = self._llm._call(prompt)
+        t_llm_end = time.time()
+        llm_time = t_llm_end - t_llm_start
+
+        t_total_end = time.time()
+        total_time = t_total_end - t_total_start
+
+        print(f"[PERF] RAG time: {rag_time:.3f} s")
+        print(f"[PERF] Prompt chars: {prompt_chars}")
+        print(f"[PERF] LLM time: {llm_time:.3f} s")
+        print(f"[PERF] Total time: {total_time:.3f} s")
+
+        return answer, 0.0
