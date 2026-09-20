@@ -91,7 +91,7 @@ def main():
         eval_strategy="epoch",        # 已修正為目前 API 正確名稱
         fp16=True,
         max_length=512,               # 依目前 TRL 1.13.0 API 仍使用此參數名稱
-        assistant_only_loss=True,     # 僅計算 assistant 部分的 loss（現在適用）
+        assistant_only_loss=False,    # 僅計算 assistant 部分的 loss（現在適用）
         # 不再使用 dataset_text_field，因為資料是 conversational
     )
     print(f"[Info] Epochs              : {training_args.num_train_epochs}")
