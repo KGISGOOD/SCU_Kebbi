@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-第一版 LoRA SFT 訓練腳本（已加入 --dry-run 模式）
+第一版 LoRA SFT 訓練腳本（支援 --dry-run，使用 conversational Dataset）
 - 基礎模型 : meta-llama/Llama-3.2-3B-Instruct
-- 數據來源 : faq_dataset/ (由 prepare_faq_dataset.py 產生)
+- 數據來源 : faq_dataset/ (由 prepare_faq_dataset.py 產生，欄位為 messages)
 - 只做 LoRA + SFT，不加入其他演算法
 """
 
@@ -72,8 +72,8 @@ def main():
         eval_strategy="epoch",        # 已修正為目前 API 正確名稱
         fp16=True,
         max_length=512,               # 依目前 TRL 1.13.0 API 仍使用此參數名稱
-        assistant_only_loss=True,     # 僅計算 assistant 部分的 loss
-        dataset_text_field="text",    # 指出文字欄位
+        assistant_only_loss=True,     # 僅計算 assistant 部分的 loss（現在適用）
+        # 不再使用 dataset_text_field，因為資料是 conversational
     )
     print(f"[Info] Epochs              : {training_args.num_train_epochs}")
     print(f"[Info] Batch size          : {training_args.per_device_train_batch_size}")
