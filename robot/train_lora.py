@@ -42,6 +42,25 @@ def main():
     print(f"[Info] Train samples       : {len(dataset_dict['train'])}")
     print(f"[Info] Validation samples  : {len(dataset_dict['validation'])}")
 
+    # Debug: print dataset structure
+    print("\n=== Dataset 結構偵測 ===")
+    for split_name, ds in dataset_dict.items():
+        print(f"{split_name}:")
+        print(f"  Columns: {ds.column_names}")
+        print(f"  Features: {ds.features}")
+        print(f"  First example: {ds[0]}")
+        # Additionally, check if messages field exists and its type
+        if "messages" in ds.column_names:
+            print(f"  Messages field type: {ds.features['messages']}")
+            first_msg = ds[0]["messages"]
+            print(f"  First example messages: {first_msg}")
+            if isinstance(first_msg, list):
+                print(f"  Each element type: {[type(m) for m in first_msg]}")
+                if first_msg and isinstance(first_msg[0], dict):
+                    print(f"  First message keys: {first_msg[0].keys()}")
+        else:
+            print("  WARNING: 'messages' column not found!")
+
     # ------------------- LoRA 設定 -------------------
     lora_r = 8
     lora_alpha = 16

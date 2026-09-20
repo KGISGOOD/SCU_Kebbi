@@ -62,5 +62,14 @@ def main():
         print(f"    - 第一筆範例 (前兩則訊息):")
         print(f"      {ds[0]['messages']}")
 
+    # ====== 7. 額外驗證：重新載入並檢查是否仍為 conversational ======
+    reloaded = DatasetDict.load_from_disk(output_dir)
+    print("\n=== 重新載入後檢查 ===")
+    for split_name, ds in reloaded.items():
+        print(f"{split_name}:")
+        print(f"  Columns: {ds.column_names}")
+        print(f"  Features: {ds.features}")
+        print(f"  First example: {ds[0]}")
+
 if __name__ == "__main__":
     main()
