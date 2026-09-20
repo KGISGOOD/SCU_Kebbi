@@ -9,7 +9,7 @@ import os
 import time
 import torch
 import transformers
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 
 def main():
     # Print Transformers version
@@ -43,11 +43,11 @@ def main():
     draft_model.eval()
 
     # Fixed generation settings
-    generation_kwargs = {
-        "do_sample": False,
-        "max_new_tokens": 512,
-        "pad_token_id": tokenizer.eos_token_id,
-    }
+    gen_config = GenerationConfig(
+        do_sample=False,
+        max_new_tokens=512,
+        pad_token_id=tokenizer.eos_token_id,
+    )
 
     # Ensure deterministic behavior (seed)
     torch.manual_seed(42)
@@ -67,11 +67,11 @@ def main():
     print("\n[Warm-up] 執行 baseline warm-up...")
     warm_inputs = tokenizer("測試", return_tensors="pt").to(target_model.device)
     with torch.no_grad():
-        target_model.generate(**warm_inputs, **generation_kwargs)
+        target_model.generate(**warm_inputs, generation_config=gen_config)
     print("[Warm-up] 執行 speculative warm-up...")
     warm_inputs = tokenizer("測試", return_tensors="pt").to(target_model.device)
     with torch.no_grad():
-        target_model.generate(**warm_inputs, assistant_model=draft_model, **generation_kwargs)
+        target_model.generate(**warm_inputs, assistant_model=draft_model, generation_config=gen_config)
     print("[Warm-up] 完成。\n")
 
     # Containers for results
@@ -93,7 +93,7 @@ def main():
         torch.cuda.synchronize() if torch.cuda.is_available() else None
         start = time.time()
         with torch.no_grad():
-            output_ids = target_model.generate(**inputs, **generation_kwargs)
+            output_ids = target_model.generate(**inputs, generation_config=gen_config)
         torch.cuda.synchronize() if torch.cuda.is_available() else None
         elapsed = time.time() - start
 
@@ -122,7 +122,7 @@ def main():
         torch.cuda.synchronize() if torch.cuda.is_available() else None
         start = time.time()
         with torch.no_grad():
-            output_ids = target_model.generate(**inputs, assistant_model=draft_model, **generation_kwargs)
+            output_ids = target_model.generate(**inputs, assistant_model=draft_model, generation_config=gen_config)
         torch.cuda.synchronize() if torch.cuda.is_available() else None
         elapsed = time.time() - start
 
