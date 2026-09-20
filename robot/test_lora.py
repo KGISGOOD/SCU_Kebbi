@@ -10,10 +10,10 @@ from peft import PeftModel
 def main():
     base_model_name = "meta-llama/Llama-3.2-3B-Instruct"
     lora_adapter_path = os.path.join(
-        os.path.dirname(__file__),
-        "lora_output"
-        "checkpoint-36"
-    )
+    os.path.dirname(__file__),
+    "lora_output",
+    "checkpoint-36"
+)
 
     test_questions = [
         "學長，東吳大學是一所什麼樣的大學啊？",
