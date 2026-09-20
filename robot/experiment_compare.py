@@ -78,9 +78,10 @@ def main():
         latency = t1 - t0
         baseline_latencies.append(latency)
         baseline_answers.append(ans)
-        print(f"[{idx:03d}/{len(questions)}] Q: {q}")
-        print(f"      Latency: {latency:.3f}s")
-        print(f"      Answer: {ans[:80]}{'...' if len(ans)>80 else ''}")
+        print(f"[Baseline Q{idx}]")
+        print(f"Question: {q}")
+        print("Answer:")
+        print(ans)
         print()
 
     # Warm-up again before cache experiment to ensure model stays warm
@@ -113,9 +114,12 @@ def main():
                 latency = t1 - t0
                 cache_latencies.append(latency)
                 cache_hits.append(True)
-                print(f"[{idx:03d}/{len(questions)}] Q: {q}")
-                print(f"      HIT  | latency={latency:.3f}s (sim={sim:.3f})")
-                print(f"      Answer: {answer[:80]}{'...' if len(answer)>80 else ''}")
+                print(f"[Cache Q{idx}]")
+                print(f"Question: {q}")
+                print(f"Cache: HIT")
+                print(f"Similarity: {sim:.3f}")
+                print("Answer:")
+                print(answer)
                 print()
                 continue
         # Cache miss (includes case where index not ready)
@@ -137,9 +141,11 @@ def main():
             cache_index = faiss.IndexFlatIP(sample_dim)      # inner product == cosine after L2 norm
         cache_index.add(q_vec)
         cache_store.append((prompt, ans.strip()))
-        print(f"[{idx:03d}/{len(questions)}] Q: {q}")
-        print(f"      MISS | latency={latency:.3f}s")
-        print(f"      Answer: {ans[:80]}{'...' if len(ans)>80 else ''}")
+        print(f"[Cache Q{idx}]")
+        print(f"Question: {q}")
+        print(f"Cache: MISS")
+        print("Answer:")
+        print(ans)
         print()
 
     # ---------- 4. Statistics ----------
