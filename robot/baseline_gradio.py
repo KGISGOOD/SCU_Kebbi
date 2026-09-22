@@ -68,12 +68,14 @@ def main():
                     i += 1
             # Call service
             response = service.handle(message, history_tuples)
-            # Append to chat_history as messages
-            chat_history.append([message, response])
+            # Append to chat_history as messages (list of dicts)
+            chat_history.append({"role": "user", "content": message})
+            chat_history.append({"role": "assistant", "content": response})
             return "", chat_history
         except Exception as e:
             err_msg = f"發生錯誤: {e}"
-            chat_history.append([message, err_msg])
+            chat_history.append({"role": "user", "content": message})
+            chat_history.append({"role": "assistant", "content": err_msg})
             return "", chat_history
 
     with gr.Blocks(title="系上資訊 LLM Baseline (Gradio)") as demo:
