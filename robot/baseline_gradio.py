@@ -38,6 +38,15 @@ def main():
     relevance = RelevancePolicy()
     service = ChatService(orch, relevance, retrieve_only=False)
 
+    # ----- Warm-up -----
+    print("[Warm-up] Running a dummy query to initialise models / FAISS / Ollama...")
+    try:
+        _ , _ = orch.ask("測試", [])
+        print("[Warm-up] Completed.")
+    except Exception as e:
+        print(f"[Warm-up] Error: {e}")
+        # Continue anyway; baseline will still work but may be slower on first real query
+
     def respond(message: str, chat_history):
         """
         Gradio callback: receives user message and current chat history (list of dicts with role/content),
