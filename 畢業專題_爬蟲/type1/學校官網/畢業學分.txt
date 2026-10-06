@@ -1,0 +1,389 @@
+東吳大學資科系學士班必、選修科目表
+東吳資科系
+（適用112學年度一年級入學新生）
+
+【畢業學分規定】
+
+必修學分：81 學分
+
+選修學分：47 學分（至多承認外系 16 學分）
+
+畢業學分總計：128 學分
+
+【校訂共同必修課程】
+
+國文（CHINESE）
+
+選別：必修
+
+學分：4 學分
+
+修讀學期：第一學年上學期 2 學分、下學期 2 學分
+
+備註：詳附註 1 說明。
+
+外文(英、日、德、韓文)（FOREIGN LANGUAGE）
+
+選別：必修
+
+學分：8 學分
+
+修讀學期：
+外文(一)：第一學年上學期 2 學分、下學期 2 學分
+外文(二)：第二學年上學期 2 學分、下學期 2 學分
+
+備註：詳附註 1 說明。
+
+生命關懷（LIFE CONCERNS）
+
+選別：必修
+
+學分：1 學分
+
+修讀學期：第一學年上學期或下學期 1 學分
+
+備註：各學系依共通科目時段表安排。
+
+思維方法（PRINCIPLES OF REASONING）
+
+選別：必修
+
+學分：1 學分
+
+修讀學期：第一學年上學期或下學期 1 學分
+
+備註：各學系依共通科目時段表安排。
+
+職涯錨定（CAREER ANCHOR）
+
+選別：必修
+
+學分：1 學分
+
+修讀學期：第一學年上學期或下學期 1 學分
+
+備註：各學系依共通科目時段表安排。
+
+人工智慧跨域應用（MULTIDISCIPLINARY TRENDS IN ARTIFICIAL INTELLIGENCE）
+
+選別：必修
+
+學分：1 學分
+
+修讀學期：第一學年上學期或下學期 1 學分
+
+備註：限修本學系「人工智慧導論」。
+
+數位自主學習（INDEPENDENT ONLINE LEARNING）
+
+選別：必修
+
+學分：2 學分
+
+修讀學期：修業期限內配合選課時間自主選課修讀。
+
+通識課程（GENERAL EDUCATION COURSES）
+
+選別：必修
+
+學分：10 學分
+
+修讀學期：第二學年上學期 2 學分、下學期 2 學分；第三學年上學期 2 學分、下學期 2 學分；第四學年上學期 2 學分。配合選課時間自主選課。
+
+體育（PHYSICAL EDUCATION）
+
+選別：必修
+
+學分：0 學分
+
+修讀學期：第一學年上學期 0 學分、下學期 0 學分；第二學年上學期 0 學分、下學期 0 學分（共 4 學期）。
+
+【畢業標準能力檢核（0學分）】
+
+外文能力（FOREIGN LANGUAGE PROFICIENCY）
+
+選別：必修
+
+學分：0 學分
+
+備註：最遲在延長修業年限內必須通過檢核，未通過者不得畢業。
+
+資訊能力（INFORMATION COMPETENCE）
+
+選別：必修
+
+學分：0 學分
+
+備註：最遲在延長修業年限內必須通過檢核，未通過者不得畢業。
+
+美育活動（AESTHETIC EDUCATION & ACTIVITIES）
+
+選別：必修
+
+學分：0 學分
+
+備註：最遲在延長修業年限內至少需參與校內藝文活動 4 場次，未通過者不得畢業。
+
+【專業必修課程】
+
+微積分（CALCULUS）
+
+學分：6 學分
+
+修讀學期：第一學年上學期 3 學分、下學期 3 學分
+
+備註：含輔導，上學期成績需達 50 分以上。
+
+程式設計(一)（PROGRAMMING (I)）
+
+學分：3 學分
+
+修讀學期：第一學年上學期 3 學分
+
+備註：含輔導。
+
+巨量資料概論（INTRODUCTION OF BIG DATA）
+
+學分：3 學分
+
+修讀學期：第一學年上學期 3 學分
+
+備註：含輔導。
+
+計算機概論（INTRODUCTION TO COMPUTER SCIENCE）
+
+學分：3 學分
+
+修讀學期：第一學年上學期 3 學分
+
+線性代數（LINEAR ALGEBRA）
+
+學分：3 學分
+
+修讀學期：第一學年下學期 3 學分
+
+程式設計(二)（PROGRAMMING (II)）
+
+學分：3 學分
+
+修讀學期：第一學年下學期 3 學分
+
+備註：含輔導，程式設計(一)須 60 分以上。
+
+資料庫導論（INTRODUCTION TO DATABASE SYSTEMS）
+
+學分：3 學分
+
+修讀學期：第一學年下學期 3 學分
+
+網頁程式設計（WEB PROGRAMMING）
+
+學分：3 學分
+
+修讀學期：第一學年下學期 3 學分
+
+機率與統計（PROBABILITY AND STATISTICS）
+
+學分：6 學分
+
+修讀學期：第二學年上學期 3 學分、下學期 3 學分
+
+備註：含輔導，上學期需 50 分以上。
+
+資料分析軟體（DATA ANALYSIS SOFTWARE）
+
+學分：3 學分
+
+修讀學期：第二學年上學期 3 學分
+
+經濟學（ECONOMICS）
+
+學分：3 學分
+
+修讀學期：第二學年下學期 3 學分
+
+資料工程（DATA ENGINEERING）
+
+學分：3 學分
+
+修讀學期：第二學年下學期 3 學分
+
+資料探勘導論（INTRODUCTION TO DATA MINING）
+
+學分：3 學分
+
+修讀學期：第三學年上學期 3 學分
+
+機器學習導論（INTRODUCTION TO MACHINE LEARNING）
+
+學分：3 學分
+
+修讀學期：第三學年下學期 3 學分
+
+專題實作（PRACTICES）
+
+學分：3 學分
+
+修讀學期：第四學年上學期 3 學分
+
+人工智慧導論（INSTRUCTION TO ARTIFICIAL INTELLIGENCE）
+
+學分：3 學分
+
+修讀學期：第四學年上學期 3 學分
+
+【選修課程】
+
+互動科技（INTERACTIVE TECHNOLOGY）
+
+學分：2 學分
+
+修讀學期：第二學年上學期
+
+資訊安全與倫理（INFORMATION SECURITY AND ETHICS）
+
+學分：3 學分
+
+修讀學期：第二學年上學期
+
+巨量資料處理架構與技術（BIG DATA PROCESSING AND TECHNOLOGIES）
+
+學分：3 學分
+
+修讀學期：第二學年上學期
+
+資料結構與演算法（DATA STRUCTURES AND ALGORITHMS）
+
+學分：3 學分
+
+修讀學期：第二學年下學期
+
+服務設計思考（SERVICE DESIGN THINKING）
+
+學分：3 學分
+
+修讀學期：第二學年下學期
+
+大數據行銷（BIG DATA IN MARKETING）
+
+學分：3 學分
+
+修讀學期：第二學年下學期
+
+備註：合班於第二專長。
+
+擴增實境行動應用整合開發（DESIGN AND DEVELOPMENT OF MOBILE AUGMENTED REALITY）
+
+學分：3 學分
+
+修讀學期：第二學年下學期
+
+社群媒體行銷（SOCIAL MEDIA MARKETING）
+
+學分：2 學分
+
+修讀學期：第三學年上學期
+
+備註：合班於第二專長。
+
+廣告投放分析（ADVERTISING STRATEGY AND ANALYSIS）
+
+學分：2 學分
+
+修讀學期：第三學年上學期
+
+備註：合班於第二專長。
+
+智慧聯網應用（INTELLIGENT APPLICATIONS OF INTERNET OF THINGS）
+
+學分：2 學分
+
+修讀學期：第三學年上學期
+
+備註：合班於第二專長。
+
+雲端運算服務（CLOUD COMPUTING SERVICE）
+
+學分：3 學分
+
+修讀學期：第三學年上學期
+
+巨量資料分析應用（BIG DATA ANALYTICS AND APPLICATIONS）
+
+學分：3 學分
+
+修讀學期：第三學年上學期
+
+虛擬實境技術應用（VIRTUAL REALITY TECHNOLOGY APPLICATION）
+
+學分：3 學分
+
+修讀學期：第三學年上學期
+
+使用者經驗之洞察分析（OBSERVATION AND ANALYSIS OF USER EXPERIENCE）
+
+學分：3 學分
+
+修讀學期：第三學年下學期
+
+行為資料科學（BEHAVIORAL AND DATA SCIENCE）
+
+學分：3 學分
+
+修讀學期：第三學年下學期
+
+多變量分析導論（INTRODUCTION TO MULTIVARIATE ANALYSIS）
+
+學分：3 學分
+
+修讀學期：第三學年下學期
+
+區塊鏈（BLOCKCHAIN TECHNOLOGY AND ITS APPLICATION）
+
+學分：3 學分
+
+修讀學期：第三學年下學期
+
+企業實習(一)（INTERNSHIP (I)）
+
+學分：2 學分
+
+修讀學期：第三學年下學期
+
+社群網路分析導論（INTRODUCTION TO SOCIAL NETWORK ANALYSIS）
+
+學分：3 學分
+
+修讀學期：第四學年上學期
+
+文字探勘導論（TEXT MINING）
+
+學分：3 學分
+
+修讀學期：第四學年下學期
+
+智慧城市創新應用（SMART CITY INNOVATION APPLICATIONS）
+
+學分：3 學分
+
+修讀學期：第四學年下學期
+
+多媒體資料處理（MULTIMEDIA INFORMATION RETRIEVAL）
+
+學分：3 學分
+
+修讀學期：第四學年下學期
+
+企業實習(二)（INTERNSHIP (II)）
+
+學分：2 學分
+
+修讀學期：第四學年下學期
+
+【附註說明 (Notes)】
+
+外文共開設英、日、德、韓四種語文。大一新生可就四種語文任選一科修習。大二學生可就四種語文任選一科修習，外文(一)及(二)可選擇修習同一語文，亦可選擇修讀不同語文，但以不重複修讀為原則。外語學院學生不得修習主修語文之大一、大二外文課程。外籍生、僑生原則上不得修習母語或僑居地語文。
+
+學士班入學新生最遲在延長修業年限內，必須通過「外文能力」、「資訊能力」檢核與「美育活動」三項畢業標準，請參考教務處通識教育中心網頁。
+
+資料科學系學生最遲於延長修業年限內，需修畢「計算機概論」(必修3學分)、「程式設計(一)」(必修3學分)兩門課且成績及格，以作為認抵資訊能力畢業標準。
