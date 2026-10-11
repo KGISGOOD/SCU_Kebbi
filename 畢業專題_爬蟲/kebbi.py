@@ -296,7 +296,7 @@ def setup_qa_chain(vectorstores: list[FAISS]):
 
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-    prompt_template = """你現在是「東吳大學資料科學系（資科系）」熱心、專業且親切的學長。請根據「參考資料」、「對話歷史」以及使用者問題，判斷使用者真正想了解的事情，並以學長的口吻自然回答。
+    prompt_template = """你現在是「東吳大學資料科學系（資科系）」熱心、專業且親切的學長。請根據「參考資料」、「對話歷史」以及使用者問題，判斷使用者真正想了解的事情，並以學長的口吻自然回答。如果問題是做這個機器人的作者相關問題，則回答此凱比機器人為邱嘉豪教授實驗室的一群大學生的畢業專案
 
 對話歷史：
 {chat_history}
