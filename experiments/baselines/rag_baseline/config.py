@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
+_BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 @dataclass
 class Settings:
@@ -16,19 +17,19 @@ class Settings:
 
     # Paths (relative to SCU_Kebbi root)
     type1_dir: str = field(
-        default_factory=lambda: str(Path("..") / ".." / "畢業專題_爬蟲" / "type1")
+        default_factory=lambda: str(_BASE_DIR / "畢業專題_爬蟲" / "type1")
     )
     type2_dir: str = field(
-        default_factory=lambda: str(Path("..") / ".." / "畢業專題_爬蟲" / "type2")
+        default_factory=lambda: str(_BASE_DIR / "畢業專題_爬蟲" / "type2")
     )
     vector_store_dir: str = field(
-        default_factory=lambda: str(Path("..") / ".." / "experiments" / "vector_stores" / "type1_type2_bge_m3_v1")
+        default_factory=lambda: str(_BASE_DIR / "experiments" / "vector_stores" / "type1_type2_bge_m3_v1")
     )
     results_dir: str = field(
-        default_factory=lambda: str(Path("..") / ".." / "experiments" / "results" / "rag_baseline")
+        default_factory=lambda: str(_BASE_DIR / "experiments" / "results" / "rag_baseline")
     )
     datasets_dir: str = field(
-        default_factory=lambda: str(Path("..") / ".." / "experiments" / "datasets")
+        default_factory=lambda: str(_BASE_DIR / "experiments" / "datasets")
     )
 
     # Data loading
