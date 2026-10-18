@@ -1,39 +1,34 @@
+import re
 import pandas as pd
 
-# 1. 定義你指定的關鍵字清單
-keywords = ["東吳", "資料科學", "資料科學系", "資科", "東吳資科"]
+# 檔案路徑設定
+INPUT_CSV = "東吳資料科學系_threads_texts.csv"
+OUTPUT_CSV = "東吳資料科學系_threads_texts_cleaned.csv"
+OUTPUT_TXT = "東吳資料科學系_threads_texts_cleaned.txt"
 
-# 將關鍵字用 "|" (或) 串接成正則表達式
-# 其實「東吳|資料科學|資科」就能涵蓋全部，但這裡保險起見完全依照你的清單去比對
-pattern = "|".join(keywords)
+# 1. 讀取 CSV
+df = pd.read_csv(INPUT_CSV, encoding="utf-8-sig")
+original_count = len(df)
 
-def clean_thread_data(file_path, output_path):
-    try:
-        # 讀取 CSV 檔案
-        df = pd.read_csv(file_path)
-        
-        # 檢查是否存在 'text' 欄位
-        if 'text' not in df.columns:
-            print(f"錯誤：{file_path} 中找不到 'text' 欄位，請檢查欄位名稱。")
-            return
-            
-        # 記錄原本的資料筆數
-        original_count = len(df)
-        
-        # 進行過濾：只保留 text 欄位包含關鍵字的資料
-        # astype(str) 確保數值或空值不會導致報錯
-        # na=False 代表如果該行是空白 (NaN)，就直接刪除
-        cleaned_df = df[df['text'].astype(str).str.contains(pattern, na=False)]
-        
-        # 儲存清理後的結果 (使用 utf-8-sig 確保 Excel 打開不會亂碼)
-        cleaned_df.to_csv(output_path, index=False, encoding='utf-8-sig')
-        
-        print(f"✨ 檔案【{file_path}】清理完成！")
-        print(f"   原始資料：{original_count} 筆 -> 清理後剩餘：{len(cleaned_df)} 筆\n")
-        
-    except Exception as e:
-        print(f"處理檔案 {file_path} 時發生錯誤: {e}")
+# 2. 過濾條件：去除開頭為 "Photo by"（包含忽略大小寫與可能的前導空白）
+# regex: ^\s*Photo by[\s\xa0]
+is_photo_by = df["text"].astype(str).str.contains(r"^\s*Photo by[\s\xa0]", regex=True, case=False)
 
-# 2. 批量處理你上傳的兩個檔案
-clean_thread_data('東吳資料科學系_threads_texts.csv', 'cleaned_東吳資料科學系.csv')
-clean_thread_data('東吳資科_threads_texts.csv', 'cleaned_東吳資科.csv')
+# 保留非 Photo by 的資料
+df_cleaned = df[~is_photo_by].copy()
+
+# 3. 重新編排流水號 id
+df_cleaned["id"] = range(1, len(df_cleaned) + 1)
+
+# 4. 輸出更新後的 CSV（帶 BOM 防 Excel 亂碼）
+df_cleaned.to_csv(OUTPUT_CSV, index=False, encoding="utf-8-sig")
+
+# 5. 同步輸出乾淨的 TXT 檔
+with open(OUTPUT_TXT, "w", encoding="utf-8") as f:
+    for _, row in df_cleaned.iterrows():
+        f.write(f"{row['id']}. {row['text']}\n\n")
+
+print(f"原始筆數：{original_count} 筆")
+print(f"刪除筆數：{is_photo_by.sum()} 筆 (Photo by...)")
+print(f"剩餘筆數：{len(df_cleaned)} 筆")
+print(f"已輸出乾淨檔案：\n- {OUTPUT_CSV}\n- {OUTPUT_TXT}")
