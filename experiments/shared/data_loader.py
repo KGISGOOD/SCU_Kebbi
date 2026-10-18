@@ -97,6 +97,13 @@ def _parse_txt_file(filepath: str, source_group: str) -> List[Document]:
 
 def _parse_csv_file(filepath: str, source_group: str) -> List[Document]:
     """Parse a single CSV file."""
+    # Increase field size limit to handle large fields
+    try:
+        csv.field_size_limit(10 * 1024 * 1024)  # 10MB limit
+    except OverflowError:
+        # If we can't set it that high, try the max possible
+        csv.field_size_limit(0)  # This usually means no limit or system max
+
     try:
         # Try different encodings
         for encoding in ("utf-8-sig", "utf-8", "cp950", "big5", "gbk"):
@@ -105,18 +112,36 @@ def _parse_csv_file(filepath: str, source_group: str) -> List[Document]:
                     # Try to detect delimiter
                     sample = f.read(1024)
                     f.seek(0)
-                    sniffer = csv.Sniffer()
-                    delimiter = sniffer.sniff(sample).delimiter
-                    f.seek(0)
+                    try:
+                        sniffer = csv.Sniffer()
+                        delimiter = sniffer.sniff(sample).delimiter
+                    except csv.Error:
+                        # If sniffer fails, try common delimiters
+                        # Reset file and try to guess from first line
+                        f.seek(0)
+                        first_line = f.readline()
+                        f.seek(0)
+                        if ',' in first_line and ('"' in first_line or first_line.count(',') > 1):
+                            delimiter = ','
+                        elif '\t' in first_line:
+                            delimiter = '\t'
+                        elif ';' in first_line:
+                            delimiter = ';'
+                        else:
+                            delimiter = ','  # Default fallback
                     reader = csv.DictReader(f, delimiter=delimiter)
                     rows = list(reader)
                 break
-            except (UnicodeDecodeError, csv.Error):
+            except (UnicodeDecodeError, csv.Error) as e:
+                # Log the specific error for debugging
+                last_error = e
                 continue
         else:
-            raise ValueError(f"Could not decode or parse {filepath} with tried encodings")
+            # If all encodings failed, raise a more informative error
+            raise ValueError(f"Could not decode or parse {filepath} with tried encodings. Last error: {last_error}")
     except Exception as e:
-        print(f"Warning: Failed to read {filepath}: {e}")
+        # Show the real exception instead of hiding it
+        print(f"Warning: Failed to read {filepath}: {type(e).__name__}: {e}")
         return []
 
     documents = []

@@ -170,7 +170,7 @@ class FAISSVectorStore:
         self.index.add(embeddings.astype(np.float32))
         self.docstore = documents
         # Create mapping from index position to docstore position
-        self.index_to_docstore_id = {i: i for i in len(documents)}
+        self.index_to_docstore_id = {i: i for i in range(len(documents))}
 
     def save(self) -> None:
         """Save the index and docstore to disk."""
