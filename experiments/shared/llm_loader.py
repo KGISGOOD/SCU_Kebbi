@@ -88,8 +88,6 @@ class LLMLoader:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_id,
                 torch_dtype=self.torch_dtype,
-                load_in_8bit=load_in_8bit,
-                load_in_4bit=load_in_4bit,
                 device_map="auto" if self.device == "cuda" else None,
                 trust_remote_code=trust_remote_code,
             )
