@@ -1,0 +1,14 @@
+# Core dependencies for the RAG baseline
+torch>=2.0.0,<2.4.0
+transformers>=4.43.0,<4.48.0
+sentence-transformers>=2.2.2,<2.5.0
+faiss-cpu>=1.7.4,<1.9.0
+langchain>=0.1.0,<0.2.0
+langchain-core>=0.1.0,<0.2.0
+langchain-huggingface>=0.1.0,<0.2.0
+tqdm>=4.65.0,<5.0.0
+numpy>=1.24.0,<1.27.0
+
+# Optional: For GPU support (uncomment and adjust as needed)
+# faiss-gpu>=1.7.4,<1.9.0
+# torch>=2.0.0,<2.4.0  # with CUDA version matching your system
