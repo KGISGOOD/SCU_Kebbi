@@ -16,7 +16,7 @@ from typing import List, Dict, Any
 
 from .config import settings
 from .pipeline import create_pipeline_from_config
-from ..shared.evaluation import timer, save_jsonl
+from experiments.shared.evaluation import timer, save_jsonl
 
 
 def load_test_questions(filepath: Optional[str] = None) -> List[str]:

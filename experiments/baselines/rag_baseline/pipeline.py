@@ -12,11 +12,11 @@ from langchain_core.documents import Document
 
 from .config import settings
 from .prompts import build_prompt, create_context_from_documents
-from ..shared.evaluation import timer
-from ..shared.embeddings import BGEM3Embedder
-from ..shared.vector_store import FAISSVectorStore
-from ..shared.retrieval import Retriever
-from ..shared.llm_loader import LLMLoader
+from experiments.shared.evaluation import timer
+from experiments.shared.embeddings import BGEM3Embedder
+from experiments.shared.vector_store import FAISSVectorStore
+from experiments.shared.retrieval import Retriever
+from experiments.shared.llm_loader import LLMLoader
 
 
 class RAGPipeline:

@@ -13,10 +13,10 @@ from pathlib import Path
 from typing import List, Tuple
 
 from .config import settings
-from ..shared.data_loader import load_documents_from_type1_type2
-from ..shared.embeddings import BGEM3Embedder
-from ..shared.vector_store import FAISSVectorStore
-from ..shared.retrieval import Retriever
+from experiments.shared.data_loader import load_documents_from_type1_type2
+from experiments.shared.embeddings import BGEM3Embedder
+from experiments.shared.vector_store import FAISSVectorStore
+from experiments.shared.retrieval import Retriever
 
 
 def main():
