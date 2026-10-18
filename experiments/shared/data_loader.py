@@ -127,13 +127,48 @@ def _parse_csv_file(filepath: str, source_group: str) -> List[Document]:
     content_type = _infer_content_type(filename, "")
 
     for i, row in enumerate(rows, start=1):  # row numbers start at 1
-        # Convert row to text: combine all fields
-        # For FAQ files, we want to keep Q&A together
-        text_parts = []
-        for key, value in row.items():
-            if value is not None and str(value).strip():
-                text_parts.append(f"{key}: {str(value).strip()}")
-        content = " | ".join(text_parts)
+        # Handle specific file structures for better content organization
+        content = ""
+
+        # Special handling for type1/ig_img.csv - single text column
+        if filename == "ig_img.csv" and "text" in row:
+            content = str(row["text"]).strip() if row["text"] is not None else ""
+
+        # Special handling for type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv
+        elif filename == "資料擴充 - 家長 FAQ 資料集（30 題）.csv":
+            question = str(row["問題內容"]).strip() if row["問題內容"] is not None else ""
+            answer = str(row["ai答覆"]).strip() if row["ai答覆"] is not None else ""
+            if question and answer:
+                content = f"問題：{question}\n答案：{answer}"
+            elif question:
+                content = f"問題：{question}"
+            elif answer:
+                content = f"答案：{answer}"
+
+        # Special handling for type2/資料擴充 - 相關資料搜集.csv
+        elif filename == "資料擴充 - 相關資料搜集.csv":
+            dimension = str(row["資料搜集維度"]).strip() if row["資料搜集維度"] is not None else ""
+            content_main = str(row["完整敘述內容"]).strip() if row["完整敘述內容"] is not None else ""
+            indicators = str(row["核心官方機制與客觀指標"]).strip() if row["核心官方機制與客觀指標"] is not None else ""
+
+            # Combine all meaningful content
+            parts = []
+            if dimension:
+                parts.append(f"維度：{dimension}")
+            if content_main:
+                parts.append(f"內容：{content_main}")
+            if indicators:
+                parts.append(f"指標：{indicators}")
+            content = "\n".join(parts)
+
+        # Default handling: combine all fields
+        else:
+            text_parts = []
+            for key, value in row.items():
+                if value is not None and str(value).strip():
+                    text_parts.append(f"{key}: {str(value).strip()}")
+            content = " | ".join(text_parts)
+
         content = _clean_text(content)
         if not content:
             continue
@@ -169,6 +204,19 @@ def _parse_csv_file(filepath: str, source_group: str) -> List[Document]:
                     y, m = date_match.groups()
                     metadata["published_date"] = f"{y}/{int(m):02d}"
                     break
+
+        # For FAQ files, preserve all original columns as metadata
+        if filename == "資料擴充 - 家長 FAQ 資料集（30 題）.csv":
+            metadata["編號"] = str(row["編號"]).strip() if row["編號"] is not None else ""
+            metadata["關切維度"] = str(row["關切維度"]).strip() if row["關切維度"] is not None else ""
+            metadata["問題內容"] = str(row["問題內容"]).strip() if row["問題內容"] is not None else ""
+            metadata["ai答覆"] = str(row["ai答覆"]).strip() if row["ai答覆"] is not None else ""
+
+        # For the data collection file, preserve metadata columns
+        elif filename == "資料擴充 - 相關資料搜集.csv":
+            metadata["資料搜集維度"] = str(row["資料搜集維度"]).strip() if row["資料搜集維度"] is not None else ""
+            metadata["完整敘述內容"] = str(row["完整敘述內容"]).strip() if row["完整敘述內容"] is not None else ""
+            metadata["核心官方機制與客觀指標"] = str(row["核心官方機制與客觀指標"]).strip() if row["核心官方機制與客觀指標"] is not None else ""
 
         doc = Document(page_content=content, metadata=metadata)
         documents.append(doc)

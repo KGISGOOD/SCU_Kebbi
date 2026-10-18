@@ -34,7 +34,7 @@ def chunk_documents(
     Returns:
         List of chunked Document objects.
     """
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
 
     # Initialize text splitter
     text_splitter = RecursiveCharacterTextSplitter(
