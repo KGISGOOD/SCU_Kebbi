@@ -23,6 +23,7 @@ class RAGPipeline:
     """Retrieval-Augmented Generation pipeline."""
 
     def __init__(
+        self,
         vector_store: FAISSVectorStore,
         embedder: BGEM3Embedder,
         llm_loader: LLMLoader,
