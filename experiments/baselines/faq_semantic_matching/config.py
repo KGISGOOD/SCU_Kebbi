@@ -26,6 +26,9 @@ class FAQSettings:
     results_dir: str = field(
         default_factory=lambda: str(_BASE_DIR / "experiments" / "results" / "faq_semantic_matching")
     )
+    type2_dir: str = field(
+        default_factory=lambda: str(_BASE_DIR / "畢業專題_爬蟲" / "type2")
+    )
 
     # Embedding model (reuse BGE-M3)
     embedding_model: str = "BAAI/bge-m3"

@@ -126,11 +126,12 @@ class FAQMatcher:
         print(f"Building FAQ index from {len(self.faq_documents)} FAQs...")
         start_time = time.time()
 
-        # Clear any existing index
-        self.vector_store.clear()
+        # Compute embeddings for FAQ questions
+        questions = [doc.page_content for doc in self.faq_documents]
+        embeddings = self.embedder.encode(questions)
 
-        # Add documents to the vector store (which computes embeddings and builds index)
-        self.vector_store.add_documents(self.faq_documents)
+        # Build index
+        self.vector_store.build(embeddings, self.faq_documents)
 
         # Save the index
         self.vector_store.save()
