@@ -243,7 +243,7 @@ class FAQMatcher:
 
         # Determine match status based on threshold
         threshold = settings.similarity_threshold
-        is_matched = threshold is not None and top1_score >= threshold
+        is_matched = (threshold is None) or (top1_score >= threshold)
 
         # Prepare the return values
         matched_answer = top1_faq.get("answer") if is_matched and top1_faq else None

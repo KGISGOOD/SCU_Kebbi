@@ -233,7 +233,7 @@ def main():
 
             # Determine match status
             threshold = settings.similarity_threshold
-            is_matched = threshold is not None and similarity_score >= threshold
+            is_matched = (threshold is None) or (similarity_score >= threshold)
             match_status = "matched" if is_matched else "no_match"
 
             # Prepare result entry with all requested fields
