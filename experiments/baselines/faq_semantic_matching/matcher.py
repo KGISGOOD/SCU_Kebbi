@@ -11,8 +11,8 @@ from typing import List, Tuple, Optional, Dict, Any
 
 from langchain_core.documents import Document
 
-from ..shared.embeddings import BGEM3Embedder
-from ..shared.vector_store import FAISSVectorStore
+from experiments.shared.embeddings import BGEM3Embedder
+from experiments.shared.vector_store import FAISSVectorStore
 from .config import settings
 from .faq_loader import load_all_faq, save_faq_as_jsonl
 
