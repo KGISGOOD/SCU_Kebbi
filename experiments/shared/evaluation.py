@@ -6,6 +6,7 @@ Provides timing context managers and JSONL saving functions.
 from __future__ import annotations
 
 import json
+import os
 import time
 from contextlib import contextmanager
 from typing import Any, Dict, Generator, Optional

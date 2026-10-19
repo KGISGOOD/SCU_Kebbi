@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import time
+import traceback
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -164,6 +165,7 @@ def main():
 
         except Exception as e:
             print(f"   ERROR: {e}")
+            traceback.print_exc()
             # Still save an error result
             results.append(
                 {

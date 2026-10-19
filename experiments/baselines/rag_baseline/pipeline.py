@@ -58,9 +58,11 @@ class RAGPipeline:
         Returns:
             Tuple of (documents, scores).
         """
-        return self.retriever.vector_store.similarity_search(
-            self.retriever.embedder.embed_query(query), k=self.top_k
-        )
+        # Use the retriever which correctly converts query embedding to numpy array
+        retriever_results = self.retriever.retrieve(query)
+        documents = [doc for doc, _ in retriever_results]
+        scores = [score for _, score in retriever_results]
+        return documents, scores
 
     def generate_answer(
         self,
