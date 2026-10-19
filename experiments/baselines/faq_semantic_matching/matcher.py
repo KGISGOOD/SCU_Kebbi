@@ -5,6 +5,8 @@ Uses BGE-M3 embedding and FAISS IndexFlatIP to match questions to FAQ answers.
 
 from __future__ import annotations
 
+import json
+import os
 import time
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
