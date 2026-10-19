@@ -1,6 +1,6 @@
 """Test the complete RAG + LLM baseline.
 
-This script tests the end-to-end functionality by running the full pipeline
+This script tests the end-to-llm functionality by running the full pipeline
 on a set of test questions and saving the results.
 """
 
@@ -14,7 +14,7 @@ import time
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict[str, Any], Optional, Tuple
 
 from .config import settings
 from .pipeline import create_pipeline_from_config
@@ -274,7 +274,7 @@ def main():
     print("-" * 60)
 
     results = []
-    total_start_time = time.time()
+    total_start_time = time.perf_counter()  # Use perf_counter for more precise timing
 
     for i, question_data in enumerate(questions, start=1):
         question_id = question_data.get("question_id", f"Q{i}")
@@ -286,11 +286,20 @@ def main():
         print(f"   Type: {test_type}")
 
         try:
-            # Run pipeline with timing
-            with timer(f"Question {i}"):
-                answer, retrieved_docs, scores = pipeline(
-                    question_text, return_context=True
-                )
+            # Time the retrieval phase
+            retrieval_start = time.perf_counter()
+            retrieved_docs, scores = pipeline.retrieve(question_text)
+            retrieval_end = time.perf_counter()
+            retrieval_time = retrieval_end - retrieval_start
+
+            # Time the generation phase
+            generation_start = time.perf_counter()
+            answer = pipeline.generate_answer(question_text, retrieved_docs)
+            generation_end = time.perf_counter()
+            generation_time = generation_end - generation_start
+
+            # Total time for this question
+            question_total_time = retrieval_time + generation_time
 
             # Prepare result entry with all requested fields
             result_entry = {
@@ -314,9 +323,9 @@ def main():
                 if retrieved_docs
                 else [],
                 "timestamp": time.time(),
-                "total_time": None,  # Will be filled in after timing
-                "retrieval_time": None,
-                "generation_time": None,
+                "total_time": question_total_time,
+                "retrieval_time": retrieval_time,
+                "generation_time": generation_time,
             }
 
             # Add original question metadata if present
@@ -326,9 +335,10 @@ def main():
 
             results.append(result_entry)
 
-            # Print answer preview
+            # Print answer preview and timing info
             answer_preview = answer[:200].replace("\n", " ")
             print(f"   A: {answer_preview}...")
+            print(f"   Timing - Retrieval: {retrieval_time:.3f}s, Generation: {generation_time:.3f}s, Total: {question_total_time:.3f}s")
             if args.show_sources and retrieved_docs:
                 print(f"   Sources: {len(retrieved_docs)} documents retrieved")
                 for j, (doc, score) in enumerate(zip(retrieved_docs, scores), start=1):
@@ -338,7 +348,10 @@ def main():
         except Exception as e:
             print(f"   ERROR: {e}")
             traceback.print_exc()
-            # Still save an error result
+            # Still save an error result with timing
+            question_end_time = time.perf_counter()
+            question_total_time = question_end_time - total_start_time  # This is approximate for errors
+
             result_entry = {
                 "question_id": question_id,
                 "test_type": test_type,
@@ -348,7 +361,9 @@ def main():
                 "error": str(e),
                 "retrieved_sources": [],
                 "timestamp": time.time(),
-                "total_time": None,
+                "total_time": question_total_time,  # Approximate
+                "retrieval_time": None,  # Failed during retrieval/generation
+                "generation_time": None,  # Failed during retrieval/generation
             }
 
             # Add original question metadata if present
@@ -358,16 +373,8 @@ def main():
 
             results.append(result_entry)
 
-    total_end_time = time.time()
+    total_end_time = time.perf_counter()
     total_elapsed = total_end_time - total_start_time
-
-    # Calculate individual question times (approximate)
-    # In a more sophisticated implementation, we would track these per question
-    for i, result in enumerate(results):
-        result["total_time"] = total_elapsed / len(results) if results else 0
-        # Note: For more accurate timing, we would need to modify the pipeline
-        # to return timing information, but the instructions say not to redesign
-        # the pipeline just for timing metrics
 
     # Save results
     print(f"\n5. Saving results to {output_file}...")
