@@ -184,7 +184,7 @@ class HybridRAGRerankerPipeline:
 
         # Retrieve using hybrid approach
         retrieval_start = time.perf_counter()
-        bm25_docs, bm25_scores, dense_docks, dense_scores, hybrid_docs, hybrid_scores = self.retrieve(query)
+        bm25_docs, bm25_scores, dense_docs, dense_scores, hybrid_docs, hybrid_scores = self.retrieve(query)
         retrieval_end = time.perf_counter()
         retrieval_time = retrieval_end - retrieval_start
 
