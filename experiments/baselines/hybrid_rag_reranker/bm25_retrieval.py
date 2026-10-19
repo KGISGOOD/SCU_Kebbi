@@ -212,7 +212,9 @@ class HybridRetriever:
         bm25_docs, bm25_scores = self.bm25_retriever.retrieve(query, top_k=top_k)
 
         # Get dense results
-        dense_docs, dense_scores = self.dense_retriever.retrieve(query)
+        dense_results = self.dense_retriever.retrieve(query)
+        dense_docs = [doc for doc, _ in dense_results]
+        dense_scores = [score for _, score in dense_results]
 
         # Apply RRF fusion
         fused_docs, fused_scores = self._apply_rrf(
