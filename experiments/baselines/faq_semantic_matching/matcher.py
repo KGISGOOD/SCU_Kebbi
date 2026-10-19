@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import numpy as np
 import time
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
@@ -189,23 +190,23 @@ class FAQMatcher:
         start_time = time.time()
 
         # Embed the question
-        question_embedding = self.embedder.embed_query(question)
+        query_embedding = np.array(self.embedder.embed_query(question), dtype=np.float32)
 
         # Search the vector store for top-k similar FAQs
         # We set top_k to 2 to get the top-1 and top-2 for analysis
         top_k = max(2, settings.top_k)  # Ensure at least 2 for margin calculation
-        results = self.vector_store.similarity_search_by_vector(question_embedding, top_k)
+        docs, sims = self.vector_store.similarity_search(query_embedding, top_k)
 
         end_time = time.time()
         matching_time = end_time - start_time
 
-        if not results:
+        if not docs:
             print("No results returned from vector store.")
             return None, None, None, None
 
         # Extract the top-1 and top-2 results
-        top1_doc, top1_score = results[0]
-        top2_doc, top2_score = results[1] if len(results) > 1 else (None, 0.0)
+        top1_doc, top1_score = docs[0], sims[0]
+        top2_doc, top2_score = (docs[1], sims[1]) if len(docs) > 1 else (None, 0.0)
 
         # Get the FAQ ID from the metadata
         top1_faq_id = top1_doc.metadata.get("faq_id")
