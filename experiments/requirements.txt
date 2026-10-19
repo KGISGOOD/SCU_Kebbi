@@ -8,6 +8,7 @@ langchain-core>=0.1.0,<0.2.0
 langchain-huggingface>=0.1.0,<0.2.0
 tqdm>=4.65.0,<5.0.0
 numpy>=1.24.0,<1.27.0
+jieba>=0.42.1
 
 # Optional: For GPU support (uncomment and adjust as needed)
 # faiss-gpu>=1.7.4,<1.9.0
