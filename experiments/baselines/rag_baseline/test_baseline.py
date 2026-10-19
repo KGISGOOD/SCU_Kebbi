@@ -14,7 +14,7 @@ import time
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict[str, Any], Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple
 
 from .config import settings
 from .pipeline import create_pipeline_from_config
