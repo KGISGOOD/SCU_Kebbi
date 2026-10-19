@@ -1,0 +1,22 @@
+{
+  "run_timestamp": "20261019_164846",
+  "run_datetime": "2026-10-19T16:48:46.453400",
+  "dataset_version": "1.1",
+  "dataset_as_of": "2026-10-19",
+  "prompt_version": "N/A (FAQ matching)",
+  "question_dataset_path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\scu_fixed_questions_v1_1.jsonl",
+  "question_count": 15,
+  "faq_dataset_path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\faq\\faq_canonical_v1.jsonl",
+  "faq_count": 60,
+  "embedding_model": "BAAI/bge-m3",
+  "vector_store_path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\vector_stores\\faq_bge_m3_v1",
+  "vector_store_type": "FAISS IndexFlatIP",
+  "top_k": 1,
+  "chunk_size": 512,
+  "chunk_overlap": 128,
+  "similarity_threshold": null,
+  "faq_matching_parameters": {
+    "similarity_threshold": null,
+    "top_k_for_analysis": 2
+  }
+}
