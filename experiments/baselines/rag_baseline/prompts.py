@@ -11,17 +11,44 @@ from langchain_core.documents import Document
 from .config import settings
 
 
+# Prompt version tracking
+PROMPT_VERSION = "baseline_basic_v1"
+
+
 def build_prompt(context: str, question: str) -> str:
-    """Build a prompt from context and question.
+    """Build a prompt from context and question using the fixed baseline prompt.
 
     Args:
         context: Retrieved context string.
         question: User question.
 
     Returns:
-        Formatted prompt string.
+        Formatted prompt string following the baseline basic template.
     """
-    return settings.prompt_template.format(context=context, question=question)
+    system_prompt = """你是「資科萬事通」，專門回答東吳大學巨量資料管理學院資料科學系的相關問題。
+請主要根據提供的參考資料回答，使用繁體中文，內容清楚、簡潔。
+如果參考資料不足以確認答案，請明確說明目前資料不足，不要自行猜測或編造。
+涉及日期、招生、學分或規定時，不要把不同年度的資訊混為一談；無法確認目前最新資訊時，應說明無法確認。
+如果問題與東吳資料科學系完全無關，請簡短說明本系統主要提供系所相關資訊。
+測試參考日期為 2026 年 10 月 19 日；這是固定的離線測試基準，不代表資料一定是最新的。"""
+
+    user_prompt = f"""參考資料：
+
+{context}
+
+問題：
+
+{question}
+
+請回答："""
+
+    # Combine system and user prompts in a format suitable for Llama 3.2 Instruct
+    # Using the standard chat format: <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    # {system_prompt}<|eot_id|><|start_header_id|>user<|end_header_id|>
+    # {user_prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+    prompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{system_prompt}<|eot_id|><|start_header_id|>user<|end_header_id|>\n{user_prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+    return prompt
 
 
 def format_documents(documents: List[Document]) -> str:
