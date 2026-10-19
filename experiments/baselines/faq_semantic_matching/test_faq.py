@@ -131,6 +131,13 @@ def main():
         help="Path to file containing test questions (JSONL format)"
     )
     parser.add_argument(
+        "--test-set",
+        type=str,
+        choices=["fixed60", "faq"],
+        default=None,
+        help="Choose test set: 'fixed60' for the fixed 60 questions, 'faq' for the FAQ matching test set"
+    )
+    parser.add_argument(
         "--output-dir",
         type=str,
         default=None,
@@ -154,19 +161,33 @@ def main():
     print("=" * 60)
 
     # Load test questions
-    questions_file = args.questions_file or os.path.join(
-        settings.datasets_dir, "scu_fixed_questions_v1_1.jsonl"
-    )
+    if args.questions_file:
+        questions_file = args.questions_file
+    else:
+        if args.test_set == "faq":
+            questions_file = os.path.join(settings.datasets_dir, "scu_faq_matching_test_v1.jsonl")
+        else:
+            # default to fixed 60 questions
+            questions_file = os.path.join(settings.datasets_dir, "scu_fixed_questions_v1_1.jsonl")
     questions = load_test_questions(questions_file)
     if args.num_questions:
         questions = questions[: args.num_questions]
-    print(f"\n1. Loaded {len(questions)} test questions")
+    print(f"\n1. Loaded {len(questions)} test questions from {questions_file}")
+
+    # Determine label for output file
+    if args.test_set:
+        label = args.test_set
+    elif args.questions_file:
+        # Use base name of the provided file
+        label = os.path.splitext(os.path.basename(args.questions_file))[0]
+    else:
+        label = "fixed60"
 
     # Create output directory
     output_dir = args.output_dir or settings.results_dir
     os.makedirs(output_dir, exist_ok=True)
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    output_file = os.path.join(output_dir, f"results_{timestamp}.jsonl")
+    output_file = os.path.join(output_dir, f"results_{timestamp}_{label}.jsonl")
     print(f"2. Results will be saved to: {output_file}")
 
     # Initialize FAQ matcher
