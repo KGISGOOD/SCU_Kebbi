@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import time
 from typing import List, Tuple, Optional, Dict, Any
+
 from langchain_core.documents import Document
 
 from .config import settings
@@ -48,6 +49,7 @@ class HybridRAGRerankerPipeline:
         self.llm_loader = llm_loader
         self.top_k = top_k if top_k is not None else settings.top_k
         self.use_reranker = use_reranker
+        self.llm_top_k = settings.reranker_top_k  # Number of documents to pass to LLM after fusion/reranking
 
         # Initialize retrievers
         self.dense_retriever = Retriever(
@@ -145,8 +147,11 @@ class HybridRAGRerankerPipeline:
         # Import here to avoid circular imports
         from .prompts import build_prompt, create_context_from_documents
 
+        # Limit to top-k documents for LLM input to avoid excessive length and ensure concise answer
+        llm_docs = retrieved_docs[:self.llm_top_k]
+
         # Create context from documents
-        context = create_context_from_documents(retrieved_docs)
+        context = create_context_from_documents(llm_docs)
         # Build prompt
         prompt = build_prompt(context, query)
         # Generate answer
@@ -179,7 +184,7 @@ class HybridRAGRerankerPipeline:
 
         # Retrieve using hybrid approach
         retrieval_start = time.perf_counter()
-        bm25_docs, bm25_scores, dense_docs, dense_scores, hybrid_docs, hybrid_scores = self.retrieve(query)
+        bm25_docs, bm25_scores, dense_docks, dense_scores, hybrid_docs, hybrid_scores = self.retrieve(query)
         retrieval_end = time.perf_counter()
         retrieval_time = retrieval_end - retrieval_start
 
