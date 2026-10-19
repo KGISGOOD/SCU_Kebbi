@@ -19,7 +19,7 @@ from typing import List, Dict, Any, Optional, Tuple
 from .config import settings
 from .pipeline import create_pipeline_from_config, HybridRAGRerankerPipeline
 from experiments.shared.data_loader import load_documents_from_type1_type2
-from experiments.shared.build_bm25_index import chunk_documents
+from .build_bm25_index import chunk_documents
 from experiments.shared.evaluation import timer, save_jsonl
 
 

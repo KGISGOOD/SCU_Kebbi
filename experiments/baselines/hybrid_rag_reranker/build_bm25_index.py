@@ -19,6 +19,7 @@ from typing import List, Tuple, Dict, Any
 from .config import settings
 from experiments.shared.data_loader import load_documents_from_type1_type2
 from experiments.shared.evaluation import timer
+from langchain_core.documents import Document
 
 
 def chunk_documents(
@@ -320,6 +321,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # Import Document here to avoid circular imports
-    from langchain_core.documents import Document
     main()
