@@ -163,9 +163,10 @@ class FAQMatcher:
             return False
 
     def match(self, question: str,
-              return_faq: bool = False) -> Tuple[Optional[str], Optional[float],
+              return_faq: bool = False) -> Tuple[Optional[str], float,
                                                  Optional[Dict[str, Any]],
-                                                 Optional[List[Dict[str, Any]]]]:
+                                                 List[Dict[str, Any]],
+                                                 float]:
         """Match a question to the best FAQ.
 
         Args:
@@ -173,21 +174,23 @@ class FAQMatcher:
             return_faq: Whether to return the full FAQ dictionary for the match.
 
         Returns:
-            Tuple of (matched_answer, similarity_score, matched_faq, [top_2_faqs])
-            If no match is found (or index not built), returns (None, None, None, None).
-            If return_faq is True, the matched_faq will be the full FAQ dictionary.
-            The second element in the tuple is the similarity score of the top match.
-            The fourth element is a list of the top 2 FAQs (each as a dict) for analysis.
+            Tuple of (matched_answer, similarity_score, matched_faq, top_2_faqs, matching_time)
+            matched_answer: The answer string if similarity passes threshold, otherwise None.
+            similarity_score: Float similarity score of the top-1 FAQ (always returned).
+            matched_faq: The full FAQ dictionary for top-1 if return_faq is True, otherwise None.
+            top_2_faqs: List of up to two dictionaries, each containing faq_id, question,
+                        answer, and similarity_score (float). Empty list if no results.
+            matching_time: Time in seconds to embed the question and search the index.
         """
         if not self.index_built:
             print("FAQ index not built. Please build or load the index first.")
-            return None, None, None, None
+            return None, 0.0, None, [], 0.0
 
         if not question or not question.strip():
             print("Empty question received.")
-            return None, None, None, None
+            return None, 0.0, None, [], 0.0
 
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Embed the question
         query_embedding = np.array(self.embedder.embed_query(question), dtype=np.float32)
@@ -197,12 +200,12 @@ class FAQMatcher:
         top_k = max(2, settings.top_k)  # Ensure at least 2 for margin calculation
         docs, sims = self.vector_store.similarity_search(query_embedding, top_k)
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         matching_time = end_time - start_time
 
         if not docs:
             print("No results returned from vector store.")
-            return None, None, None, None
+            return None, 0.0, None, [], matching_time
 
         # Extract the top-1 and top-2 results
         top1_doc, top1_score = docs[0], sims[0]
@@ -244,15 +247,7 @@ class FAQMatcher:
 
         # Prepare the return values
         matched_answer = top1_faq.get("answer") if is_matched and top1_faq else None
-        similarity_score = float(top1_score) if is_matched else None
-        matched_faq = top1_faq if return_faq and is_matched else None
-
-        # If not matched, we still want to return the top-2 for analysis? The spec says:
-        #   matched：通過門檻，回傳標準 FAQ 答案。
-        #   no_match：未通過門檻，回傳固定無匹配訊息。
-        #   error：程式執行或資料異常.
-        # So we return the answer only if matched, otherwise we return a fixed message?
-        # But the function returns the answer, and the caller can decide what to do.
-        # We'll return the answer as None if not matched, and the caller can use the top2_faqs to show alternatives.
+        similarity_score = float(top1_score)  # always return similarity score
+        matched_faq = top1_faq if return_faq else None  # always return top-1 FAQ if requested
 
         return matched_answer, similarity_score, matched_faq, top2_faqs, matching_time
