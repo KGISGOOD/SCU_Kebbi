@@ -17,6 +17,9 @@ class FAQSettings:
     """Configuration settings for FAQ semantic matching."""
 
     # Paths (relative to SCU_Kebbi root)
+    datasets_dir: str = field(
+        default_factory=lambda: str(_BASE_DIR / "experiments" / "datasets")
+    )
     faq_dataset_path: str = field(
         default_factory=lambda: str(_BASE_DIR / "experiments" / "datasets" / "faq" / "faq_canonical_v1.jsonl")
     )
@@ -42,6 +45,12 @@ class FAQSettings:
     # Similarity search parameters
     top_k: int = 1  # We only need top-1 for matching, but compute top-2 for analysis
     similarity_threshold: Optional[float] = None  # To be set after calibration; None means no threshold
+
+    # Text splitting (for metadata compatibility)
+    chunk_size: int = 512
+    chunk_overlap: int = 128
+    # Optional fingerprint for data versioning
+    data_fingerprint: Optional[str] = None
 
     # Misc
     verbose: bool = True
