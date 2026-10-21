@@ -1,6 +1,6 @@
 """Train A2-1/A2-2 with masked cosine MNRL; no evaluation queries are read.
 
-Targets the repository's SentenceTransformers 2.2.2 <= version < 2.5 API.
+Uses explicit legacy and SentenceTransformers 6.1.0 training API profiles.
 Only the user may execute this program on the training computer.
 """
 from __future__ import annotations
@@ -22,6 +22,10 @@ from .common import (DATA_DIR, DataError, default_root, read_json, read_jsonl,
 from .evaluate_faq_retrieval import local_model_identity, package_versions
 from .training_data import (batch_documents, make_schedule, prepare_training, schedule_hash)
 from .validate_a2_data import collect_validation
+from .training_compat import (embedding_gradient_report, forward_training_texts,
+                              load_training_model, model_api_description,
+                              save_training_model, select_training_profile,
+                              underlying_transformers, verify_saved_model)
 
 
 def load_arguments():
@@ -58,6 +62,8 @@ def load_arguments():
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--gradient-checkpointing", action="store_true",
                         help="enable underlying Transformer checkpointing or fail explicitly")
+    parser.add_argument("--verify-save-load", action="store_true",
+                        help="reload final export on CPU and compare two Train embeddings; extra host RAM required")
     args = parser.parse_args()
     import math
     for key in ("batch_size", "epochs", "seed", "max_length", "save_every_epochs"):
@@ -108,17 +114,9 @@ def main() -> int:
         expected_pairs = 126 * args.epochs
         if sum(len(batch["samples"]) for batch in schedule) != expected_pairs:
             raise DataError("schedule coverage mismatch; no training will start")
-        # Check API ranges without importing a model or selecting a different installed API.
-        from packaging.version import Version
+        # Select an actual API implementation, not merely a relaxed version range.
         versions = package_versions()
-        for name, lower, upper in (("sentence-transformers", "2.2.2", "2.5"),
-                                    ("torch", "2.0", "2.4"),
-                                    ("transformers", "4.43", "4.48")):
-            value = versions.get(name)
-            if value is None or not Version(lower) <= Version(value) < Version(upper):
-                raise DataError("%s=%r outside repository supported range [%s,%s); "
-                                "this program does not install or upgrade packages"
-                                % (name, value, lower, upper))
+        api_profile = select_training_profile(versions)
         input_hashes = dict(validation["input_sha256"])
         input_hashes[args.config] = config_digest
         for path, digest in input_hashes.items():
@@ -130,7 +128,6 @@ def main() -> int:
         os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
         import numpy as np
         import torch
-        from experiments.shared.embeddings import BGEM3Embedder
         from .training_loss import MaskedMultipleNegativesRankingLoss
 
         if args.device == "cuda" and not torch.cuda.is_available():
@@ -151,31 +148,26 @@ def main() -> int:
         if identity is not None and read_checkpoint_provenance(model_path) is not None:
             raise DataError("initial model is an A2-trained output, not the common original checkpoint")
         effective_model = str(model_path) if identity is not None else args.model
-        wrapper = BGEM3Embedder(model_name=effective_model, device=device,
-                                batch_size=args.batch_size, normalize_embeddings=True)
-        model = wrapper.model
+        model = load_training_model(effective_model, device, args.offline, api_profile, args.max_length)
         if identity is not None and local_model_identity(model_path) != identity:
             raise DataError("initial checkpoint files changed during model loading")
-        model.max_seq_length = args.max_length
-        model.to(device).float()
+        transformers = underlying_transformers(model, api_profile)
         if args.gradient_checkpointing:
-            enabled = False
-            for module in model._modules.values():
-                transformer = getattr(module, "auto_model", None)
-                if transformer is not None:
-                    method = getattr(transformer, "gradient_checkpointing_enable", None)
-                    if not callable(method):
-                        raise DataError("underlying Transformer does not support gradient checkpointing")
-                    method()
-                    if hasattr(transformer.config, "use_cache"):
-                        transformer.config.use_cache = False
-                    enabled = True
-            if not enabled:
+            if not transformers:
                 raise DataError("no underlying Transformer found for gradient checkpointing")
+            for transformer in transformers:
+                method = getattr(transformer, "gradient_checkpointing_enable", None)
+                if not callable(method):
+                    raise DataError("underlying Transformer does not support gradient checkpointing")
+                if api_profile == "st_6_1_0_preprocess":
+                    method(gradient_checkpointing_kwargs={"use_reentrant": False})
+                else:
+                    method()
+                if hasattr(transformer.config, "use_cache"):
+                    transformer.config.use_cache = False
         revisions = sorted({
-            str(getattr(getattr(getattr(module, "auto_model", None), "config", None), "_commit_hash"))
-            for module in model._modules.values()
-            if getattr(getattr(getattr(module, "auto_model", None), "config", None), "_commit_hash", None)
+            str(transformer.config._commit_hash) for transformer in transformers
+            if getattr(transformer.config, "_commit_hash", None)
         })
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         default_output = Path("experiments/models/a2_faq_finetuning") / args.mode / (
@@ -189,6 +181,8 @@ def main() -> int:
         output = requested_output
         provisional = bool(pending) or args.allow_unreviewed
         parameters = [parameter for parameter in model.parameters() if parameter.requires_grad]
+        if not parameters:
+            raise DataError("model has no trainable parameters")
         parameter_count = sum(parameter.numel() for parameter in parameters)
         optimizer = torch.optim.AdamW(parameters, lr=args.learning_rate,
                                      betas=(0.9, 0.999), eps=1e-8,
@@ -205,12 +199,13 @@ def main() -> int:
             "loss": "MaskedMultipleNegativesRankingLoss (cosine InfoNCE)",
             "explicit_stored_negative_arrays_used": False,
             "excluded_hard_candidates": excluded_hard,
+            "training_api": model_api_description(model, api_profile),
         }
         code_paths = [Path(__file__).resolve(), Path(__file__).with_name("training_data.py"),
                       Path(__file__).with_name("training_loss.py"), Path(__file__).with_name("common.py"),
                       Path(__file__).with_name("validate_a2_data.py"),
                       Path(__file__).with_name("evaluate_faq_retrieval.py"),
-                      Path(sys.modules[BGEM3Embedder.__module__].__file__).resolve()]
+                      Path(__file__).with_name("training_compat.py")]
         run_config = {
             **provenance, "arguments": {key: str(value) if isinstance(value, Path) else value
                                        for key, value in vars(args).items()},
@@ -234,11 +229,7 @@ def main() -> int:
         write_jsonl_exclusive(output / "positive_pair_schedule.jsonl", schedule)
 
         def forward_texts(texts):
-            # encode() is inference-only and detaches gradients; train through forward().
-            features = model.tokenize(texts)
-            features = {key: value.to(device) if torch.is_tensor(value) else value
-                        for key, value in features.items()}
-            return model(features)["sentence_embedding"]
+            return forward_training_texts(model, texts, device, api_profile)
 
         def save_model(path, epoch):
             if identity is not None and local_model_identity(model_path) != identity:
@@ -250,11 +241,16 @@ def main() -> int:
             # Written first: interrupted exports cannot fall back to a raw model.
             write_json_exclusive(path / "a2_checkpoint_pending.json",
                                  {"schema_version": "a2_checkpoint_pending_v1"})
-            model.save(str(path), create_model_card=False)
+            save_training_model(model, path, api_profile)
             write_json_exclusive(path / "a2_training_provenance.json",
                                  {**provenance, "completed_epoch": epoch, "optimizer_steps": steps})
             if not (path / "modules.json").is_file():
                 raise DataError("SentenceTransformer export is missing modules.json")
+            if args.verify_save_load and path.name == "final_model":
+                verification = verify_saved_model(
+                    model, path, [by_id[key]["question"] for key in sorted(by_id)[:2]],
+                    api_profile, args.max_length)
+                write_json_exclusive(path / "a2_reload_verification.json", verification)
             write_json_exclusive(path / "a2_checkpoint_complete.json", {
                 "schema_version": "a2_checkpoint_complete_v1",
                 "files_sha256": checkpoint_files(path),
@@ -280,13 +276,21 @@ def main() -> int:
                 query_embeddings = forward_texts([sample["query"] for sample in samples])
                 base_embeddings = forward_texts([sample["positive"] for sample in samples])
                 extras = documents["document_texts"][len(samples):]
-                document_embeddings = (torch.cat([base_embeddings, forward_texts(extras)], dim=0)
+                branches = {"query": query_embeddings, "positive_documents": base_embeddings}
+                if extras:
+                    branches["extra_hard_documents"] = forward_texts(extras)
+                for embeddings in branches.values():
+                    embeddings.retain_grad()
+                document_embeddings = (torch.cat([base_embeddings, branches["extra_hard_documents"]], dim=0)
                                        if extras else base_embeddings)
                 loss = objective(query_embeddings, document_embeddings,
                                  documents["allowed_mask"], documents["targets"])
                 if not torch.isfinite(loss):
                     raise DataError("non-finite training loss at step %d" % (steps + 1))
                 loss.backward()
+                branch_gradients = embedding_gradient_report(branches)
+                if not any(parameter.grad is not None for parameter in parameters):
+                    raise DataError("backward produced no model parameter gradients")
                 gradient_norm = torch.nn.utils.clip_grad_norm_(
                     parameters, args.max_grad_norm, error_if_nonfinite=True)
                 optimizer.step()
@@ -303,6 +307,7 @@ def main() -> int:
                     "pair_ids": [sample["pair_id"] for sample in samples],
                     "batch_size_actual": len(samples), "loss": loss_value,
                     "gradient_norm_before_clip": float(gradient_norm.detach().cpu()),
+                    "embedding_branch_gradients": branch_gradients,
                     "learning_rate": optimizer.param_groups[0]["lr"],
                     **{key: documents[key] for key in (
                         "base_negative_exposures", "hard_visible_exposures",
@@ -327,6 +332,7 @@ def main() -> int:
             "elapsed_seconds": time.monotonic() - started,
             "cuda_peak_allocated_bytes": torch.cuda.max_memory_allocated() if device == "cuda" else None,
             "final_model": str(output / "final_model"), "validation_selection_performed": False,
+            "final_model_reload_verified": args.verify_save_load,
         })
         print(json.dumps({"output": str(output), "final_model": str(output / "final_model"),
                           "optimizer_steps": steps, "provisional": provisional}, ensure_ascii=False))

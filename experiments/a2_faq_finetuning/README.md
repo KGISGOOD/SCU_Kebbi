@@ -15,6 +15,7 @@
 | train_faq_embedding.py | 任務 4：Train-only 檢查與 A2-1/A2-2 微調入口，未執行 |
 | training_data.py、training_loss.py | 唯一意圖批次排程與可變難例的 masked MNRL |
 | training_config.json、TRAINING.md | 共同訓練設定、操作與方法限制 |
+| training_compat.py、TRAINING_COMPATIBILITY.md | 任務 8：ST 6.1.0 API 介接、分支梯度檢查、可選回載檢查與 Smoke Test 命令 |
 | STATIC_REVIEW.md | 任務 5：資料流靜態審查、修復紀錄與另一台電腦的 Smoke Test |
 | evaluate_hard_diagnostic.py、diagnostic_data.py | 任務 7：獨立 Train 意圖診斷入口／只讀驗證，不混入原 138 題結果 |
 | HARD_DIAGNOSTIC_REVIEW.md | 30 題待審診斷、歧義排除、使用命令與限制 |

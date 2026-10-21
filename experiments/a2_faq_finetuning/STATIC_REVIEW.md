@@ -1,5 +1,7 @@
 # A2 任務 5：靜態審查紀錄
 
+後續版本註記（任務 8）：本文保留任務 5 當時的審查歷史。訓練現已新增 ST 6.1.0 的 preprocess／公開 Transformer／save_pretrained 介接及分支梯度檢查，見 [TRAINING_COMPATIBILITY.md](TRAINING_COMPATIBILITY.md)。原 Masked InfoNCE、排程、資料 gate 與 manifest 保留；不以此歷史紀錄代表新版已執行驗證。
+
 本次僅閱讀程式、CSV、設定及檔案 hash，直接修正 A2 程式。未執行 Python、parser、測試、模型、訓練或安裝。下列程式行為是靜態追蹤結論，數值推算不是執行結果。訓練及評估 JSONL 均未修改。
 
 ## 實際缺陷與修正

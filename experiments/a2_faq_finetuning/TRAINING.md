@@ -1,4 +1,6 @@
-# A2 任務 4：BGE-M3 微調操作與方法契約
+# A2 BGE-M3 微調操作與方法契約（任務 8 相容性修訂）
+
+任務 8：新增明確的 ST 6.1.0 API 路徑，未修改 GPU 電腦套件。可直接複製的 Smoke Test 與來源查核見 [TRAINING_COMPATIBILITY.md](TRAINING_COMPATIBILITY.md)。本機只編輯／靜態審查，沒有執行成功紀錄。
 
 任務 5 補充：見 [STATIC_REVIEW.md](STATIC_REVIEW.md)。A2 模型匯出現在包含 pending 標記與最後寫入的 a2_checkpoint_complete.json（檔案 hash manifest）；缺完整性標記、內容不符或 model-tag 不符都會阻止評估。pending 檔是匯出嘗試紀錄，只有 completion manifest 完整有效時才能使用。舊 A2 匯出若缺 manifest 不再默認接受，本次不替舊模型補造完成紀錄。原始 BGE-M3 的 A1 載入及 cosine 排名流程保留。
 
@@ -7,17 +9,18 @@
 
 ## 1. 版本與採用的 API
 
-先讀取 experiments/requirements.txt，目標範圍為：
+experiments/requirements.txt 保留原內容，舊設定範圍為：
 
 - sentence-transformers >=2.2.2,<2.5.0。
 - torch >=2.0.0,<2.4.0。
 - transformers >=4.43.0,<4.48.0。
 - NumPy 沿用現有專案；packaging 為既有 Transformers 相關相依套件，用於版本比較。
 
-程式在訓練電腦以套件 metadata 檢查上述三個範圍；不支援的版本明確停止，不自行安裝、升級或選另一套 Trainer。
-採 SentenceTransformer.tokenize → model(features)["sentence_embedding"] 的可微分 forward，再用 model.save 匯出。沒有使用新式 SentenceTransformerTrainer、TrainingArguments 或 InputExample 混合長度 collator。
-重用既有 BGEM3Embedder 建立相同模型結構；不以 encode() 訓練，因其推論路徑會關閉梯度並 detach。
-版本範圍只代表對齊本專案的 API 設計，尚未證實整個相依組合能匯入。舊 ST 與 huggingface-hub、Transformers 的相容性仍須在另一台電腦確認；程式不修改 requirements 或環境。
+任務 8 改由 training_compat.py 選擇 API profile：保留舊範圍的 tokenize/save 路徑；另外支援靜態查核過的 ST==6.1.0 路徑，檢查 Python>=3.10、torch>=2.2,<3、transformers>=5,<6、numpy>=1.24。這不是整個版本組合已測試的保證，不自動安裝、升級或改用 Trainer。
+
+ST 6.1.0 直接載入 SentenceTransformer（torch backend、offline 時 local_files_only=True），使用 preprocess(inputs=texts, prompt=None) → model(features)["sentence_embedding"]，並以 save_pretrained(..., safe_serialization=True) 匯出。Pooling 沿用 checkpoint，不重建。tokenize 在該版是 deprecated alias，並非已移除；原 save/forward 也仍存在，不能把本次報錯虛稱為它們已實際執行失敗。
+
+訓練不經 BGEM3Embedder 的推論入口；評估仍沿用已可執行的 BGEM3Embedder，其內部同樣以 SentenceTransformer 載入模型。訓練沒有 encode、no_grad 或 NumPy 轉換；只在可選的訓練後回載檢查使用 encode 作推論。每路 embedding 檢查 requires_grad/grad_fn，backward 後檢查 retained gradient，逐步寫入日誌。Loss 數學及資料排程不變。
 
 方法依據為 [SentenceTransformers 2.2.2 官方 MNRL 原始碼](https://github.com/UKPLab/sentence-transformers/blob/v2.2.2/sentence_transformers/losses/MultipleNegativesRankingLoss.py)：
 標準 MNRL 將 query-positive 配對及其他文件的 cosine 分數經 scale-softmax／cross entropy 計算；硬負例也能加入，但會供整批 query 使用。
@@ -144,6 +147,7 @@ python -m experiments.a2_faq_finetuning.train_faq_embedding --project-root . --m
 - failure.json：若輸出已建立後發生錯誤，記錄已完成步數及失敗原因；不當作已完成結果。
 
 模型匯出 API 與現有評估器的 SentenceTransformer(model_path) 相同，可讀取 final_model 或中間 epoch 目錄。靜態已對齊格式，但尚未實際做 save/load round trip。
+任務 8 可加 --verify-save-load：final_model 匯出後先在 CPU 回載，以兩題 Train 原題比對正規化 embedding，檢查長度設定保存；通過才寫 completion manifest／成功 summary。失敗保留 pending／failure，不寫完成標記。這是未執行的檢查實作，不是已取得的驗證結果；CPU 回載額外需要主記憶體，且 CPU/CUDA 容差仍待實測。
 不要將 run 的上層目錄當模型路徑；應指定其中 final_model。
 
 可用 Unseen Validation 比較已保存 epoch 以選設定，但本程式不在訓練中讀 query、不自動挑 checkpoint，不作 Test early stopping。固定 epochs 的 final_model 是最後一輪，不是「最佳模型」。
