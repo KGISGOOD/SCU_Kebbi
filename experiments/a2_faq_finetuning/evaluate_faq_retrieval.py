@@ -61,8 +61,10 @@ def mean_metrics(rows):
     }
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(diagnostic=False) -> int:
+    parser = argparse.ArgumentParser(description=(
+        "Evaluate only the separate provisional Train-intent hard diagnostic, never formal tests."
+        if diagnostic else __doc__))
     add_data_arguments(parser)
     parser.add_argument("--model", default="BAAI/bge-m3",
                         help="Hugging Face model ID or local path relative to --project-root")
@@ -71,7 +73,14 @@ def main() -> int:
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--max-length", type=int, default=512)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--split", choices=("all",) + tuple(GROUPS), default="unseen_validation")
+    if diagnostic:
+        parser.add_argument("--hard-diagnostic",
+                            default="experiments/datasets/faq_finetuning/faq_hard_diagnostic.jsonl")
+        parser.add_argument("--check-only", action="store_true",
+                            help="print diagnostic validation only, without importing/loading a model")
+        parser.set_defaults(split="hard_diagnostic")
+    else:
+        parser.add_argument("--split", choices=("all",) + tuple(GROUPS), default="unseen_validation")
     parser.add_argument("--offline", action="store_true",
                         help="use only cached/local model files; do not access Hugging Face")
     parser.add_argument("--allow-unreviewed", action="store_true",
@@ -83,7 +92,16 @@ def main() -> int:
     root = args.project_root.expanduser().resolve()
     paths = data_paths(args)
     try:
-        validation = collect_validation(root, paths, include_eval=True)
+        groups = {"hard_diagnostic": None} if diagnostic else GROUPS
+        if diagnostic:
+            from .diagnostic_data import collect_diagnostic_validation
+            diagnostic_path = resolve_path(root, args.hard_diagnostic)
+            validation = collect_diagnostic_validation(root, paths, diagnostic_path)
+        else:
+            validation = collect_validation(root, paths, include_eval=True)
+        if diagnostic and args.check_only:
+            print(json.dumps(validation, ensure_ascii=False, indent=2))
+            return 0 if validation["structural_ok"] else 1
         if not validation["structural_ok"]:
             errors = [issue for issue in validation["issues"] if issue["severity"] == "error"]
             raise DataError("data validation failed before model loading:\n" +
@@ -91,12 +109,15 @@ def main() -> int:
         input_hashes = validation["input_sha256"]
         read_issues = []
         corpus = read_jsonl(paths["candidates"], read_issues)
-        all_queries = read_jsonl(paths["queries"], read_issues)
+        all_queries = read_jsonl(diagnostic_path if diagnostic else paths["queries"], read_issues)
+        if diagnostic:
+            all_queries = [dict(row, scenario="diagnostic", split="hard_diagnostic")
+                           for row in all_queries]
         if read_issues:
             raise DataError(json.dumps(read_issues, ensure_ascii=False))
         assert_input_hashes(input_hashes)
         corpus = sorted(corpus, key=lambda row: row["faq_id"])
-        selected_groups = list(GROUPS) if args.split == "all" else [args.split]
+        selected_groups = list(groups) if args.split == "all" else [args.split]
         queries = [row for row in all_queries if row["split"] in selected_groups]
         if not queries:
             raise DataError("no queries selected")
@@ -187,8 +208,12 @@ def main() -> int:
                 "full_ranking_faq_ids": ranking,
                 "full_ranking_scores": [float(scores[index]) for index in order],
             })
+            if diagnostic:
+                results[-1].update({key: query[key] for key in (
+                    "difficulty_type", "confusable_faq_ids", "rationale")})
+                results[-1].update({"diagnostic": True, "provisional": True})
         summary = {}
-        for group in GROUPS:
+        for group in groups:
             rows = [row for row in results if row["split"] == group]
             by_faq = defaultdict(list)
             for row in rows:
@@ -201,6 +226,15 @@ def main() -> int:
             summary[group] = {"evaluated": group in selected_groups, "query_count": len(rows),
                               "faq_count": len(by_faq), "metrics": mean_metrics(rows),
                               "macro_faq_metrics": macro, "per_faq": per_faq}
+            if diagnostic:
+                from .diagnostic_data import DIFFICULTY_TYPES
+                summary[group].update({"provisional": True,
+                                       "purpose": "development_diagnostic_not_final_test"})
+                summary[group]["by_difficulty_type"] = {
+                    kind: {"query_count": sum(row["difficulty_type"] == kind for row in rows),
+                           "metrics": mean_metrics([row for row in rows
+                                                    if row["difficulty_type"] == kind])}
+                    for kind in DIFFICULTY_TYPES}
         # Detect input edits during a run; do not save misleading results.
         for name, digest in input_hashes.items():
             if sha256_file(Path(name)) != digest:
@@ -213,11 +247,15 @@ def main() -> int:
             if getattr(getattr(getattr(module, "auto_model", None), "config", None), "_commit_hash", None)
         })
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        default_output = Path("experiments/results/a2_faq_retrieval") / args.model_tag / (
+        result_base = ("experiments/results/a2_hard_diagnostic" if diagnostic
+                       else "experiments/results/a2_faq_retrieval")
+        default_output = Path(result_base) / args.model_tag / (
             timestamp + "_" + uuid.uuid4().hex[:8])
         output = resolve_path(root, args.output_dir or default_output)
         if output.exists():
             raise DataError("result directory already exists; choose a NEW --output-dir: %s" % output)
+        if diagnostic and resolve_path(root, "experiments/results/a2_faq_retrieval") in (output, *output.parents):
+            raise DataError("diagnostic output must be separate from the formal retrieval result tree")
         metadata = {
             "schema_version": "a2_retrieval_run_v1", "model_tag": args.model_tag,
             "model_argument": args.model, "effective_model": model_name,
@@ -230,7 +268,7 @@ def main() -> int:
             "tie_break": "FAQ ID ascending", "candidate_count": len(corpus),
             "ranking_depth": len(corpus), "top_k_saved": 5, "mrr": "full ranking, not MRR@5",
             "query_count": len(queries), "selected_splits": selected_groups,
-            "provisional": (bool(pending) or args.allow_unreviewed or
+            "provisional": (diagnostic or bool(pending) or args.allow_unreviewed or
                             bool(model_provenance and model_provenance["provisional"])),
             "model_training_provenance": model_provenance,
             "unreviewed_query_ids": pending,
@@ -240,6 +278,13 @@ def main() -> int:
             "python": platform.python_version(), "platform": platform.platform(),
             "utc_timestamp": timestamp, "offline": args.offline,
             "torch_deterministic_algorithms": True,
+            **({"evaluation_purpose": "provisional_development_diagnostic_not_final_test",
+                "diagnostic": True, "diagnostic_path": str(diagnostic_path),
+                "diagnostic_gold_scope": "train_only",
+                "designed_after_a1_validation_aggregate_observed": True,
+                "diagnostic_validator_sha256": sha256_file(Path(__file__).with_name("diagnostic_data.py")),
+                "diagnostic_entry_sha256": sha256_file(Path(__file__).with_name("evaluate_hard_diagnostic.py"))}
+               if diagnostic else {}),
             "code_sha256": {str(path): sha256_file(path) for path in (
                 Path(__file__).resolve(), Path(__file__).with_name("common.py").resolve(),
                 Path(__file__).with_name("validate_a2_data.py").resolve(),

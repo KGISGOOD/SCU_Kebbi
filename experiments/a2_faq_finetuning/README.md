@@ -16,6 +16,8 @@
 | training_data.py、training_loss.py | 唯一意圖批次排程與可變難例的 masked MNRL |
 | training_config.json、TRAINING.md | 共同訓練設定、操作與方法限制 |
 | STATIC_REVIEW.md | 任務 5：資料流靜態審查、修復紀錄與另一台電腦的 Smoke Test |
+| evaluate_hard_diagnostic.py、diagnostic_data.py | 任務 7：獨立 Train 意圖診斷入口／只讀驗證，不混入原 138 題結果 |
+| HARD_DIAGNOSTIC_REVIEW.md | 30 題待審診斷、歧義排除、使用命令與限制 |
 | ../datasets/faq_finetuning/faq_eval_queries.jsonl | 138 題待人工審核查詢，不是已凍結 Test |
 
 ## 環境與路徑
