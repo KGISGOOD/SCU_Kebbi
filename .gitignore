@@ -9,3 +9,5 @@ venv/
 
 # Logs and temporary files
 *.log
+
+experiments/models/

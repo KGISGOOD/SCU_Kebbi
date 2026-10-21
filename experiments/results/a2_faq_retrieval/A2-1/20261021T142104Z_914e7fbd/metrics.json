@@ -1,0 +1,100 @@
+{
+  "seen_test": {
+    "evaluated": false,
+    "query_count": 0,
+    "faq_count": 0,
+    "metrics": null,
+    "macro_faq_metrics": null,
+    "per_faq": {}
+  },
+  "unseen_validation": {
+    "evaluated": true,
+    "query_count": 27,
+    "faq_count": 9,
+    "metrics": {
+      "top1_accuracy": 1.0,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "mean_top1_cosine": 0.8273360243550053,
+      "mean_gold_cosine": 0.8273360243550053
+    },
+    "macro_faq_metrics": {
+      "top1_accuracy": 1.0,
+      "recall_at_5": 1.0,
+      "mrr": 1.0
+    },
+    "per_faq": {
+      "P22": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.8940363725026449,
+        "mean_gold_cosine": 0.8940363725026449
+      },
+      "P23": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.8554309209187826,
+        "mean_gold_cosine": 0.8554309209187826
+      },
+      "P24": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.7936972379684448,
+        "mean_gold_cosine": 0.7936972379684448
+      },
+      "P25": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.8238925735155741,
+        "mean_gold_cosine": 0.8238925735155741
+      },
+      "S22": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.7611101667086283,
+        "mean_gold_cosine": 0.7611101667086283
+      },
+      "S23": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.7799447377522787,
+        "mean_gold_cosine": 0.7799447377522787
+      },
+      "S24": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.8208958109219869,
+        "mean_gold_cosine": 0.8208958109219869
+      },
+      "S25": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.8662617603937784,
+        "mean_gold_cosine": 0.8662617603937784
+      },
+      "S26": {
+        "top1_accuracy": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "mean_top1_cosine": 0.8507546385129293,
+        "mean_gold_cosine": 0.8507546385129293
+      }
+    }
+  },
+  "unseen_test": {
+    "evaluated": false,
+    "query_count": 0,
+    "faq_count": 0,
+    "metrics": null,
+    "macro_faq_metrics": null,
+    "per_faq": {}
+  }
+}
