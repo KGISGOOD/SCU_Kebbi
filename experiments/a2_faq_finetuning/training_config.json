@@ -1,0 +1,39 @@
+{
+  "schema_version": "a2_training_v1",
+  "model": "BAAI/bge-m3",
+  "batch_size": 8,
+  "epochs": 3,
+  "learning_rate": 0.00002,
+  "seed": 42,
+  "max_length": 512,
+  "scale": 20,
+  "weight_decay": 0.01,
+  "max_grad_norm": 1,
+  "save_every_epochs": 1,
+  "false_negative_pairs": [
+    [
+      "P18",
+      "P19"
+    ],
+    [
+      "P21",
+      "S13"
+    ],
+    [
+      "S12",
+      "S13"
+    ],
+    [
+      "P13",
+      "S04"
+    ],
+    [
+      "P13",
+      "P14"
+    ],
+    [
+      "P16",
+      "P17"
+    ]
+  ]
+}

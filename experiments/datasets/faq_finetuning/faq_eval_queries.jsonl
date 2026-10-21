@@ -1,0 +1,138 @@
+{"query_id":"ST_P01_01","query":"能舉幾家資科系畢業生實際任職的公司嗎？我想知道就業的企業有哪些，當中有沒有大家熟悉的大廠。","gold_faq_id":"P01","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P01_02","query":"學生念完後通常被哪些公司錄用？如果有知名企業的例子，也想一起了解。","gold_faq_id":"P01","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P02_01","query":"最近軟體、科技公司裁員的新聞很多，這種情況下，念資料科學出來的工作還好找嗎？","gold_faq_id":"P02","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P02_02","query":"看到科技業和軟體業都在縮編，我有點擔心資科系畢業後的求職難度，現在就業容易嗎？","gold_faq_id":"P02","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P03_01","query":"走完本系課程後，公職考試或國營事業是不是可行的出路？有哪些類科是畢業生能報考的？","gold_faq_id":"P03","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P03_02","query":"除了找一般工作，資科系學生畢業能考上公務員或國營單位嗎？想請教對應的考試類科。","gold_faq_id":"P03","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P04_01","query":"想看的不是剛畢業起薪，而是離校三到五年後的平均收入，以及這段時間薪水能成長多少。","gold_faq_id":"P04","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P04_02","query":"資科系友畢業滿三至五年時，通常拿到什麼待遇？薪資繼續往上走的潛力大不大？","gold_faq_id":"P04","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P05_01","query":"學士接碩士有沒有能連著念、總共五年的管道？另外，這種管道可收的人數算多嗎？","gold_faq_id":"P05","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P05_02","query":"若規劃在貴系學碩士一起讀，有五年一貫可以走嗎？每屆開放的位置會不會很少？","gold_faq_id":"P05","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P06_01","query":"四年大學結束就去找工作，會不會因為沒念碩士而找不到好工作？研究所是必經之路嗎？","gold_faq_id":"P06","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P06_02","query":"想有好的工作發展，念完四年資科系就夠了嗎，還是一定要再升研究所？","gold_faq_id":"P06","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P07_01","query":"本系學長姐考研究所時，推甄和考試哪邊的成功比例較高？想比較的是兩個管道的錄取率。","gold_faq_id":"P07","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P07_02","query":"就你們系學生的考研表現來看，推甄比較容易被錄取，還是走考試的錄取比例較好？","gold_faq_id":"P07","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P08_01","query":"學校這邊有和大廠一起辦的實習方案嗎？去參加的學生是不是能拿薪水？","gold_faq_id":"P08","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P08_02","query":"想透過系上的合作計畫去知名公司實習，這樣的機會有嗎？實習生有沒有薪資可領？","gold_faq_id":"P08","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P09_01","query":"把大四整年用來做校外全職實習，這一年能不能列入修課學分？","gold_faq_id":"P09","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P09_02","query":"第四學年若從頭到尾都在校外全職實習，系上可以認列那一整年的實習學分嗎？","gold_faq_id":"P09","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P10_01","query":"企業找系上合作的案子，大多是哪幾類產業？金融和科技兩邊，哪邊的案量較大？","gold_faq_id":"P10","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P10_02","query":"能介紹貴系企業專案合作的產業組成嗎？我尤其想比較金融類與科技類哪個比較常見。","gold_faq_id":"P10","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P11_01","query":"能介紹系內專任教授的規模和研究專長嗎？想知道老師多不多，以及主要來自哪些研究領域。","gold_faq_id":"P11","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P11_02","query":"本系專任師資陣容算多嗎？這些教授以什麼學術研究背景為主？","gold_faq_id":"P11","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P12_01","query":"教我們的教授有沒有在產業現場累積經驗，還是師資都是只走學術這條路？","gold_faq_id":"P12","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P12_02","query":"想了解本系老師與業界的接觸：教授有實務經歷嗎，還是全屬純學術型？","gold_faq_id":"P12","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P13_01","query":"孩子就讀後如果上課開始落後，考試也沒及格，校方會不會發出學業預警並安排輔導？","gold_faq_id":"P13","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P13_02","query":"若學生入學後學習跟不上又考試不及格，學校有預警及後續協助的機制嗎？","gold_faq_id":"P13","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P14_01","query":"學生碰到生活或學業上的疑問時，是不是每個人都有固定對應的導師可以談？","gold_faq_id":"P14","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P14_02","query":"系裡會替所有學生各安排自己的導師嗎？生活和課業的事情都能找導師請教嗎？","gold_faq_id":"P14","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P15_01","query":"資料科學是不是近年才興起的科系？等流行熱度降下來，社會還會需要這個領域嗎？","gold_faq_id":"P15","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P15_02","query":"我擔心資料科學只是新興熱潮；它算新科系嗎，而且退燒後會不會就沒人需要了？","gold_faq_id":"P15","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P16_01","query":"企業主管挑面試者的時候，會因為對方是傳統資工系，就比資科系更有好感嗎？","gold_faq_id":"P16","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P16_02","query":"本系學生求職面試若和資工系學生相比，主管是否通常比較中意資工背景？","gold_faq_id":"P16","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P17_01","query":"選校時把國立大學也放進來比較，貴校貴系能拿出哪些優勢，競爭力在哪？","gold_faq_id":"P17","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P17_02","query":"相對於去念國立大學，就讀貴校這個系的長處與競爭條件是什麼？","gold_faq_id":"P17","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P18_01","query":"家裡想估四年的讀書開銷，每學期的學雜費約要準備多少？有獎學金或助學金可用嗎？","gold_faq_id":"P18","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P18_02","query":"念完四年，每學期繳給學校的學雜費大概多少錢？學校有沒有獎助學金能幫忙負擔？","gold_faq_id":"P18","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P19_01","query":"優秀入學獎學金是依哪些條件評選的？拿到之後有可能不用付學雜費嗎？","gold_faq_id":"P19","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P19_02","query":"想爭取新生的優秀入學獎勵，資格標準是什麼，能不能藉此免掉學雜費？","gold_faq_id":"P19","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P20_01","query":"修課期間除了正常學習，還會不會被要求自己掏錢買很貴的套裝軟體或教材？","gold_faq_id":"P20","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P20_02","query":"讀這個系是否有額外開銷，要學生自費採買高價的軟體套裝或課程教材？","gold_faq_id":"P20","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P21_01","query":"AWS、GCP、Azure 這些雲端服務的運算額度，系上會幫學生補助嗎？","gold_faq_id":"P21","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_P21_02","query":"雲端算力若用到 AWS、GCP 或 Azure 等平台，學生有沒有系上給的額度補貼？","gold_faq_id":"P21","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S01_01","query":"我在高中一次程式都沒碰過，進資科系後會不會追不上同學的學習進度？","gold_faq_id":"S01","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S01_02","query":"高中階段完全是程式新手，入學後的課程會不會讓我跟不上？","gold_faq_id":"S01","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S02_01","query":"新生第一學期的程式課會從哪種語言開始？老師教的節奏會不會一下就很快？","gold_faq_id":"S02","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S02_02","query":"大學一年級上半學年的程式設計用什麼語言教？進度快到需要擔心嗎？","gold_faq_id":"S02","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S03_01","query":"這個系的程式語言學習範圍是什麼？Python 我已經知道會教，想問的是其他還有哪些語言。","gold_faq_id":"S03","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S03_02","query":"想了解就學期間會接觸的程式語言種類，先不算 Python，還有哪些會出現在課程裡？","gold_faq_id":"S03","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S04_01","query":"我平常遇到上機考就會慌到寫不出程式，進來以後系上有辦法讓我補救嗎？","gold_faq_id":"S04","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S04_02","query":"如果考試一用電腦寫程式就緊張卡住，系裡有哪些可以補救的途徑？","gold_faq_id":"S04","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S05_01","query":"數學不是我的強項，像學測數 A 也沒拿到頂標，這樣念資科會很辛苦嗎？","gold_faq_id":"S05","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S05_02","query":"以數 A 沒到頂標這類數學較弱的程度，讀本系是不是會覺得很吃力？","gold_faq_id":"S05","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S06_01","query":"必修裡哪些科目用到的數學最重？這些課的不及格學生會很多嗎？","gold_faq_id":"S06","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S06_02","query":"能說明系上數學比重最高的必修有哪些，以及會不會有一大批人被當嗎？","gold_faq_id":"S06","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S07_01","query":"以前接觸的是高中數學，換成微積分時，最不一樣的地方會是什麼？","gold_faq_id":"S07","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S07_02","query":"高中學的數學跟微積分相比，兩者最大的分別應該怎麼理解？","gold_faq_id":"S07","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S08_01","query":"學統計和高中原本的數學有什麼區別？是不是又要背一大堆公式？","gold_faq_id":"S08","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S08_02","query":"統計這門課跟一般高中數學比起來，哪裡不一樣，公式記憶的負擔會很重嗎？","gold_faq_id":"S08","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S09_01","query":"可以描述大一平常一週的排課樣子嗎？空堂多不多，又是不是每天都要待在電腦教室？","gold_faq_id":"S09","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S09_02","query":"一年級課表通常排得怎樣，有多少空堂？會要求學生天天泡在電腦教室裡嗎？","gold_faq_id":"S09","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S10_01","query":"微積分沒修過關，到了大二會不會有課不能選？系上對擋修是怎麼規定的？","gold_faq_id":"S10","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S10_02","query":"想先弄清楚擋修這件事：如果微積分不及格，大二的選課會受影響嗎？","gold_faq_id":"S10","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S11_01","query":"外系開的課，本系學生能去修嗎？那些學分能不能放進畢業學分計算？","gold_faq_id":"S11","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S11_02","query":"我想跨到別系選課，不知道可不可以；修完的學分對畢業有沒有採計？","gold_faq_id":"S11","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S12_01","query":"準備買電腦來念這個系，筆電規格有被限定嗎？顯示卡要不要挑很高階的 GPU？","gold_faq_id":"S12","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S12_02","query":"系上會指定學生筆電的硬體規格嗎？買一般筆電行不行，還是顯卡得上高階？","gold_faq_id":"S12","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S13_01","query":"做人工智慧或深度學習時，有系裡的伺服器可以借用算力嗎？","gold_faq_id":"S13","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S13_02","query":"系內是否備有伺服器運算資源，供學生進行 AI、深度學習工作？","gold_faq_id":"S13","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S14_01","query":"我想先知道學生的日常作息：為了交作業和完成專案，念本系的人是不是經常得做到半夜？","gold_faq_id":"S14","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S14_02","query":"聽到作業和專案就擔心睡眠，這個系平常趕這些東西時，需要常常熬到很晚嗎？","gold_faq_id":"S14","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S15_01","query":"想了解系館裡能用哪些設施，尤其有沒有專屬給學生自習或小組討論的空間？","gold_faq_id":"S15","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S15_02","query":"系館的設施大概包括什麼？會有專用的自習室或供討論的地方嗎？","gold_faq_id":"S15","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S16_01","query":"新生大一抽學校宿舍有保證中籤嗎？若在學校附近找租屋，方不方便？","gold_faq_id":"S16","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S16_02","query":"一年級學生是不是一定分得到學校宿舍？校園周圍租房子容易嗎？","gold_faq_id":"S16","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S17_01","query":"在這個系要顧課業，還抽得出空去熱舞社或吉他社這類社團嗎？","gold_faq_id":"S17","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S17_02","query":"如果想參加像跳舞、吉他之類的社團，本系的課業壓力會讓人沒有時間嗎？","gold_faq_id":"S17","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S18_01","query":"迎新會由系學會特別替新生辦嗎？另外，系學會一整年通常有哪些活動？","gold_faq_id":"S18","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S18_02","query":"想知道本系學會的年度活動內容，裡面是否包含新生專屬的迎新？","gold_faq_id":"S18","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S19_01","query":"做畢業專題大概輪到哪個年級才開始？指導老師是學生自己去接洽嗎？","gold_faq_id":"S19","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S19_02","query":"系上的畢業專題通常從大幾起跑？教授要我們自己找，還是另有安排？","gold_faq_id":"S19","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S20_01","query":"專題要自己獨立完成還是找組員一起做？專題題目一般透過什麼方式決定？","gold_faq_id":"S20","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S20_02","query":"想了解專題的做法：會分組合作或各自做，題目又是怎樣選出來的？","gold_faq_id":"S20","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S21_01","query":"能不能介紹以前學長姐做過的出色作品，例如 APP 或 AI 系統？","gold_faq_id":"S21","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"ST_S21_02","query":"想看看前幾屆學生有沒有很亮眼的 APP、人工智慧系統成果，有哪些例子？","gold_faq_id":"S21","scenario":"seen","split":"seen_test","review_status":"needs_review"}
+{"query_id":"UV_P22_01","query":"在這裡念書，能出去當交換學生的機會多不多？可以去的姊妹校有哪些？","gold_faq_id":"P22","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P22_02","query":"想知道學生到海外交換的管道是否多，以及學校合作的姊妹校名單。","gold_faq_id":"P22","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P22_03","query":"本校提供多少出國交換機會？有哪些姊妹學校能讓學生選擇？","gold_faq_id":"P22","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P23_01","query":"如果在學期間去海外交換，回來會不會就得延後畢業？","gold_faq_id":"P23","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P23_02","query":"交換學生這條路是不是一定會把畢業時間往後拖？","gold_faq_id":"P23","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P23_03","query":"想出國交換，但怕學業時程被拉長，這會讓人必須延畢嗎？","gold_faq_id":"P23","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P24_01","query":"孩子進系後還想跨去財金或資工修讀，申請資格會不會很嚴？","gold_faq_id":"P24","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P24_02","query":"如果孩子入學後希望跨修財務金融、資訊工程，會遇到很高的門檻嗎？","gold_faq_id":"P24","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P24_03","query":"進來之後再跨到財金或資工領域修讀，這件事對孩子來說難不難申請？","gold_faq_id":"P24","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P25_01","query":"備審沒有大型科技競賽的獎狀，個人申請的書審還有不錯的機會嗎？","gold_faq_id":"P25","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P25_02","query":"孩子沒在大型科技競賽得獎，送書面審查時是不是仍有希望？","gold_faq_id":"P25","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_P25_03","query":"書審資料裡拿不出大型科技競賽獲獎紀錄，通過書審的機會還大嗎？","gold_faq_id":"P25","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S22_01","query":"系上學生念完大學後，接著去念研究所的是不是多數？","gold_faq_id":"S22","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S22_02","query":"想了解畢業學長姐的選擇，大部分會再升學讀碩士嗎？","gold_faq_id":"S22","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S22_03","query":"從歷屆畢業生來看，繼續攻讀研究所的人占多數嗎？","gold_faq_id":"S22","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S23_01","query":"本系學長姐靠推甄進頂尖大學研究所，通常會錄取哪些學校，像台清交成政呢？","gold_faq_id":"S23","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S23_02","query":"想知道系友推甄研究所的去向，在台大、清大、交大、成大、政大這些學校有哪些成果？","gold_faq_id":"S23","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S23_03","query":"走推甄的本系畢業生一般能上哪些頂大研究所？台清交成政有例子嗎？","gold_faq_id":"S23","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S24_01","query":"資科背景能去跨考一般資工所，或商管領域的數據研究所嗎？這樣考的難度如何？","gold_faq_id":"S24","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S24_02","query":"如果研究所不留在本科系，改考資工所或商管的數據所可不可行，會不會很難？","gold_faq_id":"S24","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S24_03","query":"想跨到一般資訊工程或商管數據類研究所，系上學生有辦法報考嗎？準備難度大不大？","gold_faq_id":"S24","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S25_01","query":"不走資料工程師這條路，從本系畢業還有哪些工作職稱可以選？","gold_faq_id":"S25","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S25_02","query":"想了解資科畢業生的其他職涯選擇，除了當資料工程師，還能擔任什麼職務？","gold_faq_id":"S25","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S25_03","query":"如果未來不打算做資料工程師，這個系的學歷還能對應哪些職位？","gold_faq_id":"S25","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S26_01","query":"拿到大學學位就直接工作，本系畢業生剛入行的薪資大約在哪個範圍？","gold_faq_id":"S26","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S26_02","query":"若大學一畢業便進企業，通常第一份工作的起薪區間是多少？","gold_faq_id":"S26","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UV_S26_03","query":"不先升學而在大學畢業後直接就業，剛開始月薪大概能落在哪一段？","gold_faq_id":"S26","scenario":"unseen","split":"unseen_validation","review_status":"needs_review"}
+{"query_id":"UT_P26_01","query":"申請入學的面試，是一個人進去還是幾個考生一起？教授最重視哪些特質？","gold_faq_id":"P26","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P26_02","query":"想準備系上的面試，形式以個別或團體為主，考官看重的特質又是什麼？","gold_faq_id":"P26","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P26_03","query":"面試安排通常採單人還是多人一起的方式？評審最在意學生展現什麼特質？","gold_faq_id":"P26","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P27_01","query":"學校附近買東西、生活方不方便？治安好不好，搭車往來又便利嗎？","gold_faq_id":"P27","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P27_02","query":"能介紹校園周圍的生活機能和安全狀況嗎？交通上會不會不方便？","gold_faq_id":"P27","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P27_03","query":"想了解學校周邊的日常生活、治安以及交通，這三方面的情況如何？","gold_faq_id":"P27","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P28_01","query":"除了拿滿學分，畢業前還得通過英文或程式能力檢定嗎？","gold_faq_id":"P28","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P28_02","query":"學分都修齊之後，有沒有另外的英語測驗、程式檢定門檻才准畢業？","gold_faq_id":"P28","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P28_03","query":"想確認畢業資格，除修足學分外，英文和程式方面是否還有檢定要求？","gold_faq_id":"P28","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P29_01","query":"學生整體畢業率大概如何？專題卡住做不出成果，會不會讓很多人延畢？","gold_faq_id":"P29","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P29_02","query":"想知道這個系整體的畢業比例，以及是否常因畢業專題沒完成而拖延畢業。","gold_faq_id":"P29","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P29_03","query":"系上的平均畢業率好嗎？專題做不出來造成普遍延畢的情況嚴重嗎？","gold_faq_id":"P29","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P30_01","query":"準備找工作時，校方或系上會幫忙看履歷、安排模擬面試，或舉辦就業博覽會嗎？","gold_faq_id":"P30","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P30_02","query":"學校及系裡有沒有履歷修改和面試演練的協助，也會辦就業徵才博覽會嗎？","gold_faq_id":"P30","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_P30_03","query":"想了解校系的就業輔導資源：能協助修履歷、做模擬面試，並提供就業博覽會嗎？","gold_faq_id":"P30","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S27_01","query":"實習是系上會主動推薦的事嗎？學生會不會被規定一定得去企業實習？","gold_faq_id":"S27","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S27_02","query":"想問企業實習的定位，系上只是推薦參加，還是會強制學生去？","gold_faq_id":"S27","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S27_03","query":"本系對到公司實習有沒有鼓勵推薦的安排？是否屬於學生必須做的要求？","gold_faq_id":"S27","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S28_01","query":"資科和傳統資工 CS 的差別，最根本的地方在哪？","gold_faq_id":"S28","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S28_02","query":"想在貴系與傳統資訊工程之間選擇，兩者最核心的區別是什麼？","gold_faq_id":"S28","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S28_03","query":"若拿本系對照一般 CS 科系，最主要的不同可以怎麼說明？","gold_faq_id":"S28","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S29_01","query":"拿貴系和資管 MIS 相比，哪一邊的技術訓練比較深入？","gold_faq_id":"S29","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S29_02","query":"資管和這個系在技術深度上誰比較強？想了解兩者的比較。","gold_faq_id":"S29","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S29_03","query":"如果只看技術學得深不深，本系相對 MIS 是哪個比較有深度？","gold_faq_id":"S29","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S30_01","query":"以後想把重心放在人工智慧，選資科比較適合，還是去資工比較好？","gold_faq_id":"S30","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S30_02","query":"如果目標是專攻 AI，在貴系與資工系之間該選哪一個比較適合？","gold_faq_id":"S30","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
+{"query_id":"UT_S30_03","query":"對想深入走人工智慧這條路的人來說，貴系和資工系哪個更合適？","gold_faq_id":"S30","scenario":"unseen","split":"unseen_test","review_status":"needs_review"}
