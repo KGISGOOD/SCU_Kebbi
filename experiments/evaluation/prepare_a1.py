@@ -5,12 +5,38 @@ import argparse
 import json
 from pathlib import Path
 
-from .common import ROOT, DataError, atomic_json, dataset, read_rows, resolve, sha
+from .common import (ROOT, DataError, atomic_json, dataset, differences,
+                     read_json, read_rows, read_run, resolve, sha)
 from .model_resources import cached_model
 
 CANONICAL = "experiments/datasets/faq/faq_canonical_60_v2.jsonl"
 INDEX = "experiments/vector_stores/faq_bge_m3_60_v2"
 MANIFEST = "experiments/datasets/faq_finetuning/faq_split_manifest.json"
+
+
+def index_completion_report(canonical, index_dir, version=None):
+    """One byte-level receipt contract for builder, preflight and read-only audit.
+
+    Never reserialize JSON, normalize line endings, unpickle, load FAISS or repair
+    a receipt. Missing/malformed files raise with their concrete path.
+    """
+    version_path = index_dir / "version.json"
+    if version is None:
+        version = read_json(version_path)
+    expected = {"schema_version": "a1_60_preparation_v1", "status": "completed", "faq_count": 60,
+                "canonical_sha256": version.get("canonical_sha256"),
+                "index_sha256": version.get("index_sha256"),
+                "docstore_sha256": version.get("docstore_sha256")}
+    actual = {"schema_version": version.get("schema_version"), "status": version.get("status"),
+              "faq_count": version.get("faq_count"), "canonical_sha256": sha(canonical),
+              "index_sha256": sha(index_dir / "index.faiss"),
+              "docstore_sha256": sha(index_dir / "index.pkl")}
+    changes = differences(expected, actual, "a1_index_completion")
+    paths = {"version": str(version_path), "canonical": str(canonical),
+             "index": str(index_dir / "index.faiss"), "docstore": str(index_dir / "index.pkl")}
+    return {"status": "failed" if changes else "passed", "paths": paths,
+            "expected": expected, "actual": actual, "differences": changes,
+            "hash_algorithm": "SHA-256 of raw file bytes; lowercase hex; no text normalization"}
 
 
 def validate_canonical(root, canonical, manifest):
@@ -43,9 +69,50 @@ def main():
     p = sub.add_parser("check", help="check A1 and A2 IDs/Q/A against CSV; no model load")
     p.add_argument("--canonical", default=CANONICAL)
     p.add_argument("--a2-candidates", default="experiments/datasets/faq_finetuning/faq_retrieval_candidates.jsonl")
+    p = sub.add_parser("audit-index", help="read-only completion/hash/path/CSV audit; no FAISS/model load or writes")
+    context = p.add_mutually_exclusive_group()
+    context.add_argument("--config", help="inspect paths from this evaluation config")
+    context.add_argument("--run-dir", type=Path, help="inspect exact frozen paths from a failed Smoke run")
+    p.add_argument("--canonical", help="explicit path override, shown in the report")
+    p.add_argument("--index-dir", help="explicit path override, shown in the report")
     args = parser.parse_args()
     root = args.project_root.expanduser().resolve()
     try:
+        if args.command == "audit-index":
+            if args.run_dir:
+                frozen = read_run(resolve(root, args.run_dir))
+                if Path(frozen["project_root"]).resolve() != root:
+                    raise DataError("frozen run project_root differs from --project-root; audit on its original GPU project")
+                config = frozen["config"]
+                context_path = str(resolve(root, args.run_dir) / "run.json")
+            else:
+                config_path = resolve(root, args.config) if args.config else Path(__file__).with_name("config.json")
+                config = read_json(config_path)
+                context_path = str(config_path)
+            canonical = resolve(root, args.canonical or config["a1_canonical"])
+            index_dir = resolve(root, args.index_dir or config["a1_index"])
+            report = index_completion_report(canonical, index_dir)
+            report["configuration_source"] = context_path
+            report["path_overrides"] = {"canonical": args.canonical, "index_dir": args.index_dir}
+            if args.run_dir:
+                recorded = frozen["resources"]["a1_index"]
+                report["frozen_a1_resources"] = {name: frozen["resources"][name]
+                                                 for name in ("a1_index", "a1_canonical")}
+                if recorded.get("value"):
+                    current_files = {name: sha(index_dir / name)
+                                     for name in recorded["value"]["files_sha256"]}
+                    report["changes_since_run_creation"] = differences(
+                        recorded["value"]["files_sha256"], current_files, "frozen_a1_index.files_sha256")
+                    if report["changes_since_run_creation"]:
+                        report["status"] = "failed"
+            try:
+                rows, _ = validate_canonical(root, canonical, config["manifest"])
+                report["csv_validation"] = {"status": "passed", "faq_count": len(rows)}
+            except Exception as exc:
+                report["csv_validation"] = {"status": "failed", "error": "%s: %s" % (type(exc).__name__, exc)}
+                report["status"] = "failed"
+            print(json.dumps(report, ensure_ascii=True, indent=2))
+            return 0 if report["status"] == "passed" else 2
         if args.command == "canonical":
             output = resolve(root, args.output)
             metadata = output.with_name(output.name + ".metadata.json")
@@ -124,6 +191,9 @@ def main():
             "embedding_model": model, "embedding_max_length": 512, "normalization": "L2",
             "index_type": "IndexFlatIP", "index_sha256": sha(output / "index.faiss"),
             "docstore_sha256": sha(output / "index.pkl")})
+        completion = index_completion_report(canonical, output)
+        if completion["status"] != "passed":
+            raise DataError("A1 index receipt failed self-check: " + json.dumps(completion, ensure_ascii=True))
         print("A1 NEW index built/reloaded: 60 FAQs; output=%s" % output)
         return 0
     except Exception as exc:

@@ -1,9 +1,11 @@
 """Offline resource inventory, hashes and per-architecture readiness (no generation)."""
 from pathlib import Path
+import json
 import os
 
 from .common import DataError, digest, environment, read_json, read_rows, resolve, sha
 from .model_resources import cached_model
+from .prepare_a1 import index_completion_report
 
 NEEDS = {
     "A0": ("bge", "base", "dense_index"),
@@ -72,11 +74,10 @@ def inspect_resources(root, config, questions):
             version = read_json(version_path)
             if version.get("schema_version") == "a1_60_preparation_v1":
                 index_dir = version_path.parent
-                if (version.get("status") != "completed" or version.get("faq_count") != 60
-                        or version.get("canonical_sha256") != sha(path)
-                        or version.get("index_sha256") != sha(index_dir / "index.faiss")
-                        or version.get("docstore_sha256") != sha(index_dir / "index.pkl")):
-                    raise DataError("A1 new index completion/hash/canonical mismatch")
+                completion = index_completion_report(path, index_dir, version)
+                if completion["status"] != "passed":
+                    raise DataError("A1 new index completion/hash/canonical mismatch: "
+                                    + json.dumps(completion, ensure_ascii=True))
                 bge = resources["bge"]
                 if (bge["status"] != "ready"
                         or version.get("embedding_model", {}).get("files_sha256") != bge["value"]["files_sha256"]):

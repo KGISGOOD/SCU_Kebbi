@@ -1,5 +1,62 @@
 # A0–A5 統一 FAQ 問答測試（第一輪）
 
+## A1 completion/hash mismatch 的唯讀定位
+
+若 A1 顯示 `A1 new index completion/hash/canonical mismatch`，先不要重建、修改 version.json 或重新保存 canonical。修正版讓 prepare_a1 建置後自查、Preflight 與 audit-index 共用同一個 `index_completion_report`；所有 hash 都用 A3 `sha()` 以 `rb` 讀取原始 bytes、計算小寫 SHA-256，沒有字串序列化、換行正規化或忽略差異。Preflight 失敗會列出每個不一致欄位的 expected／actual，以及實際解析的 canonical/index/docstore/version 絕對路徑，仍然阻止載入。
+
+本次開發機已收到一份 GPU A1 資料副本，唯讀 PowerShell 檢查結果如下（不是模型／Python 測試）：
+
+| 欄位 | version.json 記載與本機實際 SHA-256（兩者一致） |
+|---|---|
+| canonical_sha256 | `7ff63fb1a27558345f33b034023243a8a35e774019f53397108861d40679f8ac` |
+| index_sha256 | `f96399a2e96b663f10b4fc9c36f01378762491e894e677554d7a9e7c24207ffa` |
+| docstore_sha256 | `6c92de766e1f6544ca5bf7250845d9ea1a83be6ffb53de6665a4464cf7683498` |
+
+receipt 為 schema `a1_60_preparation_v1`、status `completed`、faq_count 60。預設 config 及 Wrapper 均指向 `faq_canonical_60_v2.jsonl`／`faq_bge_m3_60_v2`；Wrapper 只 load 與檢查 docstore，沒有 build/save 呼叫。建置端則是 build/save → load → 檢查 Q/A/mapping → hash → 寫入 version.json。靜態資料流未發現兩端 Hash 算法不同或讀取後自動改寫的程式缺陷。
+
+**本機副本無法重建失敗當時 GPU 的檔案狀態。** 目前只能確認舊訊息把 status/count/三個 hash 合併，無法定位；不能斷言是換行、傳輸、重建或設定變動。八個 loader 曾成功與後續 Smoke 失敗，也不能證明上述檔案在兩次執行間未改變。
+
+錯誤階段另有一項可由程式確定的意義：Worker 在 architecture_preflight 前先執行 verify_inputs，後者會重新盤點並要求 resources 與 run.json 完全相等。因此此錯誤表示該 Smoke Run 建立時的 a1_canonical 盤點就已同樣失敗；若 Worker 才看到新的資源差異，應先在 verify_inputs 拋 InputChanged。且此訊息位於 60 題 ID／原始 Q/A 檢查之後，表示該次讀到的 canonical 已先通過那些檢查，並非只載入了舊三題而產生這個特定錯誤。
+
+同步本次 `prepare_a1.py`、`preflight.py`、README（不複製資料覆蓋 GPU），在 GPU 專案根目錄先執行：
+
+```powershell
+Set-Location 'C:\Users\rsy\Desktop\SCU_Kebbi'
+
+# 以目前 config 檢查；不載入模型、FAISS 或 pickle，不寫任何檔案
+python -m experiments.evaluation.prepare_a1 --project-root . audit-index
+
+# 把下列目錄替換為這次 A1 失敗的 Smoke Run；讀取其凍結設定，不修改舊 Run
+python -m experiments.evaluation.prepare_a1 --project-root . audit-index --run-dir 'experiments/results/unified_faq/實際失敗的Smoke目錄'
+```
+
+audit-index 輸出全部預期／實際 hash 與完整路徑、CSV 60 題 Q/A 核對結果。指定 --run-dir 時也保留舊 Run 的 a1_index／a1_canonical 資源紀錄，並比較索引檔案與 version.json 是否自該 Run 建立後改變；退出碼 2 表示有差異或驗證失敗。這個命令不驗證 BGE 權重、FAISS 二進位結構或語意匹配結果；完整 loader 驗證仍由原 Preflight／Wrapper 執行。
+
+判讀方式：
+
+- 目前 config 通過、失敗 Run 不通過：先看兩份路徑、舊資源錯誤及 changes_since_run_creation；不要直接改舊 Run。
+- canonical hash 不符但 CSV Q/A 核對通過：只證明內容語意來源一致，不代表 byte receipt 相同；查明是否有 BOM、換行、欄位順序或其他重寫。禁止直接更新 receipt 讓它通過；優先找回與 receipt 匹配的原始版本。
+- index/docstore hash 不符：停止，保留現有檔案與 receipt，核對備份及檔案同步紀錄，不自動重新保存或重建。
+- status/count/schema 不符：檢查是否選到其他建置版本或不完整輸出，不把它改成 completed。
+- 全部通過：此副本沒有 completion/hash 缺陷，不需要重建。用同一 BGE snapshot 做全新 A1 loader 與 Smoke；若再失敗，新的 Log 會指出當下確切欄位。
+
+沿用先前成功的原始 BGE snapshot 絕對路徑（以下第一份是先前 receipt 記載；自訂快取請改實際位置）：
+
+```powershell
+$bgeSnapshot = Join-Path $env:USERPROFILE '.cache/huggingface/hub/models--BAAI--bge-m3/snapshots/5617a9f61b028005a4858fdac845db406aefb181'
+$loadTag = [guid]::NewGuid().ToString('N')
+python -m experiments.evaluation.run preflight --project-root . --architectures A1 --run-dir "experiments/results/unified_faq/a1_receipt_load_$loadTag" --bge-snapshot "$bgeSnapshot" --allow-unreviewed --load-models
+```
+
+確認 A1 `loaded_no_inference` 後，再使用全新 Run，僅驗證 A1 的三題：
+
+```powershell
+$smokeTag = [guid]::NewGuid().ToString('N')
+python -m experiments.evaluation.run smoke --project-root . --architectures A1 --run-dir "experiments/results/unified_faq/a1_receipt_smoke_$smokeTag" --bge-snapshot "$bgeSnapshot" --allow-unreviewed
+```
+
+不需重跑其他七架構、不覆寫 A1 索引或舊結果。若真的證實現有索引無法恢復，才另以 prepare_a1 index 的 --output-dir 建立全新 v3，搭配新的 config 與新 Run；本次沒有證據需要這樣做，也未執行重建。
+
 > 第一輪 Smoke 的資源修正與 GPU 指令見 [RESOURCE_PREPARATION.md](RESOURCE_PREPARATION.md)：離線固定 BGE snapshot、建立全新 A1 60 題 canonical／索引、重用 A2 候選庫建置程式。新預設不再指向舊 A1 三題示範檔；所有資料與模型操作均由使用者在 GPU 電腦明確執行。
 
 > Windows Fingerprint 修正版：GPU 已確認唯一差異為 `environment.platform` 的 build 26200／26100，處理方式見下節。先前 [WORKER_ENCODING_AUDIT.md](WORKER_ENCODING_AUDIT.md) 為當時的歷史盤點，其「欄位未知」結論已由本次證據更新。所有舊 Run 完整保留；本次仍未執行 Python、測試或模型。
