@@ -1,0 +1,16 @@
+{
+  "base_model": "meta-llama/Llama-3.2-3B-Instruct",
+  "lora_r": 8,
+  "lora_alpha": 16,
+  "lora_dropout": 0.05,
+  "target_modules": ["q_proj", "v_proj"],
+  "epochs": 3,
+  "batch_size": 1,
+  "gradient_accumulation": 4,
+  "learning_rate": 0.0002,
+  "max_length": 512,
+  "seed": 42,
+  "precision": "bf16",
+  "weight_decay": 0.0,
+  "max_grad_norm": 1.0
+}
