@@ -1,0 +1,21 @@
+{
+  "base_model": "meta-llama/Llama-3.2-3B-Instruct",
+  "bge_model": "BAAI/bge-m3",
+  "bge_snapshot": null,
+  "reranker_model": "BAAI/bge-reranker-v2-m3",
+  "dense_index": "experiments/vector_stores/type1_type2_bge_m3_v1",
+  "a1_index": "experiments/vector_stores/faq_bge_m3_60_v2",
+  "a1_canonical": "experiments/datasets/faq/faq_canonical_60_v2_lf_restored.jsonl",
+  "a2_candidates": "experiments/datasets/faq_finetuning/faq_retrieval_candidates.jsonl",
+  "a2_1_model": "experiments/models/a2_1_smoke_task8/final_model",
+  "a2_2_model": "experiments/models/a2_2_smoke_task8/final_model",
+  "a3_adapter": "experiments/models/a3_smoke_v1/final_adapter",
+  "manifest": "experiments/datasets/faq_finetuning/faq_split_manifest.json",
+  "device": "cuda",
+  "precision": "fp16",
+  "seed": 42,
+  "max_new_tokens": 256,
+  "a5_max_input_tokens": 2048,
+  "a2_max_length": 64,
+  "allow_unreviewed": false
+}
