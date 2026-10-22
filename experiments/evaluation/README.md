@@ -1,5 +1,7 @@
 # A0–A5 統一 FAQ 問答測試（第一輪）
 
+> A1 後續已找到 LF／CRLF 的精確 Hash 證據。新增唯讀 byte/docstore 診斷、只寫全新檔案的 LF 恢復與清楚的 Preflight 跳過訊息，見 [A1_CANONICAL_RECOVERY.md](A1_CANONICAL_RECOVERY.md)。原 canonical、FAISS 與 version.json 均不改寫。下節「當時尚未定位」是先前盤點狀態，現以本恢復文件為準。
+
 ## A1 completion/hash mismatch 的唯讀定位
 
 若 A1 顯示 `A1 new index completion/hash/canonical mismatch`，先不要重建、修改 version.json 或重新保存 canonical。修正版讓 prepare_a1 建置後自查、Preflight 與 audit-index 共用同一個 `index_completion_report`；所有 hash 都用 A3 `sha()` 以 `rb` 讀取原始 bytes、計算小寫 SHA-256，沒有字串序列化、換行正規化或忽略差異。Preflight 失敗會列出每個不一致欄位的 expected／actual，以及實際解析的 canonical/index/docstore/version 絕對路徑，仍然阻止載入。

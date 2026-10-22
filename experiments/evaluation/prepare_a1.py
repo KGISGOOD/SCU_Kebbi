@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 from pathlib import Path
 
 from .common import (ROOT, DataError, atomic_json, dataset, differences,
@@ -12,6 +14,71 @@ from .model_resources import cached_model
 CANONICAL = "experiments/datasets/faq/faq_canonical_60_v2.jsonl"
 INDEX = "experiments/vector_stores/faq_bge_m3_60_v2"
 MANIFEST = "experiments/datasets/faq_finetuning/faq_split_manifest.json"
+
+
+def canonical_bytes_report(path, expected_hash):
+    raw = path.read_bytes()
+    lf = raw.replace(b"\r\n", b"\n")
+    return {"bytes": len(raw), "utf8_bom": raw.startswith(b"\xef\xbb\xbf"),
+            "crlf_count": raw.count(b"\r\n"), "bare_lf_count": raw.count(b"\n") - raw.count(b"\r\n"),
+            "raw_sha256": hashlib.sha256(raw).hexdigest(),
+            "lf_bytes": len(lf), "lf_sha256": hashlib.sha256(lf).hexdigest(),
+            "lf_matches_receipt": hashlib.sha256(lf).hexdigest() == expected_hash}
+
+
+def inspect_docstore(canonical, index_dir, manifest, root):
+    """Explicitly opted-in, hash-checked local pickle inspection; no FAISS/model.
+
+    The receipt must be trusted locally. A hash in an untrusted receipt alone is
+    not a security guarantee. Refuse globals other than the original Document.
+    """
+    import pickle
+    completion = index_completion_report(canonical, index_dir)
+    if any(row["field"] != "a1_index_completion.canonical_sha256" for row in completion["differences"]):
+        raise DataError("docstore inspection blocked by non-canonical receipt mismatch: "
+                        + json.dumps(completion, ensure_ascii=True))
+    rows, sources = validate_canonical(root, canonical, manifest)
+    expected = {row["faq_id"]: row for row in rows}
+    pickle_path = index_dir / "index.pkl"
+
+    class LocalDocumentUnpickler(pickle.Unpickler):
+        def find_class(self, module, name):
+            if (module, name) == ("langchain_core.documents.base", "Document"):
+                from langchain_core.documents import Document
+                return Document
+            raise DataError("unsupported pickle global; do not weaken inspection whitelist: %s.%s" % (module, name))
+
+    with pickle_path.open("rb") as handle:
+        saved = LocalDocumentUnpickler(handle).load()
+        if handle.read(1):
+            raise DataError("unexpected bytes after docstore pickle")
+    if not isinstance(saved, dict):
+        raise DataError("docstore payload must be a dictionary")
+    docs, mapping = saved.get("docstore"), saved.get("index_to_docstore_id")
+    if not isinstance(docs, list) or len(docs) != 60 or mapping != {i: i for i in range(60)}:
+        raise DataError("docstore must have 60 documents and complete identity mapping")
+    changes, seen = [], set()
+    for position, doc in enumerate(docs):
+        metadata = getattr(doc, "metadata", None)
+        faq_id = metadata.get("faq_id") if isinstance(metadata, dict) else None
+        if not isinstance(faq_id, str) or faq_id not in expected or faq_id in seen:
+            raise DataError("docstore[%d] duplicate/unknown FAQ ID: %r" % (position, faq_id))
+        seen.add(faq_id)
+        row = expected[faq_id]
+        changes += differences({"question": row["question"], "answer": row["answer"]},
+                               {"question": getattr(doc, "page_content", None), "answer": metadata.get("answer")},
+                               "docstore." + faq_id)
+        if metadata.get("question") != row["question"]:
+            changes += differences(row["question"], metadata.get("question"), "docstore." + faq_id + ".metadata.question")
+    after = index_completion_report(canonical, index_dir)
+    if after != completion:
+        raise DataError("index/canonical/receipt changed during docstore inspection")
+    for relative, expected_hash in sources.items():
+        if sha(root / relative) != expected_hash:
+            raise DataError("CSV/manifest changed during docstore inspection: %s" % relative)
+    return {"status": "failed" if changes else "passed", "faq_count": len(docs),
+            "id_set_matches": seen == set(expected), "differences": changes,
+            "scope": "exact ID/question/answer and mapping; not FAISS tensor validation"}
 
 
 def index_completion_report(canonical, index_dir, version=None):
@@ -75,12 +142,77 @@ def main():
     context.add_argument("--run-dir", type=Path, help="inspect exact frozen paths from a failed Smoke run")
     p.add_argument("--canonical", help="explicit path override, shown in the report")
     p.add_argument("--index-dir", help="explicit path override, shown in the report")
+    p.add_argument("--inspect-docstore", action="store_true", help="compare exact stored Q/A; requires trusted local pickle opt-in")
+    p.add_argument("--trust-local-docstore", action="store_true")
+    p = sub.add_parser("restore-canonical", help="write NEW LF-only byte restoration and NEW config; never edit receipt/index")
+    p.add_argument("--config", default=str(Path(__file__).with_name("config.json")))
+    p.add_argument("--canonical", help="override source canonical")
+    p.add_argument("--index-dir", help="override existing trusted index directory")
+    p.add_argument("--output", required=True, help="NEW .jsonl path")
+    p.add_argument("--output-config", required=True, help="NEW evaluation config path")
+    p.add_argument("--trust-local-docstore", action="store_true", required=True)
     args = parser.parse_args()
     root = args.project_root.expanduser().resolve()
     try:
+        if args.command == "restore-canonical":
+            config = read_json(resolve(root, args.config))
+            canonical = resolve(root, args.canonical or config["a1_canonical"])
+            index_dir = resolve(root, args.index_dir or config["a1_index"])
+            output, config_output = resolve(root, args.output), resolve(root, args.output_config)
+            receipt_output = output.with_name(output.name + ".restoration.json")
+            if (output.suffix != ".jsonl" or config_output.suffix != ".json"
+                    or any(p.exists() for p in (output, config_output, receipt_output))
+                    or len({output, config_output, receipt_output}) != 3):
+                raise DataError("restoration requires distinct NEW JSONL/config/receipt outputs; no overwrites")
+            # Keep the new corpus in the project, and allow only a separate config
+            # file outside the existing index. Never publish over any input.
+            output.relative_to(root / "experiments/datasets/faq")
+            config_output.relative_to(root / "experiments/evaluation")
+            watched = [canonical, index_dir / "index.faiss", index_dir / "index.pkl", index_dir / "version.json"]
+            before = {str(p): sha(p) for p in watched}
+            version = read_json(index_dir / "version.json")
+            content = inspect_docstore(canonical, index_dir, config["manifest"], root)
+            if content["status"] != "passed":
+                raise DataError("canonical differs from stored Q/A; restore blocked: " + json.dumps(content, ensure_ascii=True))
+            restored = canonical.read_bytes().replace(b"\r\n", b"\n")
+            target_hash = hashlib.sha256(restored).hexdigest()
+            if target_hash != version.get("canonical_sha256"):
+                raise DataError("LF-only restoration does not reproduce original receipt hash; use original backup or a NEW index")
+            if before != {str(p): sha(p) for p in watched}:
+                raise DataError("input changed during restoration checks; no outputs written")
+            config["a1_canonical"] = output.relative_to(root).as_posix()
+            config["a1_index"] = index_dir.relative_to(root).as_posix()
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with output.open("xb") as handle:
+                handle.write(restored)
+                handle.flush()
+                os.fsync(handle.fileno())
+            completion = index_completion_report(output, index_dir)
+            if completion["status"] != "passed":
+                raise DataError("new restoration failed receipt check; retained for investigation; no config published")
+            if sha(output) != target_hash or before != {str(p): sha(p) for p in watched}:
+                raise DataError("original input or restored output changed; no restoration receipt/config published")
+            atomic_json(receipt_output, {"schema_version": "a1_lf_restoration_v1", "status": "completed",
+                                        "transformation": "CRLF bytes to LF only; exact original byte hash restored",
+                                        "original_inputs_sha256": before, "output_sha256": sha(output),
+                                        "docstore_validation": content})
+            atomic_json(config_output, config)
+            print(json.dumps({"status": "restored_to_new_files", "canonical": str(output),
+                              "config": str(config_output), "sha256": target_hash,
+                              "original_index_and_receipt_unchanged": True}, ensure_ascii=True, indent=2))
+            return 0
         if args.command == "audit-index":
             if args.run_dir:
-                frozen = read_run(resolve(root, args.run_dir))
+                run = resolve(root, args.run_dir)
+                if not (run / "run.json").is_file():
+                    partial = sorted(str(p) for p in (run / "preflight").glob("*_dataset_failed.json"))
+                    raise DataError("cannot audit frozen run: " + json.dumps({
+                        "requested_run_root": str(run), "directory_exists": run.is_dir(),
+                        "required_manifest": str(run / "run.json"), "dataset_failure_reports": partial,
+                        "reason": "run.json missing; wrong/subdirectory path, incomplete copy, or creation failed before manifest",
+                        "action": "locate actual run root containing run.json; otherwise audit explicit canonical/index paths",
+                        "frozen_config_verified": False, "fallback_performed": False}, ensure_ascii=True))
+                frozen = read_run(run)
                 if Path(frozen["project_root"]).resolve() != root:
                     raise DataError("frozen run project_root differs from --project-root; audit on its original GPU project")
                 config = frozen["config"]
@@ -94,6 +226,13 @@ def main():
             report = index_completion_report(canonical, index_dir)
             report["configuration_source"] = context_path
             report["path_overrides"] = {"canonical": args.canonical, "index_dir": args.index_dir}
+            report["canonical_representation"] = canonical_bytes_report(canonical, report["expected"]["canonical_sha256"])
+            if args.inspect_docstore:
+                if not args.trust_local_docstore:
+                    raise DataError("--inspect-docstore requires --trust-local-docstore for your own hash-checked local pickle")
+                report["docstore_validation"] = inspect_docstore(canonical, index_dir, config["manifest"], root)
+                if report["docstore_validation"]["status"] != "passed":
+                    report["status"] = "failed"
             if args.run_dir:
                 recorded = frozen["resources"]["a1_index"]
                 report["frozen_a1_resources"] = {name: frozen["resources"][name]
@@ -152,7 +291,6 @@ def main():
         allowed = (root / "experiments/vector_stores").resolve()
         if allowed not in output.parents or output.exists():
             raise DataError("index must be a NEW directory under experiments/vector_stores: %s" % output)
-        import os
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
         model = cached_model(root, "BAAI/bge-m3", snapshot=args.bge_snapshot)

@@ -238,10 +238,23 @@ def main():
             with lock(run / "run.lock"):
                 if args.command == "preflight":
                     failed = any(r["status"] == "failed" for r in preflight.values())
+                    for arch, result in preflight.items():
+                        print("%s: %s; model_load_verified=False" % (arch, result["status"]), flush=True)
+                        for error in result["errors"]:
+                            print("%s resource failure: %s" % (arch, error), file=sys.stderr, flush=True)
+                    if not args.verify_workers and not args.load_models:
+                        print("Inventory only: no Worker requested; use --load-models for actual loader verification.", flush=True)
                     if args.verify_workers:
                         failed = launch(run, meta, meta["architectures"], verify_only=True) or failed
                     if args.load_models:
                         ready = [a for a, r in preflight.items() if r["status"] != "failed"]
+                        for arch in meta["architectures"]:
+                            if arch not in ready:
+                                print("%s: Worker SKIPPED because resource validation failed" % arch,
+                                      file=sys.stderr, flush=True)
+                        if not ready:
+                            print("No model Workers launched; all selected architectures failed resource validation; exit=2.",
+                                  file=sys.stderr, flush=True)
                         failed = launch(run, meta, ready, load_only=True) or failed
                         for arch in ready:
                             jobs = [read_json(p) for p in sorted((run / "jobs" / arch).glob("*.json"))]
@@ -255,6 +268,7 @@ def main():
                         atomic_json(run / "preflight" / (identifier() + "_loaded.json"),
                                     {"run_id": meta["run_id"], "architectures": preflight,
                                      "resource_inventory_only": False, "generation_executed": False})
+                    print("Preflight summary: %s; exit=%d" % ("FAILED" if failed else "PASSED", 2 if failed else 0), flush=True)
                 else:
                     failed = launch(run, meta, meta["architectures"])
                     runtime_preflight(run, meta)
