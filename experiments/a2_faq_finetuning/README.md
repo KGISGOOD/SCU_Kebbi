@@ -1,4 +1,67 @@
-# A2 FAQ 資料準備與檢索評估
+# A2 FAQ 微調、檢索評估與標準答案問答
+
+## 互動式 FAQ 問答（本次新增）
+
+A2 研究 BGE-M3 微調能否改善 FAQ 語意表示：A2-1 使用 Positive Pair；A2-2 在相同 Positive Pair、排程及 masked InfoNCE 基礎上加入 Hard Negative 候選。訓練產生的 SentenceTransformer 模型可供下列問答入口載入；啟動問答不會訓練模型，也不會讀取評估查詢或計算研究指標。
+
+```text
+使用者問題 → 選定原始 BGE-M3 / A2-1 / A2-2
+           → 同一模型編碼 Query 與固定 60 題標準問題
+           → float32、L2 正規化、NumPy 精確內積、FAQ ID 同分排序
+           → Top-1 FAQ ID → CSV 答案對照表 → 顯示原文標準答案
+```
+
+新增 `faq_answering.py` 提供 `load_answer_mapping`、`load_answering_data` 及 `FAQAnswerer.answer(query)`；新增 `chat.py` 提供兩組模型共用的互動入口。回傳結果包含 faq_id、question、answer、similarity、model、model_tag、provisional、accepted。只編碼問題，不將答案放入檢索向量。
+
+資料來源為 `common.CSV_SOURCES` 的兩份原始 CSV：
+
+- `畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv`
+- `畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv`
+
+直接使用 CSV「編號」P01–P30、S01–S30；「問題內容」與「ai答覆」保留原文，類別來自「關切維度」或「問題分類」。不使用 A1 的少量 canonical，也不呼叫其會再次加上 P/S 前綴的 loader。
+
+檢索仍使用既有獨立的 `experiments/datasets/faq_finetuning/faq_retrieval_candidates.jsonl`，不新增或改寫候選資料。載入前檢查來源完整 60 ID、候選 ID 唯一且完整、question/source_group 與 CSV 一致，以及每題答案非空；答案以 ID 字典查找，不依陣列位置推定。若 CSV 在兩次讀取間改變，輸入 hash 檢查會停止啟動。載入後使用記憶體快照。
+
+每次啟動僅以選定模型編碼 60 題一次，後續提問只編碼 Query；不保存或重用其他模型的向量索引。重用 `BGEM3Embedder` 與 evaluator 的正規化及排序方式，不新增 FAISS 或第三方依賴。`--max-length` 預設 512；下列 smoke 模型範例明確使用 64，與其訓練長度一致。這不是模型效果比較。
+
+### GPU 電腦啟動
+
+先同步新增的兩個 Python 檔案及本 README。下列命令僅供使用者執行，Codex 未執行。
+
+```powershell
+Set-Location 'C:\Users\rsy\Desktop\SCU_Kebbi'
+
+# 先唯讀確認輸入存在（必須全部為 True）
+Test-Path 'experiments/models/a2_1_smoke_task8/final_model/a2_checkpoint_complete.json'
+Test-Path 'experiments/models/a2_2_smoke_task8/final_model/a2_checkpoint_complete.json'
+Test-Path 'experiments/datasets/faq_finetuning/faq_retrieval_candidates.jsonl'
+Test-Path '畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv'
+Test-Path '畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv'
+
+# A2-1：執行後輸入一兩個問題；exit / quit 結束
+python -m experiments.a2_faq_finetuning.chat --project-root . --model experiments/models/a2_1_smoke_task8/final_model --model-tag A2-1 --device cuda --batch-size 8 --max-length 64 --offline --allow-unreviewed
+
+# 結束上一個互動程序後再啟動 A2-2
+python -m experiments.a2_faq_finetuning.chat --project-root . --model experiments/models/a2_2_smoke_task8/final_model --model-tag A2-2 --device cuda --batch-size 8 --max-length 64 --offline --allow-unreviewed
+```
+
+可手動輸入「大一上主要會用什麼語言學寫程式？」，核對終端機顯示的模型、FAQ ID、原題、相似度與 CSV 答案。此為功能確認步驟，未預先指定匹配結果。空白輸入會提示重輸；重複問題仍可回答；exit/quit、EOF 或 Ctrl+C 結束。每次程序固定一個模型，切換需結束後重新啟動。
+
+原始模型亦可使用同一入口：指定 `--model BAAI/bge-m3 --model-tag A1`；離線時必須已有完整快取。A2 模型必須為存在的本機目錄；缺檔、模型標籤與 provenance 模式不符、checkpoint hash 不符或未完成儲存均報錯，不退回原始模型。完整性檢查會讀取權重 hash，因此啟動可能需要等待磁碟 IO。
+
+目前 smoke checkpoint 為 provisional；必須明確加 `--allow-unreviewed`，畫面持續標記 provisional。這個開關不會修改資料審核狀態或 checkpoint。若 GPU 記憶體不足，可降低 `--batch-size` 或改 `--device cpu`；不要換用其他模型冒充指定模型。
+
+本次開發工作區缺少正式 60 題候選 JSONL；請確認 GPU 電腦原有版本存在，缺少時從已使用的專案備份同步，不使用舊 3 題 canonical 替代，也不由 chat 自動重建。缺 CSV、壞 JSONL、重複/遺漏 ID、題目不同步或空答案時會在模型載入前報錯。缺模型權重或 tokenizer 時，模型 loader 的具體錯誤會顯示；不自動下載替代模型。若啟動失敗，回傳完整命令、錯誤類型與完整錯誤訊息；如提問失敗，再附問題及畫面顯示的模型/模式。未自動寫入結果或錯誤檔案。
+
+### 功能邊界與驗證狀態
+
+預設 Top-1 一定回傳最相近 FAQ 的標準答案。**目前 Top-1 是基本功能模式，不表示能安全處理所有未知問題；未校準門檻前，不應將相似度視為回答正確機率。**
+
+`--threshold` 是可選的 cosine 下限，預設 None、不拒答；如手動指定，低於下限只顯示匹配資料而不提供答案。此值未校準，沒有預設正式標準。本次未加入門檻最佳化、Confidence Calibration、A0 Fallback、Router、LLM 生成或機器人硬體整合。
+
+本次沒有執行 Python，因此尚未經過 GPU 實際功能驗證。只進行靜態程式碼與呼叫流程檢查；模組匯入、CSV/JSON 解析、CPU/CUDA 模型載入、離線行為及互動輸出仍須在 GPU 電腦手動確認。未修改訓練/評估資料、原始 CSV、模型權重、A0/A1/A4 或原評估程式。
+
+以下保留原資料準備與評估操作說明；其中「未執行」指該次 Codex 開發過程，不代表另一台電腦沒有執行紀錄。
 
 本目錄為獨立 A2 程式，不修改或呼叫既有 A1 的 loader/matcher。
 狀態：程式碼與查詢候選已撰寫，尚未執行 Python、測試、parser、模型推論或訓練。本說明中的命令由使用者在另一台電腦執行。
