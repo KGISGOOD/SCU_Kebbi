@@ -1,0 +1,66 @@
+{
+  "run_id": "20261022T154711Z_65cfb8f3cb8b",
+  "architecture": "A1",
+  "faq_id": "S19",
+  "question": "畢業專題大約是在大幾開始做？是自己找教授嗎？",
+  "reference_answer": "畢業專題通常是在大三開始啟動（大三上學期尋找指導老師與確定方向，大三下至大四進行系統開發與成果發表）。專題題目與指導教授是由同學們自行組隊後，依照感興趣的研究領域主動洽詢系上教授洽談媒合。",
+  "split": "train",
+  "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+  "source_row": 20,
+  "attempt_id": "43c7408d523a4986b36b61e33352d604",
+  "attempt_number": 1,
+  "created_ns": 1792684071629287700,
+  "generated_answer": "畢業專題通常是在大三開始啟動（大三上學期尋找指導老師與確定方向，大三下至大四進行系統開發與成果發表）。專題題目與指導教授是由同學們自行組隊後，依照感興趣的研究領域主動洽詢系上教授洽談媒合。",
+  "status": "success",
+  "error_message": null,
+  "latency_seconds": 0.017316600074991584,
+  "model_name": "BAAI/bge-m3",
+  "model_version_or_path": {
+    "model_argument": "BAAI/bge-m3",
+    "revision_requested": null,
+    "snapshot_override": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-m3\\snapshots\\5617a9f61b028005a4858fdac845db406aefb181",
+    "path": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-m3\\snapshots\\5617a9f61b028005a4858fdac845db406aefb181",
+    "files_sha256": {
+      "1_Pooling/config.json": "e54c164a07274f2eb45bb724f54a79d1efcc90c41573887cd9a29aeee0597352",
+      "config.json": "26159e7ad065073448460117eb24b7a4572f6f4e78eadff65dc0a11c052449fa",
+      "config_sentence_transformers.json": "1eef72430e7194a1e59680e635aed81ffa083f05668dbc5bb1c56c04c0999c38",
+      "modules.json": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+      "pytorch_model.bin": "b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38",
+      "sentence_bert_config.json": "eb9b44b13c0f52a3b3685c3b1cbdea1ba8b04bea123b98f61610048940776eb1",
+      "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+      "special_tokens_map.json": "8c785abebea9ae3257b61681b4e6fd8365ceafde980c21970d001e834cf10835",
+      "tokenizer.json": "21106b6d7dab2952c1d496fb21d5dc9db75c28ed361a05f5020bbba27810dd08",
+      "tokenizer_config.json": "a62b2b6784f990259fddef5f16388693a8043be4f69179e6a5257eeb3f9abac4"
+    },
+    "content_sha256": "2b0617a475299ad48c2346dcab71d07f7adb4887694de1edb4c0fba6b858bd41",
+    "identity_scope": "native PyTorch inference dependencies; not entire Hub repository",
+    "loader_validation_required": true
+  },
+  "model_provisional": false,
+  "input_tokens": null,
+  "output_tokens": null,
+  "stop_reason": null,
+  "reached_token_limit": null,
+  "job_id": "20261022T154712Z_740777a497d3",
+  "runtime_contract": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\results\\unified_faq\\a1_full_recovered_425e826b053b4dc390708bc4da17333a\\contracts\\A1.json",
+  "predicted_faq_id": "S19",
+  "matched_question": "畢業專題大約是在大幾開始做？是自己找教授嗎？",
+  "similarity_score": 1.0,
+  "faq_top2": [
+    {
+      "faq_id": "S19",
+      "question": "畢業專題大約是在大幾開始做？是自己找教授嗎？",
+      "answer": "畢業專題通常是在大三開始啟動（大三上學期尋找指導老師與確定方向，大三下至大四進行系統開發與成果發表）。專題題目與指導教授是由同學們自行組隊後，依照感興趣的研究領域主動洽詢系上教授洽談媒合。",
+      "similarity_score": 1.0
+    },
+    {
+      "faq_id": "S20",
+      "question": "專題是分組進行還是一個人做？題目通常是怎麼決定的？",
+      "answer": "專題多半以團隊分組進行（通常 3 到 5 人一組），強調分工合作。題目決定方式主要有兩種：一種是由指導教授提供企業產學合作的真實數據案（如醫療、商業數據），另一種是小組成員發想感興趣的生活或 AI 應用題目，經教授指導後推進實作。",
+      "similarity_score": 0.7320690751075745
+    }
+  ],
+  "query_equals_matched_question": true,
+  "faq_id_correct": true,
+  "record_sha256": "b734488dbad9340f87a171562356a4d2b6b45a4243d6dd29eacf1b29197e3581"
+}

@@ -1,0 +1,16 @@
+{
+  "run_id": "20261022T155116Z_9572f9d39abb",
+  "architectures": {
+    "A5": {
+      "model_load_verified": true,
+      "job_statuses": [
+        {
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "runtime_contract_available": true
+    }
+  },
+  "resource_inventory_only": false
+}

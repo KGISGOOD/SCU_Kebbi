@@ -1,0 +1,1342 @@
+{
+  "schema_version": "unified_faq_v1",
+  "run_id": "20261022T144732Z_fd665658773f",
+  "project_root": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi",
+  "mode": "full",
+  "architectures": [
+    "A0",
+    "A1",
+    "A2-1",
+    "A2-2",
+    "A3",
+    "A4-1",
+    "A4-2",
+    "A5"
+  ],
+  "question_ids": [
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P06",
+    "P07",
+    "P08",
+    "P09",
+    "P10",
+    "P11",
+    "P12",
+    "P13",
+    "P14",
+    "P15",
+    "P16",
+    "P17",
+    "P18",
+    "P19",
+    "P20",
+    "P21",
+    "P22",
+    "P23",
+    "P24",
+    "P25",
+    "P26",
+    "P27",
+    "P28",
+    "P29",
+    "P30",
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "S11",
+    "S12",
+    "S13",
+    "S14",
+    "S15",
+    "S16",
+    "S17",
+    "S18",
+    "S19",
+    "S20",
+    "S21",
+    "S22",
+    "S23",
+    "S24",
+    "S25",
+    "S26",
+    "S27",
+    "S28",
+    "S29",
+    "S30"
+  ],
+  "dataset": [
+    {
+      "faq_id": "P01",
+      "question": "畢業後具體是去哪些企業上班？有沒有知名大廠？",
+      "reference_answer": "畢業生就業領域涵蓋科技業、金融業、顧問諮詢業與生醫數據產業。常見企業包括：金控大廠（如富邦、國泰、中信等數位科技與數據分析部門）、科技大廠（如緯創、廣達、華碩）、大型系統整合商、四大會計師事務所之管理諮詢部門以及醫療數據公司等。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 2
+    },
+    {
+      "faq_id": "P02",
+      "question": "現在軟體與科技業傳出裁員潮，資料科學好找工作嗎？",
+      "reference_answer": "科技業目前的調整主要針對純初階程式撰寫人員，但各行各業（特別是金融、醫療、智慧製造與傳統零售）對「數位轉型」與「數據驅動決策」的人才需求反而持續攀升。本系培養學生兼具 AI 技術與場域業務理解的跨域能力，在就業市場上依舊具備高度競爭力。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 3
+    },
+    {
+      "faq_id": "P03",
+      "question": "畢業生有沒有考上公務員或國營事業的機會？有哪些類科？",
+      "reference_answer": "有的。系上必修涵蓋程式設計、資料庫系統、統計學等核心科目，完全對應高普考與地方特考的「資訊處理」與「統計」類科。此外，學生也可報考國營事業聯招（台電、中油、台水）的資訊類組，或是公股銀行的數位金融與資訊人員甄試。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 4
+    },
+    {
+      "faq_id": "P04",
+      "question": "本系畢業後 3~5 年的薪資成長潛力與平均待遇如何？",
+      "reference_answer": "資料科學與軟體領域具備顯著的經驗溢價。畢業 3 至 5 年的系友，隨著能獨立負責資料管線或 AI 專案，晉升為資深資料工程師、資料科學家或專案主管後，月薪普遍落在 60,000 至 85,000 元以上，在金融總行或外商科技業年薪突破百萬亦屬常見路徑。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 5
+    },
+    {
+      "faq_id": "P05",
+      "question": "系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？",
+      "reference_answer": "有的，系上設有學士班學生修讀碩士學位（五年一貫）辦法。學生可於大三提出申請，通過審查後可於大四先修碩士班課程，先修學分可依規定折抵碩士學分，順利的話能用五年時間取得學士與碩士雙學位，每屆均有固定名額供優秀學生申請。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 6
+    },
+    {
+      "faq_id": "P06",
+      "question": "讀完四年大學，有需要一定要讀研究所才能找到好工作嗎？",
+      "reference_answer": "不一定。若志在投入前沿 AI 深度演算法研發或頂尖研究機構，攻讀碩士確有優勢；但若希望擔任資料工程師、軟體工程師或商業數據分析師，系上四年扎實的專題成果、黑客松競賽經驗與大四實習銜接，已足以讓學生在大學畢業時順利獲得優質工作。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 7
+    },
+    {
+      "faq_id": "P07",
+      "question": "本系學生考研時，推甄錄取率高還是考試錄取率高？",
+      "reference_answer": "推甄錄取的比例相當高！因為本系高度重視實作專題與產學競賽，加上許多同學在大二大三期間便成功申請並執行國科會「大專生研究計畫」，具備扎實的實務作品與研究成果，在頂大研究所推甄面試中往往能獲得教授高度青睞。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 8
+    },
+    {
+      "faq_id": "P08",
+      "question": "系上有沒有配合的知名企業實習計畫？有給薪資嗎？",
+      "reference_answer": "有的。系上每學期均積極媒合金控集團、軟體科技大廠、顧問公司與醫療機構之實習機會。依現行勞基法與學校實習規範，合作企業所提供的全職或長期實習皆依法給付合法工資（月薪或時薪）並享有勞健保保障，並非無薪實習。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 9
+    },
+    {
+      "faq_id": "P09",
+      "question": "大四一整年都可以去校外全職實習算學分嗎？",
+      "reference_answer": "系上設有校外實習相關修業規範。學生若在前三年依進度修畢大部分必修學分並符合申請資格，大四可申請全學期或全學年的企業實習並認列實習學分，詳細修業規定與時數要求依系辦最新實習辦法辦理。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 10
+    },
+    {
+      "faq_id": "P10",
+      "question": "企業合作專案主要是哪些產業？金融業還是科技業多？",
+      "reference_answer": "產業分佈非常廣泛且多元。系上教授近期在醫療大數據與生醫資訊分析上有深入的產學合作專案；同時，結合東吳傳統商管優勢，金融科技（FinTech）與商業零售數據的合作案比例也相當高，科技業的軟體開發專案亦涵蓋其中。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 11
+    },
+    {
+      "faq_id": "P11",
+      "question": "系上專任老師多嗎？教授主要的研究背景是什麼領域？",
+      "reference_answer": "系上專任師資陣容完善且具跨領域背景。教授專長涵蓋數理統計、深度學習、機器學習、巨量資料架構、自然語言處理、金融科技等，能提供學生多元且完整的技術指導與專案帶領。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 12
+    },
+    {
+      "faq_id": "P12",
+      "question": "教授是否具備業界實務經驗？還是都是純學術派？",
+      "reference_answer": "系上多位教授均具備豐富的業界產學合作與顧問經歷。老師們經常帶領學生執行企業委託的實際專案（例如與醫療數據公司合作模型開發、參與黑客松實戰競賽等），教學與研究緊扣產業實務。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 13
+    },
+    {
+      "faq_id": "P13",
+      "question": "萬一孩子入學後跟不上進度、考試不及格，學校會預警輔導嗎？",
+      "reference_answer": "學校建置有完整的學業預警與課業輔導機制。期中考後若成績未達標準，系統會主動發送預警通知並由班級導師進行會談關懷；系上專業核心課程亦設有教學助理（TA）與實習課輔導機制，協助學習落後的學生及時跟上進度。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 14
+    },
+    {
+      "faq_id": "P14",
+      "question": "每一位學生都有專屬的導師可以諮詢生活與課業嗎？",
+      "reference_answer": "是的。學校實施完善的導師制度，每位學生入學後皆有專屬的班級導師輔導。學校定期舉辦導師時間與導生晤談，學生在面臨課業選課、生活適應、心理壓力或未來升學就業抉擇時，均能直接向導師諮詢求助。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 15
+    },
+    {
+      "faq_id": "P15",
+      "question": "資料科學是新興科系嗎？會不會熱潮過了之後就沒需求？",
+      "reference_answer": "資料科學雖然是因應大數據與 AI 浪潮設立的新興學門，但其根本是建立在扎實的「計算機工程」與「數理統計」基礎上。現代各產業皆已高度數位化，只要企業營運持續產生數據，就必然需要資料處理、模型建立與決策分析，這已是現代產業的底層核心基建，需求具備長遠穩定性。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 16
+    },
+    {
+      "faq_id": "P16",
+      "question": "和傳統資工系相比，業界主管在面試時會不會比較偏好資工？",
+      "reference_answer": "這完全取決於應聘的職缺屬性。若是硬體底層驅動、晶片編譯器或單純作業系統開發，傳統資工確實有其優勢；但若職務涉及資料分析、機器學習應用、商業智慧或跨領域數據專案，業界主管反而更看重資科系學生兼具技術實作與業務溝通理解的整合能力。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 17
+    },
+    {
+      "faq_id": "P17",
+      "question": "相比國立大學，貴校貴系的優勢和競爭力在哪裡？",
+      "reference_answer": "本系的最大優勢在於「跨領域場域對接」與「高階實務設備整合」。東吳具備頂尖的文法商底蘊，本系不走閉門造車路線，而是直接結合醫療、金融與商務場域進行實務專案；硬體上建置與 NVIDIA 合作的智慧創新學習中心與高階 GPU 算力，並輔導考取國際證照，實戰競爭力不輸國立大學。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 18
+    },
+    {
+      "faq_id": "P18",
+      "question": "四年的學雜費每學期大約多少錢？有沒有提供獎助學金？",
+      "reference_answer": "私立大學資訊類學雜費每學期約五萬餘元（配合行政院私立大專學費補助方案，每學期定額減免 1.75 萬元）。系上設有由張善政榮譽院長捐贈成立的「文華獎學金」，學校亦提供學業表現優良獎學金、各類急難救助與清寒助學金等多項獎補助資源。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 19
+    },
+    {
+      "faq_id": "P19",
+      "question": "申請優秀入學獎學金的標準是什麼？能免學雜費嗎？",
+      "reference_answer": "東吳大學訂有優秀新生入學獎勵辦法，學測成績優異達各學院指定門檻（如數 A、英文前標或頂標標準）之新生，可獲得入學獎學金或全額、半額學雜費補助。各學年度具體標準與名額請以當年度招生簡章公告為準。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 20
+    },
+    {
+      "faq_id": "P20",
+      "question": "學習過程中需要額外自費購買昂貴的套裝軟體或教材嗎？",
+      "reference_answer": "不需要。資料科學與 AI 領域的主流開發工具與語言（如 Python、R、各類深度學習框架）皆為全球開源社群資源。學校與系上也提供了 Microsoft 365 及專業軟體之校園授權，學生無需自費購買昂貴的專案軟體。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 21
+    },
+    {
+      "faq_id": "P21",
+      "question": "系上有提供雲端運算（如 AWS, GCP, Azure）的額度補助嗎？",
+      "reference_answer": "相關專業課程中，授課教師會協助學生申請國際雲端大廠（如 AWS Educate、Google Cloud 等）的教育補助額度。同時，系上本身即建置有專屬的高階 GPU 運算伺服器供學生免費連線訓練 AI 模型，能充分滿足專案算力需求，減輕學生自費負擔。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 22
+    },
+    {
+      "faq_id": "P22",
+      "question": "學生在學期間出國交換的機會多嗎？有哪些姊妹校？",
+      "reference_answer": "出國交換管道非常多元。東吳大學與全球數百所海外知名大學締結姊妹校（遍及美、歐、日、韓等地），國際處每學期均開放申請。此外，學院亦推動與美國聖荷西州立大學 IDS 學院、亞利桑那州立大學雷鳥學院等碩士先修與雙聯合作，提供豐富的國際學習機會。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 23
+    },
+    {
+      "faq_id": "P23",
+      "question": "出國交換會不會導致學生必須延期畢業（延畢）？",
+      "reference_answer": "只要提前做好修課規劃，不必然會延畢。學生於姊妹校修習及格之課程，返校後可依教務處「學生抵免學分辦法」申請抵免系上的選修學分。若能在大一至大三提早修畢核心必修，多數交換學生皆能如期在四年內順利畢業。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 24
+    },
+    {
+      "faq_id": "P24",
+      "question": "孩子進來後如果想跨修財務金融或資工，門檻會很高嗎？",
+      "reference_answer": "東吳校風極為鼓勵跨領域學習，雙主修與輔系申請機制透明，主要依據學生大一的學業成績與在校排名進行審核。本系學生因為具備扎實的資訊技術與數據分析能力，申請跨修商學院（如財金、企管、經濟等）輔系或雙主修相當具備優勢。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 25
+    },
+    {
+      "faq_id": "P25",
+      "question": "書面審查時，如果沒有得過大型科技競賽獎項，機會大嗎？",
+      "reference_answer": "機會依然很大！競賽得獎屬於加分項目而非絕對門檻。審查教授更看重學生的運算思維、學習動機以及對資料與生活問題的觀察力。只要能在備審資料中展現出自主學習歷程、動手解決問題的探索過程與熱忱，都能獲得審查委員的肯定。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 26
+    },
+    {
+      "faq_id": "P26",
+      "question": "面試主要是個人面試還是團體面試？最看重什麼特質？",
+      "reference_answer": "個人申請面試主要採個人獨立面試（多位考官對單一考生）進行。教授最看重的特質包括：清晰的邏輯思維與口語表達、對資料科學的正確理解與好奇心、以及在面對問題時能否具備拆解問題與勇於探索的學習潛力。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 27
+    },
+    {
+      "faq_id": "P27",
+      "question": "校園周邊生活機能與治安狀況如何？交通是否便利？",
+      "reference_answer": "校園周邊治安良好、環境單純。外雙溪校區鄰近士林商圈與故宮，環境清幽安全，門口設有密集之接駁公車往返捷運士林站；城中校區位於中正博愛特區，步行即可抵達西門或小南門捷運站，整體交通網絡便捷、生活機能健全。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 28
+    },
+    {
+      "faq_id": "P28",
+      "question": "畢業除了修滿學分外，有英文檢定或程式檢定門檻嗎？",
+      "reference_answer": "學校層面設有基礎之英文能力檢定門檻（如多益成績標準，未通過者可修習校內補救課程替代）。系上核心的專業檢核門檻為修畢規定之模組學分，並通過團隊「畢業專題」的成果審查與發表，並無強制要求自費考取外部特定程式證照。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 29
+    },
+    {
+      "faq_id": "P29",
+      "question": "系上的平均畢業率如何？會不會因為專題做不出來而普遍延畢？",
+      "reference_answer": "系上絕大多數同學都能在四年內如期完成學業，極少數存在因專題而延畢的情形。畢業專題在大三啟動時便由指導教授每週定期引導與期中進度控管，只要同學按部就班與組員協作，都能順利完成作品並通過發表。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 30
+    },
+    {
+      "faq_id": "P30",
+      "question": "學校或系上有提供履歷修改、模擬面試或就業博覽會嗎？",
+      "reference_answer": "學校與系上的就業輔導資源非常健全。學校「生涯發展中心」每學期均舉辦企業徵才博覽會、職涯教練履歷健檢與模擬面試工作坊；系辦亦常態性辦理系友職涯講座，並主動向應屆畢業生推薦金融與科技大廠之專屬實習與就業職缺。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv",
+      "source_row": 31
+    },
+    {
+      "faq_id": "S01",
+      "question": "高中完全沒有寫過程式，進來會不會跟不上？",
+      "reference_answer": "不用太擔心！系上很多同學在高中完全沒寫過程式。大一程式設計課會從最基礎的運算思維、語法邏輯開始教起。開學後課堂也都有助教（TA）與實習課能隨時發問，只要作業按部就班自己練習，絕對跟得上。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 2
+    },
+    {
+      "faq_id": "S02",
+      "question": "大一上學期教哪一種程式語言？進度會很快嗎？",
+      "reference_answer": "大一上學期主要以 Python 為主。進度上前半學期會著重在基礎變數、邏輯判斷與迴圈等概念。老師課堂更重視運算思維。只要每週跟著實作練習，進度是完全可以消化的。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 3
+    },
+    {
+      "faq_id": "S03",
+      "question": "系上除了 Python 還會學到哪些程式語言？",
+      "reference_answer": "除了貫穿機器學習與資料分析核心的 Python 之外，在統計與資料科學相關課程中常會使用 R 語言；資料庫相關課程會學 SQL",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 4
+    },
+    {
+      "faq_id": "S04",
+      "question": "我如果上機考試容易緊張寫不出來，系上有補救管道嗎？",
+      "reference_answer": "可以放心！系上程式課程的成績配比相當多元，不只有上機考試，同時也有專案時作報告。老師更看重每週作業與專案實作的累積。此外，每門程式課都配有實習課與助教（TA），平時卡關或解不出來都可以向助教尋求輔導。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 5
+    },
+    {
+      "faq_id": "S05",
+      "question": "數學不好（如學測數 A 沒頂標）讀這個系會很吃力嗎？",
+      "reference_answer": "數 A 沒頂標完全不需要自己嚇自己。大學的數學（如微積分、線性代數）主要是為了讓我們看懂機器學習演算法與程式背後的數學原理與推導，不是要你去考數學競賽。只要上課有搞懂觀念、按時完成習題，並不需要極高的數學天賦。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 6
+    },
+    {
+      "faq_id": "S06",
+      "question": "系上哪些必修課數學成分最重？會當很多人嗎？",
+      "reference_answer": "數學比重最重的科目主要集中在大一與大二的微積分、線性代數與機率統計，這些是日後建構資料模型與演算法的基石。只要作業按時繳交、觀念有理解，考試有掌握基本題，老師基本上不會故意為難大家。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 7
+    },
+    {
+      "faq_id": "S07",
+      "question": "微積分和高中數學最大的差別在哪裡？",
+      "reference_answer": "高中數學多半偏向公式套用與題型解題技巧，而大學微積分更重視觀念的嚴謹定義（如極限、連續性），並會延伸到多變數函數與偏微分。在資科系，學微積分主要是為了理解機器學習中「梯度下降」等模型最佳化的過程，重點在於觀念理解而非死背題型。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 8
+    },
+    {
+      "faq_id": "S08",
+      "question": "統計學跟一般高中數學有什麼不同？需要背很多公式嗎？",
+      "reference_answer": "高中數學的機率多偏向排列組合的計算，大學的統計學則更聚焦在資料分布、抽樣推論、假設檢定與信賴區間。實務上不需要死背繁雜的計算公式，大部分繁瑣計算會交由 Python 或 R 等軟體處理，課程更看重的是你能不能看懂數據背後的意涵與統計邏輯。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 9
+    },
+    {
+      "faq_id": "S09",
+      "question": "大一課表通常長怎樣？空堂多嗎？需要天天泡電腦教室嗎？",
+      "reference_answer": "大一課表通常由系定基礎必修（程式設計、微積分、計算機概論）與校定通識組成，每週約落在 18 到 22 學分之間，空堂時間相當充裕。平常不需要天天泡在電腦教室，多數人自備筆電在圖書館、宿舍或自習空間就能寫作業，只有上實習課時會使用專業電腦教室。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 10
+    },
+    {
+      "faq_id": "S10",
+      "question": "系上有沒有擋修規定？如果微積分被當會影響大二修課嗎？",
+      "reference_answer": "系上課程的修習規範以教務處當屆修業檢核表為準。部分進階課程可能會有先修建議或擋修規定，若微積分不慎被當，雖然不一定會立刻卡死所有大二選修，但會影響到後續需要微積分基礎的進階數學與模型課程，建議大二儘早透過重修或暑修補齊學分。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 11
+    },
+    {
+      "faq_id": "S11",
+      "question": "可以選修外系的課程嗎？可以算在畢業學分裡面嗎？",
+      "reference_answer": "可以選修外系課程！東吳大學鼓勵跨領域修課，在畢業學分中通常規劃有一定額度的「自由選修學分」。只要選修的外系專業課程符合系上審核規定，都可以計入畢業學分數中（詳細認列上限依入學年度修業規定為準）。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 12
+    },
+    {
+      "faq_id": "S12",
+      "question": "買筆電有特定規格限制嗎？需要買到很高階的顯卡 (GPU) 嗎？",
+      "reference_answer": "大一筆電建議以攜帶輕便、效能主流為主（建議 CPU i5/i7 或 Ryzen 5/7 以上、16GB 記憶體、512GB 以上 SSD）。不需要特地砸大錢買頂級獨立顯卡（GPU），因為系上建置了高階 GPU 運算設備與 AI 專業教室，進階深度學習模型都能連線到系上資源或雲端運算跑。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 13
+    },
+    {
+      "faq_id": "S13",
+      "question": "系上有沒有提供做深度學習或 AI 的伺服器運算資源？",
+      "reference_answer": "有的！學院建置了專屬的 AI 專業教室與虛實互動學習中心，擁有充足的高階 GPU 運算設備，並與 NVIDIA 等產業品牌合作設立智慧創新 AI 學習中心，能提供大家在訓練大型深度學習模型與大數據分析時足夠的算力支援。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 14
+    },
+    {
+      "faq_id": "S14",
+      "question": "讀這個系平時需要常熬夜趕作業或專案嗎？",
+      "reference_answer": "這完全取決於個人時間管理與除錯（Debug）效率。平時只要每週按部就班寫 code，基本上不需要通宵熬夜；但在期中、期末作業繳交前夕，或是大三大四進行專題衝刺時，因為常常會遇到 bug 兜不出來或模型需要調校，偶爾確實會需要熬夜趕工。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 15
+    },
+    {
+      "faq_id": "S15",
+      "question": "系館設施有哪些？有專屬的自習室或討論空間嗎？",
+      "reference_answer": "系館設有智慧創新 AI 學習中心、高階 AI 專業教室與學生專題討論空間。此外，校區內的總館與各閱覽室（如外雙溪總館第一閱覽室、城中第一閱覽室等）開放時間相當長，提供非常完善的安靜自習與小組討論環境。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 16
+    },
+    {
+      "faq_id": "S16",
+      "question": "大一新生一定能抽到學校宿舍嗎？周邊租屋方便嗎？",
+      "reference_answer": "只要是非設籍於台北市與新北市的新生，在第一階段都享有優先分配宿舍的資格（雙北新生則於第二階段申請候補）。校內有外雙溪的榕華樓、柚芳樓、松勁樓，校外也有泉思學舍與有容學舍等選擇。若想外宿，士林或捷運沿線租屋選擇也很多。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 17
+    },
+    {
+      "faq_id": "S17",
+      "question": "課業壓力下，還有時間參加熱舞社、吉他社等社團嗎？",
+      "reference_answer": "絕對有時間！系上很多學長姐同時活躍在熱舞社、吉他社、各類體育校隊或系學會中。大學生活關鍵在於自我時間分配，只要平時作業不拖延到最後一天，兼顧專業課業與熱門社團是完全做得到的。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 18
+    },
+    {
+      "faq_id": "S18",
+      "question": "系學會一年會辦哪些活動？有沒有專門辦給新生的迎新？",
+      "reference_answer": "系學會每學年都會規劃豐富的活動，開學初有專門辦給新生的迎新茶會或迎新活動，幫助新生快速認識同學與學長姐。學期中還會舉辦系烤、巨資電競盃／體育賽事、系卡、耶誕活動以及業界系友職涯講座等。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 19
+    },
+    {
+      "faq_id": "S19",
+      "question": "畢業專題大約是在大幾開始做？是自己找教授嗎？",
+      "reference_answer": "畢業專題通常是在大三開始啟動（大三上學期尋找指導老師與確定方向，大三下至大四進行系統開發與成果發表）。專題題目與指導教授是由同學們自行組隊後，依照感興趣的研究領域主動洽詢系上教授洽談媒合。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 20
+    },
+    {
+      "faq_id": "S20",
+      "question": "專題是分組進行還是一個人做？題目通常是怎麼決定的？",
+      "reference_answer": "專題多半以團隊分組進行（通常 3 到 5 人一組），強調分工合作。題目決定方式主要有兩種：一種是由指導教授提供企業產學合作的真實數據案（如醫療、商業數據），另一種是小組成員發想感興趣的生活或 AI 應用題目，經教授指導後推進實作。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 21
+    },
+    {
+      "faq_id": "S21",
+      "question": "過去有沒有學長姐做出很厲害的 APP 或 AI 系統的例子？",
+      "reference_answer": "非常多！例如有學長姐結合大型語言模型與語音分析，為 Kebbi 機器人開發智慧資訊教育與導讀應用，並在 AI 黑客松競賽中獲獎；也有團隊與醫療機構產學合作，利用真實臨床數據建立疾病預測模型與決策支援系統，成果非常具實戰價值。",
+      "split": "train",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 22
+    },
+    {
+      "faq_id": "S22",
+      "question": "大部分學長姐畢業後會選擇繼續讀研究所嗎？",
+      "reference_answer": "一部分的學長姐選擇繼續攻讀研究所（包含推甄頂大、本系碩士班或出國深造），以進一步鑽研進階演算法與 AI 模型；也有一部分則選擇直接進入職場擔任資料工程師、數據分析師或軟體工程師，業界對本系實作人才能見度相當高。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 23
+    },
+    {
+      "faq_id": "S23",
+      "question": "本系畢業生通常能推甄上哪些頂大（台清交成政）研究所？",
+      "reference_answer": "歷年來學長姐推甄錄取台大、清大、交大、成大、政大以及台科、北科等頂尖大學資工、資管、數據科學與統計研究所的成果非常豐富。系上累積的實務專案、黑客松得獎履歷，加上許多同學成功通過國科會大專生研究計畫，在推甄審查時極具競爭力。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 24
+    },
+    {
+      "faq_id": "S24",
+      "question": "可以跨考一般資工所或商管類的數據所嗎？難度如何？",
+      "reference_answer": "完全可以！若跨考商管類的大數據所、資管所或統計所，本系的程式與資料模型背景具備非常大的優勢；若想跨考傳統資工所，因為考科包含計算機組織、作業系統等底層工程學科，建議大二、大三時及早選修外系相關課程或額外加強準備。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 25
+    },
+    {
+      "faq_id": "S25",
+      "question": "畢業後如果不當資料工程師，還可以做什麼職務？",
+      "reference_answer": "職涯選擇非常寬廣！常見職位包括：商業數據分析師（Business/Data Analyst）、AI 應用工程師、機器學習工程師、金融科技（FinTech）數據專員、數據顧問，甚至能結合跨域背景擔任軟體產品經理（PM）或系統企劃人員。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 26
+    },
+    {
+      "faq_id": "S26",
+      "question": "大學畢業直接去業界工作，通常起薪落在哪個區間？",
+      "reference_answer": "大學畢業直接就業擔任初階數據分析師或軟體工程師，起薪普遍落在 38,000 至 48,000 元之間；若在校期間累積了完整的專案成果、競賽得獎或知名企業實習經歷，進入金控總行或科技大廠擔任資料工程師，起薪突破 50,000 元也是常見的。",
+      "split": "validation",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 27
+    },
+    {
+      "faq_id": "S27",
+      "question": "系上會不會推薦或強制要求學生去企業實習？",
+      "reference_answer": "系上高度鼓勵並積極媒合學生進行企業實習。課程規劃中在大四設有對接的實習機制，系辦每學期都會釋出金融業、科技業與醫療資訊等合作單位的實習職缺，讓學生可以在大四提早走入業界累積實戰經驗，詳細修業規定依各屆檢核表為準。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 28
+    },
+    {
+      "faq_id": "S28",
+      "question": "貴系跟傳統資訊工程系 (CS) 最核心的差異到底是什麼？",
+      "reference_answer": "傳統資工系偏重在底層架構、作業系統、晶片編譯器與硬體工程技術，目標多走向半導體與系統軟體開發；而我們資科系則是聚焦在「AI 模型應用」與「資料科學分析」，更強調將演算法與數據技術落地，解決真實場域（如商業、金融、醫療）的實際問題。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 29
+    },
+    {
+      "faq_id": "S29",
+      "question": "貴系跟資訊管理系 (MIS) 相比，誰的技術深度更深？",
+      "reference_answer": "在資料技術與 AI 模型的技術深度上，資科系明顯更深。資管系偏向商管學院架構，核心在於「將資訊系統導入企業流程與管理」；資科系則扎實包含數學推導、資料工程、機器學習與深度學習模型實作，技術訓練的比重遠高於傳統資管系。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 30
+    },
+    {
+      "faq_id": "S30",
+      "question": "我想專攻人工智慧 (AI)，讀你們系適合還是資工系適合？",
+      "reference_answer": "這取決於你想專攻 AI 的哪一個層面。如果你想做的是底層晶片算力最佳化、編譯器或底層系統架構，資工系較為對口；但如果你想做的是 AI 機器學習建模、自然語言處理、生成式 AI 應用落地與大數據跨域分析，我們系的課程規劃與專屬設備會非常適合你。",
+      "split": "test",
+      "source": "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+      "source_row": 31
+    }
+  ],
+  "source_sha256": {
+    "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv": "85f8e782f08b01f4aba0681fe9d8975e7e4a0be79ba1250a79251740c4e4aaac",
+    "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv": "749a448ee28a7ddd388b4f246dace412acaaba9fabfc718daae81353cf06736f",
+    "experiments/datasets/faq_finetuning/faq_split_manifest.json": "402f3522071474597dfe4ebe90fc29c619de98ebeb666117b29ecba77db2a959"
+  },
+  "config": {
+    "base_model": "meta-llama/Llama-3.2-3B-Instruct",
+    "bge_model": "BAAI/bge-m3",
+    "bge_snapshot": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-m3\\snapshots\\5617a9f61b028005a4858fdac845db406aefb181",
+    "reranker_model": "BAAI/bge-reranker-v2-m3",
+    "dense_index": "experiments/vector_stores/type1_type2_bge_m3_v1",
+    "a1_index": "experiments/vector_stores/faq_bge_m3_60_v2",
+    "a1_canonical": "experiments/datasets/faq/faq_canonical_60_v2_lf_restored.jsonl",
+    "a2_candidates": "experiments/datasets/faq_finetuning/faq_retrieval_candidates.jsonl",
+    "a2_1_model": "experiments/models/a2_1_smoke_task8/final_model",
+    "a2_2_model": "experiments/models/a2_2_smoke_task8/final_model",
+    "a3_adapter": "experiments/models/a3_smoke_v1/final_adapter",
+    "manifest": "experiments/datasets/faq_finetuning/faq_split_manifest.json",
+    "device": "cuda",
+    "precision": "fp16",
+    "seed": 42,
+    "max_new_tokens": 256,
+    "a5_max_input_tokens": 2048,
+    "a2_max_length": 64,
+    "allow_unreviewed": true
+  },
+  "resources": {
+    "a3_adapter": {
+      "status": "ready",
+      "value": {
+        "path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\models\\a3_smoke_v1\\final_adapter",
+        "files_sha256": {
+          "a3_complete.json": "ca24e5220712bae1ed90787d69cce4597f484436e279191efd51b1aba62452b6",
+          "a3_provenance.json": "b76fc0fdc7ef119c095d3403d44614ba0b589142156374383e3b9fc93698bbea",
+          "adapter_config.json": "f2880804de7c12ba73f2be21365dc69fb376b8359ef6c3a0e45954cd556dbb37",
+          "adapter_model.safetensors": "271088611924d6fa2fc35bb6affd418476c1cf187800d8f55fea5e9e83355fcc",
+          "chat_template.jinja": "b582d2fda0f25a88324b6b5d56812b56f6f2c7890a08c9503cbed42ed70c7f3e",
+          "README.md": "e6e7561742df6d4e05041abc9d6ad46306708a0cb80f71573960f088da2ba092",
+          "tokenizer.json": "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b",
+          "tokenizer_config.json": "f0813b63c7f00dca2dbbf484c968a69cb0c6c2115b2b87f830379616daa2fd45"
+        },
+        "content_sha256": "8e9e0aa0e05418529856b07d13a10ea53de2ae1b6499559512a7d4c21a6159a0",
+        "provenance": {
+          "schema_version": "a3_training_v1",
+          "base_identity": {
+            "kind": "hub",
+            "model_id": "meta-llama/Llama-3.2-3B-Instruct"
+          },
+          "base_revision": "0cb88a4f764b7a12671c53f0838cd831a0843b95",
+          "base_argument": "meta-llama/Llama-3.2-3B-Instruct",
+          "system_prompt": "你是東吳大學資料科學系的智慧問答助理。請使用繁體中文回答；不知道時請明確說明，不要編造資訊。",
+          "provisional": true,
+          "vocab_size": 128256,
+          "tokenizer_size": 128256,
+          "seed": 42,
+          "source_sha256": {
+            "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv": "85f8e782f08b01f4aba0681fe9d8975e7e4a0be79ba1250a79251740c4e4aaac",
+            "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv": "749a448ee28a7ddd388b4f246dace412acaaba9fabfc718daae81353cf06736f",
+            "experiments/datasets/faq_finetuning/faq_split_manifest.json": "402f3522071474597dfe4ebe90fc29c619de98ebeb666117b29ecba77db2a959"
+          },
+          "train_sha256": "4bae4a434ade3a20ebb24f981917b96681f762e63b6e2be61cc5bd63b588a944",
+          "training_faq_ids": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P09",
+            "P10",
+            "P11",
+            "P12",
+            "P13",
+            "P14",
+            "P15",
+            "P16",
+            "P17",
+            "P18",
+            "P19",
+            "P20",
+            "P21",
+            "S01",
+            "S02",
+            "S03",
+            "S04",
+            "S05",
+            "S06",
+            "S07",
+            "S08",
+            "S09",
+            "S10",
+            "S11",
+            "S12",
+            "S13",
+            "S14",
+            "S15",
+            "S16",
+            "S17",
+            "S18",
+            "S19",
+            "S20",
+            "S21"
+          ],
+          "versions": {
+            "torch": "2.13.0+cu126",
+            "transformers": "5.16.1",
+            "peft": "0.20.0",
+            "accelerate": "1.14.0",
+            "trl": "1.13.0",
+            "datasets": "5.0.1",
+            "bitsandbytes": "0.50.1"
+          },
+          "matched_target_modules": {
+            "q_proj": [
+              "model.layers.0.self_attn.q_proj",
+              "model.layers.1.self_attn.q_proj",
+              "model.layers.2.self_attn.q_proj",
+              "model.layers.3.self_attn.q_proj",
+              "model.layers.4.self_attn.q_proj",
+              "model.layers.5.self_attn.q_proj",
+              "model.layers.6.self_attn.q_proj",
+              "model.layers.7.self_attn.q_proj",
+              "model.layers.8.self_attn.q_proj",
+              "model.layers.9.self_attn.q_proj",
+              "model.layers.10.self_attn.q_proj",
+              "model.layers.11.self_attn.q_proj",
+              "model.layers.12.self_attn.q_proj",
+              "model.layers.13.self_attn.q_proj",
+              "model.layers.14.self_attn.q_proj",
+              "model.layers.15.self_attn.q_proj",
+              "model.layers.16.self_attn.q_proj",
+              "model.layers.17.self_attn.q_proj",
+              "model.layers.18.self_attn.q_proj",
+              "model.layers.19.self_attn.q_proj",
+              "model.layers.20.self_attn.q_proj",
+              "model.layers.21.self_attn.q_proj",
+              "model.layers.22.self_attn.q_proj",
+              "model.layers.23.self_attn.q_proj",
+              "model.layers.24.self_attn.q_proj",
+              "model.layers.25.self_attn.q_proj",
+              "model.layers.26.self_attn.q_proj",
+              "model.layers.27.self_attn.q_proj"
+            ],
+            "v_proj": [
+              "model.layers.0.self_attn.v_proj",
+              "model.layers.1.self_attn.v_proj",
+              "model.layers.2.self_attn.v_proj",
+              "model.layers.3.self_attn.v_proj",
+              "model.layers.4.self_attn.v_proj",
+              "model.layers.5.self_attn.v_proj",
+              "model.layers.6.self_attn.v_proj",
+              "model.layers.7.self_attn.v_proj",
+              "model.layers.8.self_attn.v_proj",
+              "model.layers.9.self_attn.v_proj",
+              "model.layers.10.self_attn.v_proj",
+              "model.layers.11.self_attn.v_proj",
+              "model.layers.12.self_attn.v_proj",
+              "model.layers.13.self_attn.v_proj",
+              "model.layers.14.self_attn.v_proj",
+              "model.layers.15.self_attn.v_proj",
+              "model.layers.16.self_attn.v_proj",
+              "model.layers.17.self_attn.v_proj",
+              "model.layers.18.self_attn.v_proj",
+              "model.layers.19.self_attn.v_proj",
+              "model.layers.20.self_attn.v_proj",
+              "model.layers.21.self_attn.v_proj",
+              "model.layers.22.self_attn.v_proj",
+              "model.layers.23.self_attn.v_proj",
+              "model.layers.24.self_attn.v_proj",
+              "model.layers.25.self_attn.v_proj",
+              "model.layers.26.self_attn.v_proj",
+              "model.layers.27.self_attn.v_proj"
+            ]
+          },
+          "trainable_parameters": 2293760,
+          "training_precision": "bf16",
+          "max_length": 512,
+          "optimizer_steps": 2,
+          "epoch": 1,
+          "smoke_step_limit": 2
+        },
+        "training_run_sha256": {
+          "training_config.json": "562d94c6ba183a69bbf757b10a1d87430accef555c7cc63f6f28e33341d11714",
+          "dataset_manifest.json": "5806f3605504b8eb95feeb010044ad1cf9fba3ca04fc93fc048249f985bd3572",
+          "completed.json": "9d66fe5ab74707eea0f9ce5b862bdeb2f17f6952b6992045e7256b86f400124e"
+        }
+      },
+      "error": null
+    },
+    "base": {
+      "status": "ready",
+      "value": {
+        "model_argument": "meta-llama/Llama-3.2-3B-Instruct",
+        "revision_requested": "0cb88a4f764b7a12671c53f0838cd831a0843b95",
+        "snapshot_override": null,
+        "path": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--meta-llama--Llama-3.2-3B-Instruct\\snapshots\\0cb88a4f764b7a12671c53f0838cd831a0843b95",
+        "files_sha256": {
+          ".gitattributes": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+          "config.json": "39fb36dc5416f445ebc4e71cb71fbcf6727e80a35836d8ba1a1474c318467b7a",
+          "generation_config.json": "88effbb63300dbbc7390143fbbdd9d9fa50587b37e8bfd16c8c90d4970a74a36",
+          "LICENSE.txt": "0b4284c1f87029e67654c7953afa16279961632cf73dcfe33374c4c2f298fa35",
+          "model-00001-of-00002.safetensors": "13cbd6d16e927a0c5bad54102514e6e18b4a47b3a6eb911e39d678d328d19f55",
+          "model-00002-of-00002.safetensors": "7b770216613ac5c34d7c54bdff1fa616bc4e338a9d0b20af6303e48c295ee23c",
+          "model.safetensors.index.json": "0a57c30afc07c81610ae7fe013bea3b9d50365f9a8145ae98e8714220f3d7c7c",
+          "original/consolidated.00.pth": "dd817d4653a88601bac65e39ae7446ead3988264afafbce48559d5b5359044d6",
+          "original/orig_params.json": "0aa31c4da011c8cb7ab8d40dfe4402971426063038f622001e34008ce452e953",
+          "original/params.json": "0aa31c4da011c8cb7ab8d40dfe4402971426063038f622001e34008ce452e953",
+          "original/tokenizer.model": "82e9d31979e92ab929cd544440f129d9ecd797b69e327f80f17e1c50d5551b55",
+          "README.md": "8cea167f3aa4dbeea16d32caf6e446184e7e9aa9ebae7de6e3259ea049874570",
+          "special_tokens_map.json": "6f38c73729248f6c127296386e3cdde96e254636cc58b4169d3fd32328d9a8ec",
+          "tokenizer.json": "79e3e522635f3171300913bb421464a87de6222182a0570b9b2ccba2a964b2b4",
+          "tokenizer_config.json": "9823dcfdc1121869029da45192238e85cf44f0b232a6d9dc20e4fe6f4242a14e",
+          "USE_POLICY.md": "40e2777d7faa6beaf98400654170f414d8ab29b921b5163ad4ea0a1d39894201"
+        },
+        "content_sha256": "fcd8009ea4b55dcc460600b7d9bc1c18e89488bae680ba99956b9b4895a82885",
+        "identity_scope": "all existing local files; required inference dependencies validated",
+        "loader_validation_required": true,
+        "inference_files_sha256": {
+          "config.json": "39fb36dc5416f445ebc4e71cb71fbcf6727e80a35836d8ba1a1474c318467b7a",
+          "generation_config.json": "88effbb63300dbbc7390143fbbdd9d9fa50587b37e8bfd16c8c90d4970a74a36",
+          "model-00001-of-00002.safetensors": "13cbd6d16e927a0c5bad54102514e6e18b4a47b3a6eb911e39d678d328d19f55",
+          "model-00002-of-00002.safetensors": "7b770216613ac5c34d7c54bdff1fa616bc4e338a9d0b20af6303e48c295ee23c",
+          "model.safetensors.index.json": "0a57c30afc07c81610ae7fe013bea3b9d50365f9a8145ae98e8714220f3d7c7c",
+          "special_tokens_map.json": "6f38c73729248f6c127296386e3cdde96e254636cc58b4169d3fd32328d9a8ec",
+          "tokenizer.json": "79e3e522635f3171300913bb421464a87de6222182a0570b9b2ccba2a964b2b4",
+          "tokenizer_config.json": "9823dcfdc1121869029da45192238e85cf44f0b232a6d9dc20e4fe6f4242a14e"
+        }
+      },
+      "error": null
+    },
+    "bge": {
+      "status": "ready",
+      "value": {
+        "model_argument": "BAAI/bge-m3",
+        "revision_requested": null,
+        "snapshot_override": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-m3\\snapshots\\5617a9f61b028005a4858fdac845db406aefb181",
+        "path": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-m3\\snapshots\\5617a9f61b028005a4858fdac845db406aefb181",
+        "files_sha256": {
+          "1_Pooling/config.json": "e54c164a07274f2eb45bb724f54a79d1efcc90c41573887cd9a29aeee0597352",
+          "config.json": "26159e7ad065073448460117eb24b7a4572f6f4e78eadff65dc0a11c052449fa",
+          "config_sentence_transformers.json": "1eef72430e7194a1e59680e635aed81ffa083f05668dbc5bb1c56c04c0999c38",
+          "modules.json": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+          "pytorch_model.bin": "b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38",
+          "sentence_bert_config.json": "eb9b44b13c0f52a3b3685c3b1cbdea1ba8b04bea123b98f61610048940776eb1",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+          "special_tokens_map.json": "8c785abebea9ae3257b61681b4e6fd8365ceafde980c21970d001e834cf10835",
+          "tokenizer.json": "21106b6d7dab2952c1d496fb21d5dc9db75c28ed361a05f5020bbba27810dd08",
+          "tokenizer_config.json": "a62b2b6784f990259fddef5f16388693a8043be4f69179e6a5257eeb3f9abac4"
+        },
+        "content_sha256": "2b0617a475299ad48c2346dcab71d07f7adb4887694de1edb4c0fba6b858bd41",
+        "identity_scope": "native PyTorch inference dependencies; not entire Hub repository",
+        "loader_validation_required": true
+      },
+      "error": null
+    },
+    "reranker": {
+      "status": "ready",
+      "value": {
+        "model_argument": "BAAI/bge-reranker-v2-m3",
+        "revision_requested": null,
+        "snapshot_override": null,
+        "path": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-reranker-v2-m3\\snapshots\\953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+        "files_sha256": {
+          "config.json": "13dcd6c31d9fec9d1d8e158702072f62d7fa7d312a64b9fe057bec9a08cfe41a",
+          "model.safetensors": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+          "special_tokens_map.json": "8c785abebea9ae3257b61681b4e6fd8365ceafde980c21970d001e834cf10835",
+          "tokenizer.json": "69564b696052886ed0ac63fa393e928384e0f8caada38c1f4864a9bfbf379c15",
+          "tokenizer_config.json": "7e4c1cc848840aeccdd763458c18dd525eb0f795c992e00ebe9c28554e7db2d4"
+        },
+        "content_sha256": "43952870a197bd18106926653f65f14b3d34a436590606c6ac5029126ccc90e5",
+        "identity_scope": "all existing local files; required inference dependencies validated",
+        "loader_validation_required": true,
+        "inference_files_sha256": {
+          "config.json": "13dcd6c31d9fec9d1d8e158702072f62d7fa7d312a64b9fe057bec9a08cfe41a",
+          "model.safetensors": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286",
+          "sentencepiece.bpe.model": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+          "special_tokens_map.json": "8c785abebea9ae3257b61681b4e6fd8365ceafde980c21970d001e834cf10835",
+          "tokenizer.json": "69564b696052886ed0ac63fa393e928384e0f8caada38c1f4864a9bfbf379c15",
+          "tokenizer_config.json": "7e4c1cc848840aeccdd763458c18dd525eb0f795c992e00ebe9c28554e7db2d4"
+        }
+      },
+      "error": null
+    },
+    "dense_index": {
+      "status": "ready",
+      "value": {
+        "path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\vector_stores\\type1_type2_bge_m3_v1",
+        "files_sha256": {
+          "index.faiss": "cbc03a54befce8553cc1d0dc69c59aa119b0f179b260ed6b60b6d743fe0eac47",
+          "index.pkl": "65a7691dae5cec9d901d6ca93f157ee2a33ddcab7db9ff15bf395d0cd5e9db56"
+        },
+        "provenance_verified": false,
+        "warning": "version.json missing; build provenance unverified"
+      },
+      "error": null
+    },
+    "a1_index": {
+      "status": "ready",
+      "value": {
+        "path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\vector_stores\\faq_bge_m3_60_v2",
+        "files_sha256": {
+          "index.faiss": "f96399a2e96b663f10b4fc9c36f01378762491e894e677554d7a9e7c24207ffa",
+          "index.pkl": "6c92de766e1f6544ca5bf7250845d9ea1a83be6ffb53de6665a4464cf7683498",
+          "version.json": "f524dff1996c0b0ecf42c23d8b0234bcc334b9fa32c553290fc09ffda85a6a6c"
+        },
+        "provenance_verified": false,
+        "warning": "version/shape/content need loader validation"
+      },
+      "error": null
+    },
+    "a1_canonical": {
+      "status": "failed",
+      "value": null,
+      "error": "DataError: A1 new index completion/hash/canonical mismatch: {\"status\": \"failed\", \"paths\": {\"version\": \"C:\\\\Users\\\\rsy\\\\Desktop\\\\SCU_Kebbi\\\\experiments\\\\vector_stores\\\\faq_bge_m3_60_v2\\\\version.json\", \"canonical\": \"C:\\\\Users\\\\rsy\\\\Desktop\\\\SCU_Kebbi\\\\experiments\\\\datasets\\\\faq\\\\faq_canonical_60_v2_lf_restored.jsonl\", \"index\": \"C:\\\\Users\\\\rsy\\\\Desktop\\\\SCU_Kebbi\\\\experiments\\\\vector_stores\\\\faq_bge_m3_60_v2\\\\index.faiss\", \"docstore\": \"C:\\\\Users\\\\rsy\\\\Desktop\\\\SCU_Kebbi\\\\experiments\\\\vector_stores\\\\faq_bge_m3_60_v2\\\\index.pkl\"}, \"expected\": {\"schema_version\": \"a1_60_preparation_v1\", \"status\": \"completed\", \"faq_count\": 60, \"canonical_sha256\": \"7ff63fb1a27558345f33b034023243a8a35e774019f53397108861d40679f8ac\", \"index_sha256\": \"f96399a2e96b663f10b4fc9c36f01378762491e894e677554d7a9e7c24207ffa\", \"docstore_sha256\": \"6c92de766e1f6544ca5bf7250845d9ea1a83be6ffb53de6665a4464cf7683498\"}, \"actual\": {\"schema_version\": \"a1_60_preparation_v1\", \"status\": \"completed\", \"faq_count\": 60, \"canonical_sha256\": \"60b4fad2ff93b16b94b5f980de6d883eaccd64ad1942e5d36dd2850303869a63\", \"index_sha256\": \"f96399a2e96b663f10b4fc9c36f01378762491e894e677554d7a9e7c24207ffa\", \"docstore_sha256\": \"6c92de766e1f6544ca5bf7250845d9ea1a83be6ffb53de6665a4464cf7683498\"}, \"differences\": [{\"field\": \"a1_index_completion.canonical_sha256\", \"expected\": \"7ff63fb1a27558345f33b034023243a8a35e774019f53397108861d40679f8ac\", \"actual\": \"60b4fad2ff93b16b94b5f980de6d883eaccd64ad1942e5d36dd2850303869a63\"}], \"hash_algorithm\": \"SHA-256 of raw file bytes; lowercase hex; no text normalization\"}"
+    },
+    "a2_candidates": {
+      "status": "ready",
+      "value": {
+        "path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\faq_finetuning\\faq_retrieval_candidates.jsonl",
+        "sha256": "da9e93c2e3977e703c76f95d3851431e51811d00910ebdf172a73e119fefb16c",
+        "faq_count": 60,
+        "answer_count": 60
+      },
+      "error": null
+    },
+    "a2_1_model": {
+      "status": "ready",
+      "value": {
+        "path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\models\\a2_1_smoke_task8\\final_model",
+        "files_sha256": {
+          "1_Pooling/config.json": "b0082fd03f7fa7082d1155123fa40639e3e71bb99ceb8e96c709a6e6a6562cb0",
+          "2_Normalize/config.json": "46465f75bf7d0b90617a5f2cf64e9489d7da46d492a33a19340821899f004881",
+          "a2_checkpoint_complete.json": "f66055654489975ca0d4ed8eac5b6261ed5e509b4ce1763f2f3ea2e6a9b38ad5",
+          "a2_checkpoint_pending.json": "91f64e33eed2eb6355a82aa81b54b5573b72340a32ec046c14f247701371a15e",
+          "a2_reload_verification.json": "2462a914595e00364f7fa38feca67485849e3563930e8da3fe91cdba6dfb7999",
+          "a2_training_provenance.json": "9d71f2b37970c349dbe1e61f0c3935a15bf14406f4d2cce738300623b3b4096d",
+          "config.json": "921b2829c4aac00b1c27fd4ba201919e0540400b9ccc17c51f8dab8ef1508125",
+          "config_sentence_transformers.json": "0128a57b3d2bda088501062366d225392864cb7a6b4683d99909341cef31b24b",
+          "model.safetensors": "0f802115d5b40438d01f71eded07b88ba54cc6dd1621f2be301551bdf7787afd",
+          "modules.json": "5861cc45c276c15a212ad0a21a5a8664bb8ee0f70b1857d92a7f3e94df0f5d0e",
+          "sentence_bert_config.json": "5fee3fcdc4a727fad422f0fed0c867b0921eefa9051de221521956ed42eb4c19",
+          "tokenizer.json": "20d39b56bb2c78cba5437772a411406ad5df67f64c44090700abff175a9e715b",
+          "tokenizer_config.json": "9ade8b4dcc05c969295b018b010a3dd94cff3ca3bbca2f577f52727feaf1c072"
+        },
+        "content_sha256": "f3e487f55eed5e2f01d0d16ef7b28138b44e71cbda448df1274514c384e84bf1",
+        "provenance": {
+          "schema_version": "a2_training_provenance_v1",
+          "mode": "a2_1",
+          "provisional": true,
+          "unreviewed_faq_ids": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P09",
+            "P10",
+            "P11",
+            "P12",
+            "P13",
+            "P14",
+            "P15",
+            "P16",
+            "P17",
+            "P18",
+            "P19",
+            "P20",
+            "P21",
+            "S01",
+            "S02",
+            "S03",
+            "S04",
+            "S05",
+            "S06",
+            "S07",
+            "S08",
+            "S09",
+            "S10",
+            "S11",
+            "S12",
+            "S13",
+            "S14",
+            "S15",
+            "S16",
+            "S17",
+            "S18",
+            "S19",
+            "S20",
+            "S21"
+          ],
+          "input_sha256": {
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\faq_finetuning\\faq_split_manifest.json": "402f3522071474597dfe4ebe90fc29c619de98ebeb666117b29ecba77db2a959",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\faq_finetuning\\faq_training_candidates.jsonl": "9970f7879cde1437a4dc525fa486f09e4b3ee94cc82c184d3444790233ae3c18",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\scu_faq_matching_test_v1.jsonl": "80a063c44ba54990d6a6d28acac2e40dce8cbabb7178bd1d5a9f72469eccce52",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\畢業專題_爬蟲\\type2\\資料擴充 - 家長 FAQ 資料集（30 題）.csv": "85f8e782f08b01f4aba0681fe9d8975e7e4a0be79ba1250a79251740c4e4aaac",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\畢業專題_爬蟲\\type2\\資料擴充 - 高中生 FAQ 資料集（30 題）.csv": "749a448ee28a7ddd388b4f246dace412acaaba9fabfc718daae81353cf06736f",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\a2_faq_finetuning\\training_config.json": "0760c20a84f51cacddf810ad5f1c4a5551798815fe5b954c4865a0cad8df8694"
+          },
+          "positive_pair_schedule_sha256": "48e4b250d409c3713ca9f199eb4ab6e52c00e93406a7b00632d14b8588aba478",
+          "initial_model": "BAAI/bge-m3",
+          "initial_local_identity": null,
+          "initial_hf_revisions": [
+            "5617a9f61b028005a4858fdac845db406aefb181"
+          ],
+          "remote_revision_unresolved": false,
+          "hard_negatives_model_rank_verified": false,
+          "loss": "MaskedMultipleNegativesRankingLoss (cosine InfoNCE)",
+          "explicit_stored_negative_arrays_used": false,
+          "excluded_hard_candidates": [
+            {
+              "faq_id": "P13",
+              "source_id": "P14",
+              "text": "每一位學生都有專屬的導師可以諮詢生活與課業嗎？",
+              "reason": "diagnostic or configured semantic exclusion"
+            },
+            {
+              "faq_id": "P14",
+              "source_id": "P13",
+              "text": "萬一孩子入學後跟不上進度、考試不及格，學校會預警輔導嗎？",
+              "reason": "diagnostic or configured semantic exclusion"
+            }
+          ],
+          "training_api": {
+            "profile": "st_6_1_0_preprocess",
+            "runtime_verified_by_codex": false,
+            "training_input_api": "preprocess",
+            "forward_api": "model(features)['sentence_embedding']",
+            "pooling_policy": "preserve checkpoint modules",
+            "modules": [
+              {
+                "name": "0",
+                "class": "sentence_transformers.base.modules.transformer.Transformer"
+              },
+              {
+                "name": "1",
+                "class": "sentence_transformers.sentence_transformer.modules.pooling.Pooling",
+                "pooling": {
+                  "pooling_mode": "cls",
+                  "include_prompt": true
+                }
+              },
+              {
+                "name": "2",
+                "class": "sentence_transformers.base.modules.normalize.Normalize"
+              }
+            ]
+          },
+          "completed_epoch": 1,
+          "optimizer_steps": 42
+        }
+      },
+      "error": null
+    },
+    "a2_2_model": {
+      "status": "ready",
+      "value": {
+        "path": "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\models\\a2_2_smoke_task8\\final_model",
+        "files_sha256": {
+          "1_Pooling/config.json": "b0082fd03f7fa7082d1155123fa40639e3e71bb99ceb8e96c709a6e6a6562cb0",
+          "2_Normalize/config.json": "46465f75bf7d0b90617a5f2cf64e9489d7da46d492a33a19340821899f004881",
+          "a2_checkpoint_complete.json": "d1515061dc570ad82c594da13f2aeef2445e502880d99eed6e937ea89d863d48",
+          "a2_checkpoint_pending.json": "91f64e33eed2eb6355a82aa81b54b5573b72340a32ec046c14f247701371a15e",
+          "a2_reload_verification.json": "5c1479ca23cce9e7ec1614b77731fb3a11ff2191c6a10ecd2740215792d755e8",
+          "a2_training_provenance.json": "ee37e6440fec9fb2726e36ad2654ce64fcf988519aa22cb28ea5bf946b17423a",
+          "config.json": "921b2829c4aac00b1c27fd4ba201919e0540400b9ccc17c51f8dab8ef1508125",
+          "config_sentence_transformers.json": "0128a57b3d2bda088501062366d225392864cb7a6b4683d99909341cef31b24b",
+          "model.safetensors": "108130b142ce51f6e26106a6bf808fb9f9fb01f7979e1d836783f3c92f2dce10",
+          "modules.json": "5861cc45c276c15a212ad0a21a5a8664bb8ee0f70b1857d92a7f3e94df0f5d0e",
+          "sentence_bert_config.json": "5fee3fcdc4a727fad422f0fed0c867b0921eefa9051de221521956ed42eb4c19",
+          "tokenizer.json": "20d39b56bb2c78cba5437772a411406ad5df67f64c44090700abff175a9e715b",
+          "tokenizer_config.json": "9ade8b4dcc05c969295b018b010a3dd94cff3ca3bbca2f577f52727feaf1c072"
+        },
+        "content_sha256": "e0e1924b4a90c4410c7ba22042fe222cb3c1572393649540601453b80a497146",
+        "provenance": {
+          "schema_version": "a2_training_provenance_v1",
+          "mode": "a2_2",
+          "provisional": true,
+          "unreviewed_faq_ids": [
+            "P01",
+            "P02",
+            "P03",
+            "P04",
+            "P05",
+            "P06",
+            "P07",
+            "P08",
+            "P09",
+            "P10",
+            "P11",
+            "P12",
+            "P13",
+            "P14",
+            "P15",
+            "P16",
+            "P17",
+            "P18",
+            "P19",
+            "P20",
+            "P21",
+            "S01",
+            "S02",
+            "S03",
+            "S04",
+            "S05",
+            "S06",
+            "S07",
+            "S08",
+            "S09",
+            "S10",
+            "S11",
+            "S12",
+            "S13",
+            "S14",
+            "S15",
+            "S16",
+            "S17",
+            "S18",
+            "S19",
+            "S20",
+            "S21"
+          ],
+          "input_sha256": {
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\faq_finetuning\\faq_split_manifest.json": "402f3522071474597dfe4ebe90fc29c619de98ebeb666117b29ecba77db2a959",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\faq_finetuning\\faq_training_candidates.jsonl": "9970f7879cde1437a4dc525fa486f09e4b3ee94cc82c184d3444790233ae3c18",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\datasets\\scu_faq_matching_test_v1.jsonl": "80a063c44ba54990d6a6d28acac2e40dce8cbabb7178bd1d5a9f72469eccce52",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\畢業專題_爬蟲\\type2\\資料擴充 - 家長 FAQ 資料集（30 題）.csv": "85f8e782f08b01f4aba0681fe9d8975e7e4a0be79ba1250a79251740c4e4aaac",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\畢業專題_爬蟲\\type2\\資料擴充 - 高中生 FAQ 資料集（30 題）.csv": "749a448ee28a7ddd388b4f246dace412acaaba9fabfc718daae81353cf06736f",
+            "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\a2_faq_finetuning\\training_config.json": "0760c20a84f51cacddf810ad5f1c4a5551798815fe5b954c4865a0cad8df8694"
+          },
+          "positive_pair_schedule_sha256": "48e4b250d409c3713ca9f199eb4ab6e52c00e93406a7b00632d14b8588aba478",
+          "initial_model": "BAAI/bge-m3",
+          "initial_local_identity": null,
+          "initial_hf_revisions": [
+            "5617a9f61b028005a4858fdac845db406aefb181"
+          ],
+          "remote_revision_unresolved": false,
+          "hard_negatives_model_rank_verified": false,
+          "loss": "MaskedMultipleNegativesRankingLoss (cosine InfoNCE)",
+          "explicit_stored_negative_arrays_used": false,
+          "excluded_hard_candidates": [
+            {
+              "faq_id": "P13",
+              "source_id": "P14",
+              "text": "每一位學生都有專屬的導師可以諮詢生活與課業嗎？",
+              "reason": "diagnostic or configured semantic exclusion"
+            },
+            {
+              "faq_id": "P14",
+              "source_id": "P13",
+              "text": "萬一孩子入學後跟不上進度、考試不及格，學校會預警輔導嗎？",
+              "reason": "diagnostic or configured semantic exclusion"
+            }
+          ],
+          "training_api": {
+            "profile": "st_6_1_0_preprocess",
+            "runtime_verified_by_codex": false,
+            "training_input_api": "preprocess",
+            "forward_api": "model(features)['sentence_embedding']",
+            "pooling_policy": "preserve checkpoint modules",
+            "modules": [
+              {
+                "name": "0",
+                "class": "sentence_transformers.base.modules.transformer.Transformer"
+              },
+              {
+                "name": "1",
+                "class": "sentence_transformers.sentence_transformer.modules.pooling.Pooling",
+                "pooling": {
+                  "pooling_mode": "cls",
+                  "include_prompt": true
+                }
+              },
+              {
+                "name": "2",
+                "class": "sentence_transformers.base.modules.normalize.Normalize"
+              }
+            ]
+          },
+          "completed_epoch": 1,
+          "optimizer_steps": 42
+        }
+      },
+      "error": null
+    },
+    "raw_documents": {
+      "status": "ready",
+      "value": {
+        "files_sha256": {
+          "畢業專題_爬蟲/type1/2026東吳資科系大哉問-QA第1場上線！ - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "7454f3bac87f90095ea4d12d78bf2ffa522469c8d2171c6e46fb78dc7f2f27ad",
+          "畢業專題_爬蟲/type1/AI職場大洗牌 巨量資料管理學院金凱儀院長登上 TVBS 新聞採訪啦！ - 東吳大學巨量資料管理學院資料科學系 (youtube).txt": "71d495467c38f7710be212ab2a1fbdacda1ef067c907e0877e55e9f728314c86",
+          "畢業專題_爬蟲/type1/ig_img.csv": "7e34762d13b6e1c114a75b3759b049d4a2ad652d01f025669e16ff9bfadd0e2c",
+          "畢業專題_爬蟲/type1/NVIDIA DLI證照.txt": "9d061f4999ce22c0cc3e87a8b96c69199aa295a813936a4882f8eb77ddf59439",
+          "畢業專題_爬蟲/type1/SJSU 34+1+1 學程：你的矽谷快捷通道new - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "f18242109ed4a79ff5ba5dcdf439e56fda3d05589830a80ccc2bd83cb8c91a1b",
+          "畢業專題_爬蟲/type1/USR網站.txt": "9c10d8c126fee625ad2789e5a21440704a685664d4b714329972928430a717ce",
+          "畢業專題_爬蟲/type1/✨2026開箱東吳✨東吳資科｜學系講座回顧 - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "a4ce65b78905403751283c8951e33529171b22bdc18f0422531282ef4761abe1",
+          "畢業專題_爬蟲/type1/「選校還選系？」這題真的卡很久！ - 東吳大學巨量資料管理學院資料科學系 (youtube).txt": "21c8cf76474aed9720cdc73e687c446f71b933e9771e79add3969271bb90a351",
+          "畢業專題_爬蟲/type1/企業夥伴.txt": "13ea91ce74d33e9cd133833b4a36aba6e761892b33a93d1a1614cff2d6119ed3",
+          "畢業專題_爬蟲/type1/口稿.txt": "3c69bd960233adb6da81e217c0f08e41cd9001a2d0a248e572add40a2b0b1c40",
+          "畢業專題_爬蟲/type1/國際交換.txt": "12cdd1b0ba1c831bc56daa562dc01049bc91d5cfcdf88d84f6aba64e115589ed",
+          "畢業專題_爬蟲/type1/團隊陣容.txt": "2493002672f44e4058c490237aef6f5dd5de92fd93bc493bd3ff8f188e3061be",
+          "畢業專題_爬蟲/type1/學AI、接軌矽谷｜東吳巨資學院資料科學系 × NVIDIA DLI × SJSU - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "b6c9aea2c1ec6286f7e9e55e657b1d4861562ba7154319e0b717c1851e3bb598",
+          "畢業專題_爬蟲/type1/學生組織.txt": "27d65b066faae18f98c4e8ac7c208709d429521fb53f16d474c203446b6da48a",
+          "畢業專題_爬蟲/type1/宿舍介紹.txt": "01ea0684262539bfce571dc69449aa0fb07f6066a3542a61d754396de711cadb",
+          "畢業專題_爬蟲/type1/招生資訊_學士班.txt": "0da7dce271b2655890990da8cc09fb14fa733a9c6adbea3d22590a5ea7c1d4a9",
+          "畢業專題_爬蟲/type1/招生資訊_轉學考.txt": "72e9f5d000f2ba88d3ae59958da8a235551d78323a58a70f42ddd856e6407d56",
+          "畢業專題_爬蟲/type1/智慧創新AI學習中心.txt": "64842ee818ea4c0943f3674493ca9364e1a7e0d8f64a8176f1116f05d157d985",
+          "畢業專題_爬蟲/type1/東吳大學巨量資料管理學院文華獎學金頒發辦法.txt": "cf0e680716d09dd16f23afcc902a6206be3b3572a6564b12aafeae6d1e670781",
+          "畢業專題_爬蟲/type1/東吳大學辦理學生抵免學分作業要點.txt": "aa075f6e6dab47ae91a3ecf92c4451f9a78583a22e3c887eda76f4b989c6a9e1",
+          "畢業專題_爬蟲/type1/東吳大學＿圖書館.txt": "f7f1d8e118bd167dd466751a6c13957d867545a30ccfca27d64c3e8c37f65bbd",
+          "畢業專題_爬蟲/type1/東吳資料科學系_threads_texts_cleaned.csv": "d494cc1660fc835c40d41712672816d9b988020339bb4d2a1075ccd0b9d12e0e",
+          "畢業專題_爬蟲/type1/東吳資科_IG貼文.csv": "baad6a6c9da0c70cc17ef8b08d204f1163beec878c8af6fdf26110ede2beb381",
+          "畢業專題_爬蟲/type1/東吳資科系大哉問｜線上QA座談第2場📒學習歷程檔案準備指引 #升學 - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "29d5e9690cb76f815d76dd113b987b9117146d9a19d8d4bc2d732b3ba8cf0998",
+          "畢業專題_爬蟲/type1/畢業學分.txt": "707fae8f9495c971d5761b37ec4d0ec1df852634983b56aa8825cdc9154e752a",
+          "畢業專題_爬蟲/type1/系友專區.txt": "8c110a0360d90c2121a5fc1a07724ca07fc2df2d5b86c28971233647d0359118",
+          "畢業專題_爬蟲/type1/美國亞利桑那州立大學（ASU）雷鳥全球管理學院雙聯學位說明會｜影片回放 - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "be224393866cda24897c04005e7eeac40ba68513d85a7188635f62531cbc8b4f",
+          "畢業專題_爬蟲/type1/課程資訊.txt": "902ad1a94ebb03360f558372315e4ca241305cbd1a3839e7602b2c824035dc16",
+          "畢業專題_爬蟲/type1/課程資訊_企業實習專區.txt": "9185657b9f728073c1e51d20fd65d596e605da823d6ca1352e425a75958cf72d",
+          "畢業專題_爬蟲/type1/課程資訊_學士班.txt": "fd9da650c54d2de77d3386b21ed41c1eb25da7e725344ff8b39cf1062e66e163",
+          "畢業專題_爬蟲/type1/課程資訊_專題實作專區.txt": "897562cba70aa4e23dab28b75b052c3b3f38138a4e6047a5b5bca535a65f7d89",
+          "畢業專題_爬蟲/type1/課程資訊_跨科際智慧應用學分學程與微學程.txt": "175528b77505cb0459afc8531bf903e452468be1df946d90c182e8f7b233edd3",
+          "畢業專題_爬蟲/type1/課程資訊_輔系.txt": "0cb8b8569893ee2e11dc712679fd596ada7c1d1e4475072689fa4d4bfce427c8",
+          "畢業專題_爬蟲/type1/課程資訊_雙主修.txt": "bb15243fe79ba54b306f6491cbff0656c331c5a7f3912d5e209156579e9dadc0",
+          "畢業專題_爬蟲/type1/資料科學系首頁.txt": "23d16802d62498495d185f77d10a36143b34c52f4716f5a2a326710741d2c3a0",
+          "畢業專題_爬蟲/type1/資科宣傳單.txt": "7001d2a36cb2aa8c78faf933dd078eb98ae9c0dd5bde0e0bfa02ea298a24c3a9",
+          "畢業專題_爬蟲/type1/跨域實驗室.txt": "028da9fd9943439be33db337dcff9762b4c7361623c51d9e1e2930a018b78310",
+          "畢業專題_爬蟲/type1/關於我們.txt": "16bbc46983fc64b73c8499fd05be250a223acf3271a7e03c25444ee1eaa6b935",
+          "畢業專題_爬蟲/type1/院長訪談文字檔.txt": "2ecfa04d0413c0c72df211e62184e30aa3f6fa4deaad4f7eb379dc38a86d1906",
+          "畢業專題_爬蟲/type1/雷鳥全球管理學院與東吳大學.txt": "68477fad8611f76ce4b7f4a44d794a44552ee8ec6e4fc24bff60f1256eceec31",
+          "畢業專題_爬蟲/type1/高中生園地.txt": "5dc0287e08898a87d1323a82d4444335888fa1d89922fab4c4b4a839a9b57ee6",
+          "畢業專題_爬蟲/type1/🎬 美國聖荷西州立大學（SJSU）IDS 碩士銜接計畫說明會｜影片回放 - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "1d7283b1318ddac546bbb8d5b705cb0914bae874f732f4bd26ae60f84a7f582e",
+          "畢業專題_爬蟲/type2/Dcard_ai_clean_abstract.csv": "b577b08cf61a69d800b83880e2d36788dcb9ed8aa2cb87a5913c7711e0b25af7",
+          "畢業專題_爬蟲/type2/【2026大學OPEN DAY系列影音】東吳大學資料科學系 - 東吳大學巨量資料管理學院資料科學系 (youtube) (1).txt": "8c114457d3383581acca3e7770eebdd0e741c74d8120810d7d4b40672453aeb1",
+          "畢業專題_爬蟲/type2/口稿.txt": "3c69bd960233adb6da81e217c0f08e41cd9001a2d0a248e572add40a2b0b1c40",
+          "畢業專題_爬蟲/type2/資料擴充 - 「107~114學年度」的副本.csv": "ebbed8658153f3cf74035677123b6550cb16a3f07575269792c54897b5694f6f",
+          "畢業專題_爬蟲/type2/資料擴充 - 家長 FAQ 資料集（30 題）.csv": "85f8e782f08b01f4aba0681fe9d8975e7e4a0be79ba1250a79251740c4e4aaac",
+          "畢業專題_爬蟲/type2/資料擴充 - 相關資料搜集.csv": "ae57cab37fb9feacc9f6d3fc1dc71cc42b7589f226ec9bcfba246f3ca82015cf",
+          "畢業專題_爬蟲/type2/資料擴充 - 育瑞FAQ.csv": "528f1e05194be2ee7f31ced0bfabf8cbf04e2b15f05b9c7b720b92608c99f247",
+          "畢業專題_爬蟲/type2/資料擴充 - 高中生 FAQ 資料集（30 題）.csv": "749a448ee28a7ddd388b4f246dace412acaaba9fabfc718daae81353cf06736f",
+          "畢業專題_爬蟲/type2/院長訪談文字檔.txt": "2ecfa04d0413c0c72df211e62184e30aa3f6fa4deaad4f7eb379dc38a86d1906"
+        },
+        "construction": "existing A4 loader/chunker; BM25 built in memory; no save"
+      },
+      "error": null
+    }
+  },
+  "code_sha256": {
+    "experiments/shared/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/shared/data_loader.py": "63bbe71bf5176d65cdbc157ab736a07abb740d60314c4b05db939f387242f377",
+    "experiments/shared/embeddings.py": "6960f9cc3a1620255d05ea3d0348ec0391ff6bdbc8b10e1f1a516e9ea37e02cf",
+    "experiments/shared/evaluation.py": "de81c777950e5053fc2c634cea7465eb43a3cc91ee67d429b5019769eab4b7ba",
+    "experiments/shared/llm_loader.py": "5166c178be84868de26efa8684677de4890e60bf22dc3c105ec9924810f12e33",
+    "experiments/shared/retrieval.py": "f3c3fc2b01f7fbd828d007c432ff810db2d0a7c40be59a9585f1c5c5a4e18e9d",
+    "experiments/shared/vector_store.py": "9ecbfd940d868c9a368ce662ccadb2979cbaf7b968a5836b28398cdba952d51d",
+    "experiments/baselines/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/baselines/faq_semantic_matching/build_index.py": "eebb7e1d7e546213c7f4494c4d1f05292e1a25fdb0448642d117169ad9f5e8df",
+    "experiments/baselines/faq_semantic_matching/config.py": "5569e6dd0a0ac4a795aaed98ba6f9a226843f859afa58e19c0858d8398e6212e",
+    "experiments/baselines/faq_semantic_matching/faq_loader.py": "ad079db32a2a2ccf22420be504ae4d3cb610cd4178a695b868c7417f098559c3",
+    "experiments/baselines/faq_semantic_matching/matcher.py": "85d3e66816aedf1a26d79ed6c037a00fc247a90e1653b8503b14a967d8716c54",
+    "experiments/baselines/faq_semantic_matching/test_faq.py": "af2e9a0e5ccff99d37da3c4a10a73cc6b2f67e8b13518fbb3b15033bf50365c8",
+    "experiments/baselines/hybrid_rag_reranker/bm25_retrieval.py": "dbd1318e816ffe5a24fb3ea71eb68d667b262c75e10ad66d2cd4197529406f17",
+    "experiments/baselines/hybrid_rag_reranker/build_bm25_index.py": "38abf547066ff5cb530c003c74ec37bb3b495c85d85fbcc7259bf32d10044f2a",
+    "experiments/baselines/hybrid_rag_reranker/chat.py": "f8402c49a7136ee107dd8571fbf126302d43c6569b5f461542f77ec3145b4a01",
+    "experiments/baselines/hybrid_rag_reranker/config.py": "0caf8ef0723fe25d66b03237118ced5919049d432ab65d506e181df9fc74cad2",
+    "experiments/baselines/hybrid_rag_reranker/fusion.py": "fbef9d94af5b7335a1c4f508a2dab0a7722175a64badaee1882d82db269c2186",
+    "experiments/baselines/hybrid_rag_reranker/pipeline.py": "fa9f7b31a2c19d88665c14c9b9bd2d2466e648e5f3b8f243161871dfd178da38",
+    "experiments/baselines/hybrid_rag_reranker/prompts.py": "319e66dc1cedeecde54f81565af449b207a7b14878f1b85e65818bde947c7569",
+    "experiments/baselines/hybrid_rag_reranker/reranker.py": "07d2aa31a4dd3d29c579cc6a6beea52880bb9e5441676cb974f22c5962cae798",
+    "experiments/baselines/hybrid_rag_reranker/test_hybrid.py": "27d7463778c6c407f56f4572b9eea8b6e7a6a67e98c9bf2161079a74c8c1b6a1",
+    "experiments/baselines/hybrid_rag_reranker/test_retrieval.py": "4652fc6fdf8b35989dfb09f6b87f40506f8dffd7af456362aa7cbf41e5c8af0e",
+    "experiments/baselines/rag_baseline/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/baselines/rag_baseline/build_index.py": "ff275cb0a98342a2dc6f33c0a00b8837f32a2d764c8a1cac8f7990858e45918c",
+    "experiments/baselines/rag_baseline/chat.py": "8af5ca5c7e7f107bfdb3b2b1b7b1c468164d564c3659de4e4b6257552b023ffd",
+    "experiments/baselines/rag_baseline/config.py": "57ea848d83b4fffa78960feddce6d5e75e0222e09f67d997ead70619fe13546e",
+    "experiments/baselines/rag_baseline/pipeline.py": "181e5b9a988833dba5596f57652b96bd6a221da19de3d9969cecc54bd8d5270d",
+    "experiments/baselines/rag_baseline/prompts.py": "747b34def5ee9da301ae33c0b8204663d93dce2bf85bed4c2eb5757f5570ba63",
+    "experiments/baselines/rag_baseline/test_baseline.py": "b0b52f686b9be37285a1afe3d11b54e3c017f3c2cfdeda237de83e938bfebbcd",
+    "experiments/baselines/rag_baseline/test_retrieval.py": "20b39f43c7ec656edf2489d0223ec4082de395d90372f8262fd46b7dc70f7ae9",
+    "experiments/a2_faq_finetuning/__init__.py": "2d88e340aa3c3f47f527fd045a6ba5fa0fea0a54c12c67e5fa2d88c0c7849efc",
+    "experiments/a2_faq_finetuning/build_faq_candidates.py": "8e6cd4f9f7d41514557456d2b4982e2c168afde149928e1cca188698513b542d",
+    "experiments/a2_faq_finetuning/chat.py": "58a05154cd5649c19b68a5a59fbd4f0380df4192a2c175942a9768c86279e031",
+    "experiments/a2_faq_finetuning/common.py": "591e838a7d04149d58b7d477f68af0234589b277e158b6691519d6818cc319a7",
+    "experiments/a2_faq_finetuning/diagnostic_data.py": "2eb2abec6357b2b09d513fa10824601e602296ddcf1030c3f9f554ceba7dd61b",
+    "experiments/a2_faq_finetuning/evaluate_faq_retrieval.py": "43653ad3f6261516e95a953b8f92c6504a73eaad9ff8b809426194b95c8b4537",
+    "experiments/a2_faq_finetuning/evaluate_hard_diagnostic.py": "da05de4736f5ebb3abb41c7d02eeb03794cc69b737a91bfe79645665001542ca",
+    "experiments/a2_faq_finetuning/faq_answering.py": "28e50a1c4c3128ab63ccee2dff6f184375e129bcc95e3c40ec123dd37b9bb384",
+    "experiments/a2_faq_finetuning/train_faq_embedding.py": "6be8da76d43ce11005e927fe084bb57e4d8616e3efa084864be460b1e928df4c",
+    "experiments/a2_faq_finetuning/training_compat.py": "e9ecfb1f8665cb11bbf3d1e12d3784df6d85a3a6c67ef3b13183143aa771c239",
+    "experiments/a2_faq_finetuning/training_config.json": "0760c20a84f51cacddf810ad5f1c4a5551798815fe5b954c4865a0cad8df8694",
+    "experiments/a2_faq_finetuning/training_data.py": "f751f2d40a35d52896b1c37d8e3610279c46912575b249a588cf218e5bd974fb",
+    "experiments/a2_faq_finetuning/training_loss.py": "5a93ee379ab24312ae058264bbf4bc1bb23fb553c5f83349cadf7a345ce17950",
+    "experiments/a2_faq_finetuning/validate_a2_data.py": "fcdd69cf39d0355d41f4fcbf77c3935acbb5a89f0bf9881c7ce49afeb5d5923d",
+    "experiments/a3_faq_sft/__init__.py": "9e00bcdb3a89cdc03df156c3560ec21b1b48803bf9f1201e4a5e4f3f51ffbedd",
+    "experiments/a3_faq_sft/chat.py": "261e6bac571160d133d8ec268a9f856a49c3ffc248fada136b5cdf92c477c4ca",
+    "experiments/a3_faq_sft/common.py": "fcd93b8ac55d5548c2fb8621c10a2a1d43b0f2eccdb1284954b112d7511927e8",
+    "experiments/a3_faq_sft/model_loader.py": "1c7003070ca16d5a9a56030db1a0aedb8634cc8aad7beb98d03d671a05b3acf4",
+    "experiments/a3_faq_sft/prepare_data.py": "29b57fded3bf967ff6d024ac9e23e30634b7bc26821c85f87af2ee9953f0b021",
+    "experiments/a3_faq_sft/train.py": "17d0045ecda545e3a00ad0fc31fd0fa938fc6b725c73c7e6b66f403afb879754",
+    "experiments/a3_faq_sft/training_config.json": "3f66ff789ca717d0005d1de7163bd453a211fb945d707412763426491d79cafe",
+    "experiments/a3_faq_sft/training_data.py": "51f5ee79136b6b069f4026352796364decf4973c85dfd2d590884dd24d4d7a0e",
+    "experiments/a5_rag_finetuned_llm/__init__.py": "0880eccf77ed650c7636659606cc45a288c4501b6668b28f2f4ab2d4c7e8f57e",
+    "experiments/a5_rag_finetuned_llm/chat.py": "a382e21cf89382a82edf433ee1378c0305d1d24fb11d00f32c46472b3f06d1a9",
+    "experiments/a5_rag_finetuned_llm/config.py": "6ee929adc5bc41747ac91981b8c8d34bb5f2933a456a2d1e89c74571731525ad",
+    "experiments/a5_rag_finetuned_llm/pipeline.py": "3c8547a5f017b4fd6fe45b431ff5e01dde90289683843e9fb4cc218806cb04e4",
+    "experiments/a5_rag_finetuned_llm/prompts.py": "d0caff6094fcef47d3324081efdf99cbf5d4c88efefd01eb9e41076de157965b",
+    "experiments/evaluation/__init__.py": "ce8f53f628527a3acab5bc511861680a4900fea927af3de639b9a5a95ddd420a",
+    "experiments/evaluation/common.py": "1b2405efd2cd1903922f0c804a8a916fd84fcac9eb9a3cba053496b75e9484ec",
+    "experiments/evaluation/config.a1_lf_restored.json": "43deb481d6db938c2fb1841e2202569a60e564167a17d3221cc71a59efa58847",
+    "experiments/evaluation/config.json": "80459efca3074bf39d6f1fff3ec4e01e812865a46d4845f78eab16954ce8eff8",
+    "experiments/evaluation/model_resources.py": "87b7d9cbb597a482443372dd0c0458e3da171a6a4ff79a4959ff94f946cd196c",
+    "experiments/evaluation/preflight.py": "2415f48eb26c75baa2ce7d58375a5e0a8ca0e6c14fe0bfe5ba66c731f9146653",
+    "experiments/evaluation/prepare_a1.py": "9b1d316aba06258f37393a6d691c6faca4de65be79a847b72fb84b05c3d8a14f",
+    "experiments/evaluation/report.py": "47531ba3047716fef6b3122ded4b3e696acdbda32e16d04f3a935e0915f933ed",
+    "experiments/evaluation/run.py": "cdb5eabf1059ff91d492bd6a188e5b6a71d5d1a068bd81a725e9ef739f1216aa",
+    "experiments/evaluation/worker.py": "091f81bc84d1385e76fd2dd1a24323d58ef05c9e8ab7201e229e6055fa67116d",
+    "experiments/evaluation/wrappers.py": "799cbc054376d4588a026b75b446fac1bcd4500f31864244ab56e6d3b8c1fd7f"
+  },
+  "environment": {
+    "schema_version": "stable_environment_v2",
+    "python": "3.10.1",
+    "python_implementation": "cpython",
+    "python_executable": "C:\\Users\\rsy\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "python_prefix": "C:\\Users\\rsy\\AppData\\Local\\Programs\\Python\\Python310",
+    "os_name": "nt",
+    "sys_platform": "win32",
+    "machine": "AMD64",
+    "pointer_bits": 64,
+    "host": "DESKTOP-IM41NRB",
+    "packages": {
+      "torch": "2.13.0+cu126",
+      "transformers": "5.16.1",
+      "sentence-transformers": "6.1.0",
+      "peft": "0.20.0",
+      "numpy": "1.26.4",
+      "faiss-cpu": "1.8.0",
+      "faiss-gpu": null,
+      "langchain-core": "1.6.10",
+      "langchain-community": "0.4.2",
+      "langchain-text-splitters": "1.1.3",
+      "huggingface-hub": "1.28.0",
+      "accelerate": "1.14.0",
+      "jieba": "0.42.1",
+      "packaging": "24.2"
+    }
+  },
+  "environment_diagnostics": {
+    "compat_layer": null,
+    "platform": "Windows-10-10.0.26200-SP0",
+    "release": "10",
+    "version": "10.0.26200",
+    "win32_ver": [
+      "10",
+      "10.0.26200",
+      "SP0",
+      "Multiprocessor Free"
+    ],
+    "getwindowsversion": {
+      "major": 10,
+      "minor": 0,
+      "build": 26200,
+      "service_pack": "",
+      "platform_version": [
+        10,
+        0,
+        26100
+      ]
+    }
+  },
+  "limitations": [
+    "original canonical questions; not paraphrase generalization",
+    "A2/A3/A5 smoke weights are preliminary, inspect provenance",
+    "reference answers never passed to wrapper.answer",
+    "RAG may retrieve FAQ including held-out intents",
+    "prompt/template/EOS/truncation differ; inspect runtime contracts",
+    "no warmup; first answer includes first-call costs; model startup excluded"
+  ],
+  "run_contract_sha256": "5d3d0ef012f543a54cb5640bc2999bc0c3d16ffdfa6fc864cc3321299d8e9055"
+}
