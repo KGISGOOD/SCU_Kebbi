@@ -1,5 +1,7 @@
 # A0–A5 統一 FAQ 問答測試（第一輪）
 
+> Worker/中文問題修正版：先依 [WORKER_ENCODING_AUDIT.md](WORKER_ENCODING_AUDIT.md) 執行 `check-data` 與 `preflight --verify-workers`。已有 `preflight_v1`／`smoke_v1` 請保留，修正版必須使用全新目錄。歷史 fingerprint 的具體差異尚待 GPU 證據，不能把本次靜態修正視為已跑通。
+
 本目錄提供八種架構的獨立、離線批次測試與人工評分報表。Codex僅撰寫程式、讀取原始碼與靜態審查，**沒有執行Python/Node、測試、推論、訓練、下載或安裝**。下列指令由使用者在GPU電腦執行，不能把本文件視為已跑通或已有實驗成績。
 
 ## 架構盤點與Wrapper
@@ -181,7 +183,7 @@ python -m experiments.evaluation.run preflight --project-root . --run-dir experi
 ### 2. 固定3題Smoke（最多24筆回答）
 
 ```powershell
-python -m experiments.evaluation.run smoke --project-root . --run-dir experiments/results/unified_faq/smoke_v1 --allow-unreviewed
+python -m experiments.evaluation.run smoke --project-root . --run-dir experiments/results/unified_faq/smoke_v2 --allow-unreviewed
 ```
 
 ### 3. Full 60題（最多480個最新回答鍵位）

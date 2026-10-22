@@ -87,7 +87,54 @@ def dataset(root, manifest):
                "source": row["source_file"], "source_row": row["source_row"]} for row in rows]
     if len(result) != 60 or len({r["faq_id"] for r in result}) != 60:
         raise DataError("expected exactly 60 unique original FAQ rows")
+    text_audit(result)  # Fail closed before creating a run or loading any model.
     return result, sources
+
+
+def text_audit(rows):
+    """Lossless Unicode evidence, independent of terminal code page. No repairs."""
+    evidence = []
+    for row in rows:
+        fields = {}
+        for name in ("question", "reference_answer", "source"):
+            value = row[name]
+            bad = [(i, "U+%04X" % ord(c)) for i, c in enumerate(value)
+                   if c == "\ufffd" or 0xE000 <= ord(c) <= 0xF8FF
+                   or 0xF0000 <= ord(c) <= 0x10FFFD
+                   or 0xD800 <= ord(c) <= 0xDFFF
+                   or (ord(c) < 32 and c not in "\n\r\t")]
+            if bad or not any("\u3400" <= c <= "\u9fff" for c in value):
+                raise DataError("Chinese integrity uncertain: %s.%s; suspicious positions=%r; text=%s"
+                                % (row["faq_id"], name, bad,
+                                   json.dumps(value, ensure_ascii=True)))
+            encoded = value.encode("utf-8", errors="strict")
+            if json.loads(json.dumps(value, ensure_ascii=False)) != value:
+                raise DataError("JSON text round-trip failed: %s.%s" % (row["faq_id"], name))
+            fields[name] = {"text": value, "utf8_sha256": hashlib.sha256(encoded).hexdigest()}
+        evidence.append({"faq_id": row["faq_id"], "split": row["split"], **fields})
+    return {"status": "passed_structural_checks_not_semantic_proof", "count": len(rows),
+            "encoding": "utf-8-sig (strict; optional BOM)", "rows": evidence}
+
+
+def differences(expected, actual, path=""):
+    """JSON-safe field-level evidence; retain missing-vs-null distinctions."""
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        result = []
+        for key in sorted(set(expected) | set(actual)):
+            field = path + "." + key if path else key
+            if key not in expected or key not in actual:
+                result.append({"field": field, "expected_present": key in expected,
+                               "actual_present": key in actual,
+                               "expected": expected.get(key), "actual": actual.get(key)})
+            else:
+                result.extend(differences(expected[key], actual[key], field))
+        return result
+    if isinstance(expected, list) and isinstance(actual, list) and len(expected) == len(actual):
+        return [change for i, (left, right) in enumerate(zip(expected, actual))
+                for change in differences(left, right, "%s[%d]" % (path, i))]
+    if expected != actual:
+        return [{"field": path, "expected": expected, "actual": actual}]
+    return []
 
 
 def environment():

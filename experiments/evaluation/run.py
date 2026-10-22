@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -9,7 +10,7 @@ import sys
 
 from .common import (ARCHITECTURES, ROOT, SMOKE_IDS, DataError, atomic_json, code_hashes,
                      dataset, digest, environment, identifier, latest_results, lock, model_fields, pending,
-                     read_json, read_run, resolve, save_result)
+                     read_json, read_run, resolve, save_result, text_audit, differences)
 from .preflight import architecture_preflight, inspect_resources
 from .report import generate_report, import_reviews
 
@@ -86,19 +87,21 @@ def create_run(args):
         "run_id": meta["run_id"], "source_sha256": source_hashes, "dataset_count": 60,
         "split_counts": {split: sum(q["split"] == split for q in rows) for split in ("train", "validation", "test")},
         "architectures": preflight, "resources": resources, "environment": meta["environment"],
+        "text_integrity": text_audit(rows),
         "resource_inventory_only": True})
     return run, meta, preflight
 
 
-def launch(run, meta, architectures, retry_failed=False, load_only=False):
+def launch(run, meta, architectures, retry_failed=False, load_only=False, verify_only=False):
     """Sequential fresh Python processes, one resident architecture at a time."""
     failed = False
     for arch in architectures:
-        questions = pending(run, meta, arch, retry_failed) if not load_only else []
-        if not questions and not load_only:
+        questions = pending(run, meta, arch, retry_failed) if not (load_only or verify_only) else []
+        if not questions and not (load_only or verify_only):
             print("%s: no pending questions" % arch, flush=True)
             continue
         before = {key: row["attempt_id"] for key, row in latest_results(run).items()}
+        before_jobs = set((run / "jobs" / arch).glob("*.json"))
         log_dir = run / "logs"
         log_dir.mkdir(exist_ok=True)
         log_path = log_dir / (arch + "_" + identifier() + ".log")
@@ -107,6 +110,8 @@ def launch(run, meta, architectures, retry_failed=False, load_only=False):
             command.append("--retry-failed")
         if load_only:
             command.append("--load-only")
+        if verify_only:
+            command.append("--verify-only")
         env = dict(os.environ, HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1",
                    PYTHONHASHSEED=str(meta["config"]["seed"]), PYTHONUNBUFFERED="1",
                    PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
@@ -115,7 +120,19 @@ def launch(run, meta, architectures, retry_failed=False, load_only=False):
             result = subprocess.run(command, cwd=meta["project_root"], env=env,
                                     stdout=handle, stderr=subprocess.STDOUT, check=False)
         failed = failed or result.returncode != 0
-        if not load_only:
+        if result.returncode:
+            jobs = [read_json(p) for p in sorted(set((run / "jobs" / arch).glob("*.json")) - before_jobs)]
+            if jobs:
+                reason = "stage=%s: %s" % (jobs[-1].get("stage"), jobs[-1].get("error"))
+            else:
+                try:
+                    tail = log_path.read_text(encoding="utf-8")[-8000:]
+                except UnicodeError:
+                    # Preserve native/non-Python crash bytes instead of replacement decoding.
+                    tail = repr(log_path.read_bytes()[-8000:])
+                reason = "stage=startup/native_crash; no job report; log tail=" + tail
+            print("%s FAILED: %s; log=%s" % (arch, reason, log_path), file=sys.stderr, flush=True)
+        if not (load_only or verify_only):
             after = latest_results(run)
             for question in questions:
                 key = (arch, question["faq_id"])
@@ -128,7 +145,7 @@ def launch(run, meta, architectures, retry_failed=False, load_only=False):
                     })
                     failed = True
         print("%s: worker exit=%d; GPU allocation released with process exit" % (arch, result.returncode), flush=True)
-    if not load_only:
+    if not (load_only or verify_only):
         latest = latest_results(run)
         failed = failed or any(row["status"] == "error" for (arch, faq_id), row in latest.items()
                                if arch in architectures and faq_id in meta["question_ids"])
@@ -160,6 +177,12 @@ def main():
         p.add_argument("--precision", choices=("fp16", "bf16", "fp32"))
         if mode == "preflight":
             p.add_argument("--load-models", action="store_true", help="sequential model/index initialization, no answers")
+            p.add_argument("--verify-workers", action="store_true", help="verify parent/child identities only; no model load")
+    p = sub.add_parser("check-data", help="strict 60-FAQ Unicode audit; ASCII-escaped output; no models or writes")
+    p.add_argument("--project-root", type=Path, default=ROOT)
+    p.add_argument("--manifest", default="experiments/datasets/faq_finetuning/faq_split_manifest.json")
+    p = sub.add_parser("check-inputs", help="read-only frozen/current identity comparison; no models or writes")
+    p.add_argument("--run-dir", type=Path, required=True)
     p = sub.add_parser("resume")
     p.add_argument("--run-dir", type=Path, required=True)
     p.add_argument("--architectures", nargs="+", choices=ARCHITECTURES)
@@ -172,12 +195,37 @@ def main():
     p.add_argument("--reviewer", required=True)
     args = parser.parse_args()
     try:
+        if args.command == "check-data":
+            rows, hashes = dataset(args.project_root.resolve(), args.manifest)
+            print(json.dumps({"source_sha256": hashes, "text_integrity": text_audit(rows)},
+                             ensure_ascii=True, indent=2))
+            return 0
+        if args.command == "check-inputs":
+            meta = read_run(args.run_dir.resolve())
+            root = Path(meta["project_root"])
+            changes = (differences(meta["environment"], environment(), "environment")
+                       + differences(meta["code_sha256"], code_hashes(root), "code_sha256"))
+            rows, hashes = dataset(root, meta["config"]["manifest"])
+            changes += (differences(meta["source_sha256"], hashes, "source_sha256")
+                        + differences(meta["dataset"], rows, "dataset"))
+            try:
+                stored_text = text_audit(meta["dataset"])["status"]
+            except DataError as exc:
+                stored_text = str(exc)
+            print(json.dumps({"differences": changes, "stored_dataset_text_audit": stored_text,
+                              "scope": "code/environment/FAQ only; no model/index resource comparison"},
+                             ensure_ascii=True, indent=2))
+            return 2 if changes else 0
         if args.command in ("preflight", "smoke", "full"):
+            if args.command == "preflight" and args.load_models and args.verify_workers:
+                raise DataError("choose --verify-workers OR --load-models")
             run, meta, preflight = create_run(args)
             print("Run: %s" % run, flush=True)
             with lock(run / "run.lock"):
                 if args.command == "preflight":
                     failed = any(r["status"] == "failed" for r in preflight.values())
+                    if args.verify_workers:
+                        failed = launch(run, meta, meta["architectures"], verify_only=True) or failed
                     if args.load_models:
                         ready = [a for a, r in preflight.items() if r["status"] != "failed"]
                         failed = launch(run, meta, ready, load_only=True) or failed
