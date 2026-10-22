@@ -188,6 +188,11 @@ class Architecture:
                                                   seed=config["seed"], max_input_tokens=config["a5_max_input_tokens"]))
             if self.engine.embedder.model_name != pinned_path:
                 raise DataError("A5 did not load the preflight-pinned BGE snapshot")
+            context_window = self.engine.model.config.max_position_embeddings
+            if config["a5_max_input_tokens"] + config["max_new_tokens"] > context_window:
+                raise DataError("A5 configured input cap + max_new_tokens exceeds loaded model context: %d + %d > %d"
+                                % (config["a5_max_input_tokens"], config["max_new_tokens"], context_window))
+            self.metadata["model_context_window"] = context_window
             self.provisional = self.engine.provenance["provisional"]
             self.metadata.update(prompt_version="a5_a0_baseline_basic_v1_native_chat_v1", precision=config["precision"],
                                  adapter=resources["a3_adapter"]["value"], dense_top_k=5,

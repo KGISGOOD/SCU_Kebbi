@@ -1,5 +1,7 @@
 # A0–A5 統一 FAQ 問答測試（第一輪）
 
+> 正式 Run 的 A1 LF 復發與 A5 P11 超長輸入：見 [FULL_RUN_RECOVERY.md](FULL_RUN_RECOVERY.md)。新增唯讀 audit_run 與只選失敗題、另存新 Run 的 cap-only supplement；保留原 59 題與完整性警示，不把調高 cap 的 P11 冒充同設定 resume。開始模型工作前完成所有同步與 LF artifact 準備，避免執行中再次改變 fingerprint。
+
 > A1 後續已找到 LF／CRLF 的精確 Hash 證據。新增唯讀 byte/docstore 診斷、只寫全新檔案的 LF 恢復與清楚的 Preflight 跳過訊息，見 [A1_CANONICAL_RECOVERY.md](A1_CANONICAL_RECOVERY.md)。原 canonical、FAISS 與 version.json 均不改寫。下節「當時尚未定位」是先前盤點狀態，現以本恢復文件為準。
 
 ## A1 completion/hash mismatch 的唯讀定位

@@ -103,6 +103,7 @@ def generate_report(run):
             score = reviews.get((arch, question["faq_id"], row["attempt_id"]))
             row["human_review"] = score
             row["run_integrity_valid"] = not invalidations
+            row["supplement"] = meta.get("supplement")
             rows.append(row)
     with (output / "all_results.jsonl").open("x", encoding="utf-8") as handle:
         for row in rows:
@@ -150,7 +151,10 @@ def generate_report(run):
                             "mean_output_tokens": statistics.mean(tokens) if tokens else None,
                             "model_provisional": (True if any(r.get("model_provisional") is True for r in group)
                                                   else False if any(r.get("model_provisional") is False for r in group) else None),
-                            "integrity_valid": not invalidations})
+                            "integrity_valid": not invalidations,
+                            "question_selection": meta.get("question_selection", "mode_default"),
+                            "supplement_parent_run_id": (meta.get("supplement") or {}).get("parent_run_id"),
+                            "a5_max_input_tokens": meta["config"]["a5_max_input_tokens"]})
     csv_file(output / "summary.csv", summary, list(summary[0]))
     comparison = []
     for question in meta["dataset"]:
@@ -180,6 +184,11 @@ def generate_report(run):
              '<nav>' + ' | '.join('<a href="#%s">%s</a>' % (k, k) for k in GROUPS if k != "full") + '</nav>']
     if invalidations:
         parts.append('<h2 class="error">輸入完整性失敗：所有統計僅供排錯，不可用於比較</h2><pre>%s</pre>' % esc(json.dumps(invalidations, ensure_ascii=False, indent=2)))
+    if meta.get("supplement"):
+        parts.append('<h2 class="error">獨立補測：設定已變更，不是原 Run 的續跑或完整 60 題成績</h2><pre>%s</pre>'
+                     % esc(json.dumps(meta["supplement"], ensure_ascii=False, indent=2)))
+    if meta.get("question_selection") == "explicit_subset":
+        parts.append('<p>僅選取查詢：%s；其餘 not_selected，不合併其他 Run 的答案。</p>' % esc(", ".join(meta["question_ids"])))
     mismatches = [r["faq_id"] for r in paired if not r["same_top5_order_and_content"]]
     parts.append('<p>A0/A5 實際Top5文件順序/內容核對：配對成功題數 %d；不一致FAQ：%s。未配對題不宣稱通過。</p>' %
                  (len(paired), esc(", ".join(mismatches) or "無（限已配對題）")))
@@ -216,5 +225,6 @@ def generate_report(run):
                  esc(json.dumps({"run": meta, "runtime_contracts": contracts, "preflight": preflights}, ensure_ascii=False, indent=2)))
     (output / "report.html").write_text("\n".join(parts), encoding="utf-8")
     atomic_json(output / "report_complete.json", {"run_id": meta["run_id"], "integrity_valid": not invalidations,
+                                                "supplement": meta.get("supplement"),
                                                 "raw_attempts_preserved": True})
     return output

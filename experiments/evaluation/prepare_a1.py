@@ -145,7 +145,9 @@ def main():
     p.add_argument("--inspect-docstore", action="store_true", help="compare exact stored Q/A; requires trusted local pickle opt-in")
     p.add_argument("--trust-local-docstore", action="store_true")
     p = sub.add_parser("restore-canonical", help="write NEW LF-only byte restoration and NEW config; never edit receipt/index")
-    p.add_argument("--config", default=str(Path(__file__).with_name("config.json")))
+    source = p.add_mutually_exclusive_group()
+    source.add_argument("--config")
+    source.add_argument("--from-run", type=Path, help="inherit original frozen evaluation settings")
     p.add_argument("--canonical", help="override source canonical")
     p.add_argument("--index-dir", help="override existing trusted index directory")
     p.add_argument("--output", required=True, help="NEW .jsonl path")
@@ -155,7 +157,11 @@ def main():
     root = args.project_root.expanduser().resolve()
     try:
         if args.command == "restore-canonical":
-            config = read_json(resolve(root, args.config))
+            source_run = read_run(resolve(root, args.from_run)) if args.from_run else None
+            if source_run and Path(source_run["project_root"]).resolve() != root:
+                raise DataError("restore on the original run's project root")
+            config = (dict(source_run["config"]) if source_run else read_json(
+                resolve(root, args.config or str(Path(__file__).with_name("config.json")))))
             canonical = resolve(root, args.canonical or config["a1_canonical"])
             index_dir = resolve(root, args.index_dir or config["a1_index"])
             output, config_output = resolve(root, args.output), resolve(root, args.output_config)
@@ -195,6 +201,7 @@ def main():
             atomic_json(receipt_output, {"schema_version": "a1_lf_restoration_v1", "status": "completed",
                                         "transformation": "CRLF bytes to LF only; exact original byte hash restored",
                                         "original_inputs_sha256": before, "output_sha256": sha(output),
+                                        "configuration_source_run_id": source_run["run_id"] if source_run else None,
                                         "docstore_validation": content})
             atomic_json(config_output, config)
             print(json.dumps({"status": "restored_to_new_files", "canonical": str(output),

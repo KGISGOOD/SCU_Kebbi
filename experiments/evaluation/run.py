@@ -17,7 +17,8 @@ from .report import generate_report, import_reviews
 
 
 def load_config(root, args):
-    config = read_json(resolve(root, args.config))
+    config = (dict(read_run(resolve(root, args.from_run))["config"]) if args.from_run else
+              read_json(resolve(root, args.config or str(Path(__file__).with_name("config.json")))))
     expected = set(read_json(Path(__file__).with_name("config.json")))
     # Older custom configs remain readable; the snapshot pin is optional.
     config.setdefault("bge_snapshot", None)
@@ -34,6 +35,8 @@ def load_config(root, args):
         config["device"] = args.device
     if args.precision:
         config["precision"] = args.precision
+    if args.a5_max_input_tokens is not None:
+        config["a5_max_input_tokens"] = args.a5_max_input_tokens
     if config["device"] not in ("cpu", "cuda") or config["precision"] not in ("fp16", "bf16", "fp32"):
         raise DataError("invalid device/precision")
     if config["device"] == "cpu" and config["precision"] != "fp32":
@@ -75,11 +78,64 @@ def create_run(args):
         raise DataError("FAQ source/split validation failed; report=%s; %s" % (target, exc)) from exc
     resources = inspect_resources(root, config, rows)
     architectures = [a for a in ARCHITECTURES if a in (args.architectures or ARCHITECTURES)]
+    question_ids = ([] if args.command == "preflight" else list(SMOKE_IDS)
+                    if args.command == "smoke" else [q["faq_id"] for q in rows])
+    if args.faq_ids:
+        if args.command != "full" or len(set(args.faq_ids)) != len(args.faq_ids) or not set(args.faq_ids) <= set(question_ids):
+            raise DataError("--faq-ids requires full mode and unique original FAQ IDs")
+        question_ids = [faq_id for faq_id in question_ids if faq_id in args.faq_ids]
+    supplement = None
+    if args.from_run:
+        parent_path = resolve(root, args.from_run)
+        parent = read_run(parent_path)
+        if parent_path == run or parent_path in run.parents:
+            raise DataError("supplement must use a NEW run outside the original run directory")
+        if args.command != "full" or architectures != ["A5"] or not args.faq_ids or "A5" not in parent["architectures"]:
+            raise DataError("--from-run requires full --architectures A5 --faq-ids <failed IDs>")
+        if (str(root) != parent["project_root"] or rows != parent["dataset"]
+                or source_hashes != parent["source_sha256"]):
+            raise DataError("supplement FAQ/project/split must exactly match the original run")
+        changes = differences(parent["config"], config, "config")
+        if (not changes or any(c["field"] != "config.a5_max_input_tokens" for c in changes)
+                or config["a5_max_input_tokens"] <= parent["config"]["a5_max_input_tokens"]):
+            raise DataError("supplement permits ONLY an explicit increase of a5_max_input_tokens")
+        # A1 is unrelated to A5 inference. Its current state is still frozen and
+        # globally checked within the NEW run; no old violation is removed.
+        for name in ("base", "bge", "dense_index", "a3_adapter"):
+            if resources[name] != parent["resources"][name] or resources[name]["status"] != "ready":
+                raise DataError("A5 supplement dependency differs from original: " + name)
+        if environment() != parent["environment"]:
+            raise DataError("A5 supplement Python/packages/host differ from original")
+        old_core = {k: v for k, v in parent["code_sha256"].items() if not k.startswith("experiments/evaluation/")}
+        new_core = {k: v for k, v in code_hashes(root).items() if not k.startswith("experiments/evaluation/")}
+        if old_core != new_core:
+            raise DataError("core algorithm code changed; do not label this a cap-only supplement")
+        parent_violations = [read_json(p) for p in sorted((parent_path / "integrity_violations").glob("*.json"))]
+        for violation in parent_violations:
+            evidence = violation.get("differences", [])
+            if not evidence or any(not d["field"].startswith(("resources.a1_canonical.", "resources.a1_index.")) for d in evidence):
+                raise DataError("parent integrity violation is not proven A1-only; audit it before making a cap-only supplement")
+        previous = latest_results(parent_path)
+        records = []
+        for faq_id in question_ids:
+            record = previous.get(("A5", faq_id))
+            if not record or record["status"] != "error":
+                raise DataError("supplement only accepts previously failed A5 IDs: " + faq_id)
+            records.append({"faq_id": faq_id, "attempt_id": record["attempt_id"], "record_sha256": record["record_sha256"]})
+        supplement = {"parent_run_id": parent["run_id"], "parent_run_path": str(parent_path),
+                      "parent_run_contract_sha256": parent["run_contract_sha256"],
+                      "changed_config": changes, "failed_parent_records": records,
+                      "evaluation_tooling_changes": differences(
+                          {k: v for k, v in parent["code_sha256"].items() if k.startswith("experiments/evaluation/")},
+                          {k: v for k, v in code_hashes(root).items() if k.startswith("experiments/evaluation/")},
+                          "code_sha256"),
+                      "parent_has_integrity_violations": bool(parent_violations),
+                      "same_experiment_settings": False, "automatic_merge_permitted": False}
     run.mkdir(parents=True, exist_ok=False)
     meta = {"schema_version": "unified_faq_v1", "run_id": identifier(), "project_root": str(root),
             "mode": args.command, "architectures": architectures,
-            "question_ids": [] if args.command == "preflight" else
-                            list(SMOKE_IDS) if args.command == "smoke" else [q["faq_id"] for q in rows],
+            "question_ids": question_ids, "supplement": supplement,
+            "question_selection": "explicit_subset" if args.faq_ids else "mode_default",
             "dataset": rows, "source_sha256": source_hashes, "config": config,
             "resources": resources, "code_sha256": code_hashes(root), "environment": environment(),
             "environment_diagnostics": environment_diagnostics(),
@@ -179,13 +235,17 @@ def main():
     for mode in ("preflight", "smoke", "full"):
         p = sub.add_parser(mode)
         p.add_argument("--project-root", type=Path, default=ROOT)
-        p.add_argument("--config", default=str(Path(__file__).with_name("config.json")))
+        source = p.add_mutually_exclusive_group()
+        source.add_argument("--config")
+        source.add_argument("--from-run", help="NEW A5 cap-only supplement inheriting a frozen run; never resume or merge")
         p.add_argument("--run-dir")
         p.add_argument("--architectures", nargs="+", choices=ARCHITECTURES)
         p.add_argument("--allow-unreviewed", action="store_true")
         p.add_argument("--bge-snapshot", help="pin an existing original BGE-M3 snapshot directory; offline only")
         p.add_argument("--device", choices=("cpu", "cuda"))
         p.add_argument("--precision", choices=("fp16", "bf16", "fp32"))
+        p.add_argument("--a5-max-input-tokens", type=int, help="explicit A5 prompt cap; no truncation; NEW run only")
+        p.add_argument("--faq-ids", nargs="+", help="explicit subset in full mode; all 60 retrieval candidates retained")
         if mode == "preflight":
             p.add_argument("--load-models", action="store_true", help="sequential model/index initialization, no answers")
             p.add_argument("--verify-workers", action="store_true", help="verify parent/child identities only; no model load")
