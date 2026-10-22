@@ -7,8 +7,11 @@ import hashlib
 import json
 import os
 import platform
+import struct
+import sys
 import uuid
 from importlib import metadata
+from pathlib import Path
 
 from experiments.a3_faq_sft.common import (ROOT, DataError, read_json, read_rows,
                                            resolve, sha, snapshot)
@@ -138,6 +141,7 @@ def differences(expected, actual, path=""):
 
 
 def environment():
+    """Strict v2 identity shared by runner/worker; OS build is diagnostic only."""
     names = ("torch", "transformers", "sentence-transformers", "peft", "numpy", "faiss-cpu",
              "faiss-gpu", "langchain-core", "langchain-community", "langchain-text-splitters",
              "huggingface-hub", "accelerate", "jieba", "packaging")
@@ -147,8 +151,40 @@ def environment():
             versions[name] = metadata.version(name)
         except metadata.PackageNotFoundError:
             versions[name] = None
-    return {"python": platform.python_version(), "platform": platform.platform(),
+    return {"schema_version": "stable_environment_v2",
+            "python": platform.python_version(),
+            "python_implementation": sys.implementation.name,
+            "python_executable": str(Path(sys.executable).resolve()),
+            "python_prefix": str(Path(sys.prefix).resolve()),
+            "os_name": os.name, "sys_platform": sys.platform,
+            "machine": platform.machine(), "pointer_bits": struct.calcsize("P") * 8,
             "host": platform.node(), "packages": versions}
+
+
+def environment_diagnostics():
+    """Observed version reports, NOT an identity assertion about installed Windows.
+
+    Keep process-specific API reports for investigation, without copying a parent's
+    values into the child or suppressing any stable fingerprint differences.
+    """
+    result = {}
+    probes = {"platform": platform.platform, "release": platform.release,
+              "version": platform.version}
+    if sys.platform == "win32":
+        probes["win32_ver"] = lambda: list(platform.win32_ver())
+        def windows_version():
+            version = sys.getwindowsversion()
+            return {"major": version.major, "minor": version.minor, "build": version.build,
+                    "service_pack": version.service_pack,
+                    "platform_version": list(version.platform_version)}
+        probes["getwindowsversion"] = windows_version
+        result["compat_layer"] = os.environ.get("__COMPAT_LAYER")
+    for name, probe in probes.items():
+        try:
+            result[name] = probe()
+        except Exception as exc:
+            result[name] = {"error": "%s: %s" % (type(exc).__name__, exc)}
+    return result
 
 
 def code_hashes(root):

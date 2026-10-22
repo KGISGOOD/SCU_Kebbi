@@ -10,7 +10,8 @@ import traceback
 from pathlib import Path
 
 from .common import (DataError, atomic_json, code_hashes, dataset, environment, identifier,
-                     differences, lock, model_fields, pending, read_json, read_run, save_result)
+                     differences, lock, model_fields, pending, read_json, read_run, save_result,
+                     environment_diagnostics)
 from .preflight import architecture_preflight, inspect_resources
 
 
@@ -69,6 +70,13 @@ def main():
     job = {"architecture": arch, "job_id": job_id, "load_only": args.load_only,
            "verify_only": args.verify_only, "stage": "verify_inputs",
            "status": "failed", "model_load_verified": False, "error": None}
+    job["environment_diagnostics"] = environment_diagnostics()
+    job["diagnostic_differences_non_blocking"] = differences(
+        meta.get("environment_diagnostics", {}), job["environment_diagnostics"],
+        "environment_diagnostics")
+    if job["diagnostic_differences_non_blocking"]:
+        print("%s OS version diagnostics differ (non-blocking): %s" % (
+            arch, json.dumps(job["diagnostic_differences_non_blocking"], ensure_ascii=True)), flush=True)
     with lock(run / "locks" / (arch + ".lock")):
         questions = pending(run, meta, arch, args.retry_failed) if not (args.load_only or args.verify_only) else []
         if not questions and not (args.load_only or args.verify_only):

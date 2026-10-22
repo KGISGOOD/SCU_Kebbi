@@ -1,6 +1,50 @@
 # A0–A5 統一 FAQ 問答測試（第一輪）
 
-> Worker/中文問題修正版：先依 [WORKER_ENCODING_AUDIT.md](WORKER_ENCODING_AUDIT.md) 執行 `check-data` 與 `preflight --verify-workers`。已有 `preflight_v1`／`smoke_v1` 請保留，修正版必須使用全新目錄。歷史 fingerprint 的具體差異尚待 GPU 證據，不能把本次靜態修正視為已跑通。
+> Windows Fingerprint 修正版：GPU 已確認唯一差異為 `environment.platform` 的 build 26200／26100，處理方式見下節。先前 [WORKER_ENCODING_AUDIT.md](WORKER_ENCODING_AUDIT.md) 為當時的歷史盤點，其「欄位未知」結論已由本次證據更新。所有舊 Run 完整保留；本次仍未執行 Python、測試或模型。
+
+## Windows 父子行程 Fingerprint 修正
+
+GPU 父行程回報 `Windows-10-10.0.26200-SP0`，Worker 回報 `Windows-10-10.0.26100-SP0`。原先 `environment()` 把 `platform.platform()` 放入嚴格相等比較，因而八架構在載入模型前全部被 `verify_inputs` 拒絕。這是已確認的直接原因，並非模型失敗。
+
+Windows 版本 API 可能受 executable manifest、相容性模式或版本回報來源影響。[Microsoft GetVersionEx 文件](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getversionexw) 明列相容性模式可能回報不同於實際安裝的 OS 版本；[Python 的相關版本回報 issue](https://github.com/python/cpython/issues/91025) 亦說明 Windows 版本識別的限制。這些是可能原因，不能僅憑兩個 build 字串斷言本機存在某個特定 shim／manifest。診斷值是各 API 的觀察結果，不宣稱某一個必為真實 OS build。
+
+父行程、Worker、resume、check-inputs 與 Wrapper runtime contract 現在都使用同一個 `environment()`：
+
+| 嚴格比對欄位 | 內容 |
+|---|---|
+| schema_version | `stable_environment_v2`，不同規則不默默相容 |
+| python / python_implementation | Python 版本與實作 |
+| python_executable / python_prefix | 解析後的執行檔、Python 環境位置 |
+| os_name / sys_platform | OS 家族，不含 Windows build 或 marketing release |
+| machine / pointer_bits | CPU 架構與 Python 指標位元數 |
+| host | 主機名稱 |
+| packages | 原本 14 個重要套件的完整版本字串（含 local version suffix） |
+
+`environment_diagnostics` 另外保存 `platform.platform()`、release、version；Windows 額外保存 `win32_ver()`、`sys.getwindowsversion()`（含 platform_version）、`__COMPAT_LAYER`。父行程寫入 run.json 與 preflight；Worker 寫入自己的 job，並將差異輸出到 log 的 `diagnostic_differences_non_blocking`。只有這些 OS 版本診斷的差異不阻擋；穩定 identity 的差異仍完整列出原值／現值並失敗。
+
+沒有放寬 `verify_inputs` 的其他比較：Python／套件、原碼 SHA-256、FAQ 與 split、模型／索引／候選庫來源、run.json 凍結設定及實際 runtime contract 都保留。diagnostic Metadata 本身仍納入 run.json 的內容 hash，人工修改 frozen run 仍被拒絕；只是不拿目前 Worker 的易變 OS 字串要求與父行程相等。此規則不保證 OS 更新前後具有完全相同數值結果，跨 OS 更新的研究比較仍需人工參考診斷資訊。
+
+**舊 Run 不轉換、不覆寫、不 resume。** 舊 environment schema 與新規則不同，應使用全新 Run。請同步 common.py、run.py、worker.py 與本文件到 GPU 電腦，先確認 60 題中文與八個 Worker：
+
+```powershell
+Set-Location 'C:\Users\rsy\Desktop\SCU_Kebbi'
+python -m experiments.evaluation.run check-data --project-root .
+
+# check-data 成功後執行；GUID 避免碰撞任何既有 Run
+$runTag = [guid]::NewGuid().ToString('N')
+python -m experiments.evaluation.run preflight --project-root . --run-dir "experiments/results/unified_faq/worker_verify_stable_$runTag" --allow-unreviewed --verify-workers
+```
+
+八份 job 應為 `verified_no_model_load`；這不代表模型已載入。Windows build 不同可留下非阻擋診斷，但不應再單獨產生 integrity violation。若其他欄位不同，仍必須先處理；資源盤點失敗仍會返回退出碼 2。
+
+檢查通過且資源正常後，再執行全新三題 Smoke（P01/P22/P26，八架構共最多 24 筆）：
+
+```powershell
+$smokeTag = [guid]::NewGuid().ToString('N')
+python -m experiments.evaluation.run smoke --project-root . --run-dir "experiments/results/unified_faq/smoke_stable_$smokeTag" --allow-unreviewed
+```
+
+確認八架構 jobs／attempts 狀態與非空答案，不將啟動成功等同回答正確。本次僅完成靜態程式審查，父子行程一致性、模型啟動與 Smoke 均待 GPU 實際驗證。
 
 本目錄提供八種架構的獨立、離線批次測試與人工評分報表。Codex僅撰寫程式、讀取原始碼與靜態審查，**沒有執行Python/Node、測試、推論、訓練、下載或安裝**。下列指令由使用者在GPU電腦執行，不能把本文件視為已跑通或已有實驗成績。
 

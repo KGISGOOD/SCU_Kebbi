@@ -10,7 +10,8 @@ import sys
 
 from .common import (ARCHITECTURES, ROOT, SMOKE_IDS, DataError, atomic_json, code_hashes,
                      dataset, digest, environment, identifier, latest_results, lock, model_fields, pending,
-                     read_json, read_run, resolve, save_result, text_audit, differences)
+                     read_json, read_run, resolve, save_result, text_audit, differences,
+                     environment_diagnostics)
 from .preflight import architecture_preflight, inspect_resources
 from .report import generate_report, import_reviews
 
@@ -74,6 +75,7 @@ def create_run(args):
                             list(SMOKE_IDS) if args.command == "smoke" else [q["faq_id"] for q in rows],
             "dataset": rows, "source_sha256": source_hashes, "config": config,
             "resources": resources, "code_sha256": code_hashes(root), "environment": environment(),
+            "environment_diagnostics": environment_diagnostics(),
             "limitations": ["original canonical questions; not paraphrase generalization",
                             "A2/A3/A5 smoke weights are preliminary, inspect provenance",
                             "reference answers never passed to wrapper.answer",
@@ -87,6 +89,7 @@ def create_run(args):
         "run_id": meta["run_id"], "source_sha256": source_hashes, "dataset_count": 60,
         "split_counts": {split: sum(q["split"] == split for q in rows) for split in ("train", "validation", "test")},
         "architectures": preflight, "resources": resources, "environment": meta["environment"],
+        "environment_diagnostics": meta["environment_diagnostics"],
         "text_integrity": text_audit(rows),
         "resource_inventory_only": True})
     return run, meta, preflight
@@ -213,6 +216,9 @@ def main():
             except DataError as exc:
                 stored_text = str(exc)
             print(json.dumps({"differences": changes, "stored_dataset_text_audit": stored_text,
+                              "diagnostic_differences_non_blocking": differences(
+                                  meta.get("environment_diagnostics", {}), environment_diagnostics(),
+                                  "environment_diagnostics"),
                               "scope": "code/environment/FAQ only; no model/index resource comparison"},
                              ensure_ascii=True, indent=2))
             return 2 if changes else 0
