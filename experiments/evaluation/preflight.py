@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 
 from .common import DataError, digest, environment, read_json, read_rows, resolve, sha
+from .model_resources import cached_model
 
 NEEDS = {
     "A0": ("bge", "base", "dense_index"),
@@ -23,24 +24,6 @@ def directory_identity(path):
     if not files:
         raise DataError("empty directory: %s" % path)
     return {"path": str(path), "files_sha256": files, "content_sha256": digest(files)}
-
-
-def cached_model(root, name, revision=None):
-    path = resolve(root, name)
-    if not path.is_dir():
-        # Resolve only existing HF cache; local_files_only explicitly forbids download.
-        # Misspelled local paths are NOT treated as a Hub ID.
-        if name not in ("BAAI/bge-m3", "BAAI/bge-reranker-v2-m3", "meta-llama/Llama-3.2-3B-Instruct"):
-            raise DataError("local model path missing: %s" % path)
-        from huggingface_hub import snapshot_download
-        path = Path(snapshot_download(repo_id=name, revision=revision, local_files_only=True))
-    if not (path / "config.json").is_file():
-        raise DataError("model config.json missing: %s" % path)
-    if not any(p.name.endswith((".safetensors", ".bin")) for p in path.rglob("*")):
-        raise DataError("no cached model weights: %s" % path)
-    if not (path / "tokenizer_config.json").is_file():
-        raise DataError("tokenizer_config.json missing: %s" % path)
-    return {"model_argument": name, "revision_requested": revision, **directory_identity(path)}
 
 
 def inspect_resources(root, config, questions):
@@ -84,6 +67,20 @@ def inspect_resources(root, config, questions):
             source = expected[row["faq_id"]]
             if row.get("question") != source["question"] or row.get("answer") != source["reference_answer"]:
                 raise DataError("A1 %s Q/A differs from original CSV" % row["faq_id"])
+        version_path = resolve(root, config["a1_index"]) / "version.json"
+        if version_path.is_file():
+            version = read_json(version_path)
+            if version.get("schema_version") == "a1_60_preparation_v1":
+                index_dir = version_path.parent
+                if (version.get("status") != "completed" or version.get("faq_count") != 60
+                        or version.get("canonical_sha256") != sha(path)
+                        or version.get("index_sha256") != sha(index_dir / "index.faiss")
+                        or version.get("docstore_sha256") != sha(index_dir / "index.pkl")):
+                    raise DataError("A1 new index completion/hash/canonical mismatch")
+                bge = resources["bge"]
+                if (bge["status"] != "ready"
+                        or version.get("embedding_model", {}).get("files_sha256") != bge["value"]["files_sha256"]):
+                    raise DataError("A1 index was built with different BGE inference files; select its original snapshot")
         return {"path": str(path), "sha256": sha(path), "faq_count": 60}
 
     def a2_corpus():
@@ -141,7 +138,7 @@ def inspect_resources(root, config, questions):
             else:
                 revision = provenance.get("base_revision")
     check("base", lambda: cached_model(root, config["base_model"], revision))
-    check("bge", lambda: cached_model(root, config["bge_model"]))
+    check("bge", lambda: cached_model(root, config["bge_model"], snapshot=config.get("bge_snapshot")))
     check("reranker", lambda: cached_model(root, config["reranker_model"]))
     check("dense_index", lambda: index("dense_index"))
     check("a1_index", lambda: index("a1_index"))

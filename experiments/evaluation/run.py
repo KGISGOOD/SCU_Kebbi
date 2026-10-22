@@ -19,10 +19,17 @@ from .report import generate_report, import_reviews
 def load_config(root, args):
     config = read_json(resolve(root, args.config))
     expected = set(read_json(Path(__file__).with_name("config.json")))
+    # Older custom configs remain readable; the snapshot pin is optional.
+    config.setdefault("bge_snapshot", None)
     if set(config) != expected:
         raise DataError("config keys differ from evaluation/config.json")
     if args.allow_unreviewed:
         config["allow_unreviewed"] = True
+    if args.bge_snapshot:
+        config["bge_snapshot"] = args.bge_snapshot
+    if config["bge_snapshot"] is not None and (not isinstance(config["bge_snapshot"], str)
+                                                or not config["bge_snapshot"].strip()):
+        raise DataError("bge_snapshot must be null or a nonempty existing snapshot directory")
     if args.device:
         config["device"] = args.device
     if args.precision:
@@ -176,6 +183,7 @@ def main():
         p.add_argument("--run-dir")
         p.add_argument("--architectures", nargs="+", choices=ARCHITECTURES)
         p.add_argument("--allow-unreviewed", action="store_true")
+        p.add_argument("--bge-snapshot", help="pin an existing original BGE-M3 snapshot directory; offline only")
         p.add_argument("--device", choices=("cpu", "cuda"))
         p.add_argument("--precision", choices=("fp16", "bf16", "fp32"))
         if mode == "preflight":

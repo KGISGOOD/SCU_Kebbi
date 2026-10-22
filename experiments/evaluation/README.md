@@ -1,5 +1,7 @@
 # A0–A5 統一 FAQ 問答測試（第一輪）
 
+> 第一輪 Smoke 的資源修正與 GPU 指令見 [RESOURCE_PREPARATION.md](RESOURCE_PREPARATION.md)：離線固定 BGE snapshot、建立全新 A1 60 題 canonical／索引、重用 A2 候選庫建置程式。新預設不再指向舊 A1 三題示範檔；所有資料與模型操作均由使用者在 GPU 電腦明確執行。
+
 > Windows Fingerprint 修正版：GPU 已確認唯一差異為 `environment.platform` 的 build 26200／26100，處理方式見下節。先前 [WORKER_ENCODING_AUDIT.md](WORKER_ENCODING_AUDIT.md) 為當時的歷史盤點，其「欄位未知」結論已由本次證據更新。所有舊 Run 完整保留；本次仍未執行 Python、測試或模型。
 
 ## Windows 父子行程 Fingerprint 修正
@@ -69,7 +71,7 @@ A4使用既有資料載入/切分函式，不保存任何新索引；Wrapper另�
 - A3/A5：`experiments/models/a3_smoke_v1/final_adapter`
 - Base：`meta-llama/Llama-3.2-3B-Instruct`
 - Dense：`experiments/vector_stores/type1_type2_bge_m3_v1`
-- A1：`experiments/datasets/faq/faq_canonical_v1.jsonl`與`experiments/vector_stores/faq_bge_m3_v1`
+- A1：`experiments/datasets/faq/faq_canonical_60_v2.jsonl`與`experiments/vector_stores/faq_bge_m3_60_v2`（先依資源準備文件建立，保留舊 v1）
 
 本次本機實際閱讀發現：A1 canonical僅3筆；A2正式60題`faq_retrieval_candidates.jsonl`不在本機；A3 Adapter未同步；A0索引有index.faiss/index.pkl但沒有version.json。**這些不是已修正的問題，也不能據此假設GPU電腦相同。** GPU Preflight會依實際資源判定，各架構獨立失敗；工具不替換候選庫、不建立新模型或索引。
 
@@ -80,6 +82,9 @@ A4使用既有資料載入/切分函式，不保存任何新索引；Wrapper另�
 | config.json | 可複製修改的路徑/裝置/精度/長度/seed設定 |
 | common.py | 原始60題、固定split、嚴格IO、原子不可覆寫紀錄、OS鎖 |
 | preflight.py | 離線快取與檔案盤點、來源hash、各架構資源需求 |
+| model_resources.py | 本機 cache lookup／明確 snapshot，必要權重、tokenizer、ST modules 與 hash 驗證 |
+| prepare_a1.py | 全新 A1 60 題 canonical／索引準備，以及 A1/A2 原始 Q/A 一致性檢查 |
+| inspect_bge_snapshots.ps1 | GPU 上唯讀盤點兩個 BGE snapshot，列出必要檔與 hash |
 | wrappers.py | 原演算法最小相容層、生成telemetry與同步計時 |
 | worker.py | 一個架構一個子行程；逐題保存、失敗隔離、執行環境契約 |
 | run.py | 單一CLI：preflight/smoke/full/resume/report/import-review |
@@ -105,7 +110,7 @@ run.json保存faq_id、question、reference_answer、split、source。Worker只�
 
 預設`preflight`是資源盤點，**不載入模型、不生成**：檢查資料/manifest、套件metadata、本機/既有HF cache權重與tokenizer檔案、索引、A1完整Q/A、A2 tag與checkpoint hash、A3完成狀態/訓練設定/來源紀錄、Base/Adapter來源一致性、A4原始文件。
 
-HF只使用snapshot_download(local_files_only=True)，不下載。盤點成功標為`resources_ready_not_loaded`，不能稱為模型可執行。壞/缺檔標failed；缺version標warning/provenance未完整驗證，不補造資訊。索引二進位/語意、權重shard與runtime套件相容性仍須loader確認。
+HF 使用 `try_to_load_from_cache` 的 config.json 定位或明確 `--bge-snapshot`，不下載、不要求整個 Hub repo 完整；必要推論檔與全部權重 shards 另行驗證及記錄 hash。盤點成功標為`resources_ready_not_loaded`，不能稱為模型可執行。壞/缺檔標failed；缺version標warning/provenance未完整驗證，不補造資訊。索引二進位/語意、權重內容與runtime套件相容性仍須loader確認。
 
 `preflight --load-models`會依序在獨立子行程初始化實際Wrapper，不問測試題，不產生回答，輸出`loaded_no_inference`或failed。這才檢查FAISS映射/維度、實際模型載入與A4 BM25資料一致性，仍不等於答案正確。報告位於run/preflight/，載入詳細資訊在run/jobs/及contracts/。
 

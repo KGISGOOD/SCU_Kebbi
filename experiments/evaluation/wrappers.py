@@ -166,12 +166,28 @@ class Architecture:
         elif architecture == "A5":
             from experiments.a5_rag_finetuned_llm.pipeline import A5Pipeline
             from experiments.a5_rag_finetuned_llm.config import GenerationSettings
-            self.engine = A5Pipeline(
-                root=root, index_dir=resolve(root, config["dense_index"]), base_model=config["base_model"],
-                adapter=resolve(root, config["a3_adapter"]), device=config["device"], precision=config["precision"],
-                offline=True, allow_unreviewed=config["allow_unreviewed"],
-                generation=GenerationSettings(do_sample=False, max_new_tokens=config["max_new_tokens"],
-                                              seed=config["seed"], max_input_tokens=config["a5_max_input_tokens"]))
+            from experiments.shared import embeddings
+            from unittest.mock import patch
+            original_embedder = embeddings.BGEM3Embedder
+            pinned_path = resources["bge"]["value"]["path"]
+
+            def pinned_embedder(*, model_name="BAAI/bge-m3", **kwargs):
+                if model_name != "BAAI/bge-m3":
+                    raise DataError("unexpected A5 embedding model: %s" % model_name)
+                return original_embedder(model_name=pinned_path, **kwargs)
+
+            # A5 imports this class inside its constructor and offers no model-path
+            # parameter. Scope only the dependency injection to this isolated worker
+            # constructor; preserve A5's model-ID/index checks and all retrieval math.
+            with patch.object(embeddings, "BGEM3Embedder", new=pinned_embedder):
+                self.engine = A5Pipeline(
+                    root=root, index_dir=resolve(root, config["dense_index"]), base_model=config["base_model"],
+                    adapter=resolve(root, config["a3_adapter"]), device=config["device"], precision=config["precision"],
+                    offline=True, allow_unreviewed=config["allow_unreviewed"],
+                    generation=GenerationSettings(do_sample=False, max_new_tokens=config["max_new_tokens"],
+                                                  seed=config["seed"], max_input_tokens=config["a5_max_input_tokens"]))
+            if self.engine.embedder.model_name != pinned_path:
+                raise DataError("A5 did not load the preflight-pinned BGE snapshot")
             self.provisional = self.engine.provenance["provisional"]
             self.metadata.update(prompt_version="a5_a0_baseline_basic_v1_native_chat_v1", precision=config["precision"],
                                  adapter=resources["a3_adapter"]["value"], dense_top_k=5,
@@ -189,6 +205,8 @@ class Architecture:
         else:
             self._load_rag()
         self.metadata["model_provisional"] = self.provisional
+        if architecture in ("A0", "A1", "A4-1", "A4-2", "A5"):
+            self.metadata["embedding_model_version"] = resources["bge"]["value"]
         self.metadata["model_name"] = self.model_name
         self.metadata["model_version_or_path"] = self.model_version
         if self.capture:
