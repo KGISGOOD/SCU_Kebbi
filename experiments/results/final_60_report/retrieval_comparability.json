@@ -1,0 +1,245 @@
+{
+  "paired_successes": 60,
+  "checks": [
+    {
+      "faq_id": "P01",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P02",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P03",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P04",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P05",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P06",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P07",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P08",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P09",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P10",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P11",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P12",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P13",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P14",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P15",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P16",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P17",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P18",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P19",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P20",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P21",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P22",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P23",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P24",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P25",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P26",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P27",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P28",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P29",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "P30",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S01",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S02",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S03",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S04",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S05",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S06",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S07",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S08",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S09",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S10",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S11",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S12",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S13",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S14",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S15",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S16",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S17",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S18",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S19",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S20",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S21",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S22",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S23",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S24",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S25",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S26",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S27",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S28",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S29",
+      "same_top5_order_and_content": true
+    },
+    {
+      "faq_id": "S30",
+      "same_top5_order_and_content": true
+    }
+  ]
+}
