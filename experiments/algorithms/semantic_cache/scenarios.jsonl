@@ -1,0 +1,8 @@
+{"query_id":"SC01","query":"系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？","intent_key":"P05","category":"seed","review_status":"needs_review","rationale":"依原始 P05，首次請求應從空 Cache Miss。"}
+{"query_id":"SC02","query":"系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？","intent_key":"P05","category":"exact_repeat","review_status":"needs_review","rationale":"與 SC01 逐字相同；Exact 與 Semantic 應可重用，仍須確認答案對應。"}
+{"query_id":"SC03","query":"能不能在這裡把學士和碩士接著讀、五年拿到兩個學位？這種管道收的人多不多？","intent_key":"P05","category":"paraphrase","review_status":"needs_review","rationale":"保留制度與名額兩個條件；相似度是否足夠必須實測。"}
+{"query_id":"SC04","query":"讀完四年大學，有需要一定要讀研究所才能找到好工作嗎？","intent_key":"P06","category":"similar_different_intent","review_status":"needs_review","rationale":"與 P05 同涉升學，但問就業是否需要碩士，不可直接重用五年一貫答案。"}
+{"query_id":"SC05","query":"讀完四年大學，有需要一定要讀研究所才能找到好工作嗎？","intent_key":"P06","category":"exact_repeat","review_status":"needs_review","rationale":"檢查是否回到 SC04 的答案；錯誤的前次命中不能算正確填入。"}
+{"query_id":"SC06","query":"本系學生考研時，推甄錄取率高還是考試錄取率高？","intent_key":"P07","category":"similar_different_intent","review_status":"needs_review","rationale":"同為研究所主題，但比較入學管道；不應重用 P05 或 P06。"}
+{"query_id":"SC07","query":"今晚台北會不會下雨？","intent_key":"OOD_WEATHER","category":"should_miss","review_status":"needs_review","rationale":"刻意的系務範圍外探測，不宣稱來源 FAQ 存在此意圖；之前項目均不能回答。"}
+{"query_id":"SC08","query":"本系學生考研時，推甄錄取率高還是考試錄取率高？","intent_key":"P07","category":"exact_repeat","review_status":"needs_review","rationale":"再次檢查 P07 穩定答案對應；不是新增正式評估題。"}
