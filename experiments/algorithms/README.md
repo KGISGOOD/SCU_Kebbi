@@ -16,6 +16,11 @@
   超長直接失敗；不得以這次失敗認定 Cache 演算法錯誤。若實際資料經常超長，
   需要另外確認 A0 輸入政策，不在本任務默默改動它。
 - 原生 A0 類別載入知識庫仍使用可信專案的 pickle，不能指向不可信檔案。
+- A0 知識庫沿用 `FAISSVectorStore.load()` 的 `index.faiss`＋`index.pkl` 格式，
+  不要求 `version.json`，也不借用 FAQ Matching 索引的版本檔。保留索引類型／IP metric、
+  Embedding 維度、非空文件數及完整映射檢查。`identity.json` 的
+  `resources.knowledge_index` 分別保存兩個檔案的 SHA-256，結束時重新核對；
+  這是內容識別，不代表已證明原建置模型或向量正規化來源，仍須使用已確認的 A0 索引。
 - 開發機沒有執行 Python、測試或模型。套件相容性、生成與數值均未驗證。
 
 ## 模式與資料流

@@ -6,7 +6,6 @@ Only local-only loading, length checks and measurement are added here.
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 from pathlib import Path
 import time
@@ -26,6 +25,11 @@ def tree_hash(directory):
     if not files:
         raise ValueError(f"empty resource directory: {directory}")
     return fingerprint({p.relative_to(directory).as_posix(): file_hash(p) for p in files})
+
+
+def knowledge_hashes(directory):
+    """A0 load() consumes these two files; version.json is not required."""
+    return {name: file_hash(directory / name) for name in ("index.faiss", "index.pkl")}
 
 
 def sync():
@@ -60,12 +64,15 @@ class A0Adapter:
         for name in ("model", "bge"):
             if not (paths[name] / "config.json").is_file():
                 raise ValueError(f"{name}: config.json missing; do not pass a hub ID")
-        for name in ("index.faiss", "index.pkl", "version.json"):
+        for name in ("index.faiss", "index.pkl"):
             if not (paths["knowledge_index"] / name).is_file():
                 raise ValueError(f"existing A0 knowledge index missing {name}; never auto-build")
         print("Hashing immutable local resources (including model weights)...", flush=True)
         self.paths = paths
-        self.source_hashes = {name: tree_hash(path) for name, path in paths.items()}
+        self.source_hashes = {
+            name: knowledge_hashes(path) if name == "knowledge_index" else tree_hash(path)
+            for name, path in paths.items()
+        }
 
         import torch
         import faiss
@@ -95,16 +102,12 @@ class A0Adapter:
         store = FAISSVectorStore(self.embedder.embedding_dim, str(paths["knowledge_index"]))
         if not store.load():
             raise ValueError("existing A0 index failed to load; no rebuild")
-        version = json.loads((paths["knowledge_index"] / "version.json").read_text(encoding="utf-8"))
         if (not isinstance(store.index, faiss.IndexFlat) or store.index.metric_type != faiss.METRIC_INNER_PRODUCT
                 or store.index.d != self.embedder.embedding_dim or store.index.ntotal <= 0
                 or len(store.docstore) != store.index.ntotal
                 or set(store.index_to_docstore_id) != set(range(store.index.ntotal))
-                or set(store.index_to_docstore_id.values()) != set(range(len(store.docstore)))
-                or version.get("normalization") != "L2"
-                or version.get("embedding_model") not in {"BAAI/bge-m3", str(paths["bge"]), config["bge"]}
-                or version.get("embedding_dimension") != self.embedder.embedding_dim):
-            raise ValueError("A0 index dimension/mapping/normalization invalid")
+                or set(store.index_to_docstore_id.values()) != set(range(len(store.docstore)))):
+            raise ValueError("A0 index metric/dimension/document count/mapping invalid")
         # Existing index.pkl is trusted project input, never an uploaded pickle.
         self.llm = LLMLoader.__new__(LLMLoader)
         llm = self.llm
@@ -150,7 +153,8 @@ class A0Adapter:
 
     def verify_sources(self):
         for name, path in self.paths.items():
-            if tree_hash(path) != self.source_hashes[name]:
+            current = knowledge_hashes(path) if name == "knowledge_index" else tree_hash(path)
+            if current != self.source_hashes[name]:
                 raise ValueError(f"resource changed during run: {name}")
         if self.code_hash() != self.identity["code"]:
             raise ValueError("source code changed during run")
