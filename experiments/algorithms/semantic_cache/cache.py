@@ -8,6 +8,20 @@ from dataclasses import dataclass
 import hashlib
 import json
 import math
+import unicodedata
+
+
+NORMALIZATION_VERSION = "nfc_strip_collapse_whitespace_v1"
+
+
+def normalize_question(query):
+    """Conservative exact-key policy: preserve case, punctuation and negation."""
+    if not isinstance(query, str):
+        raise ValueError("query must be a string")
+    normalized = " ".join(unicodedata.normalize("NFC", query).split())
+    if not normalized:
+        raise ValueError("query must not be empty after normalization")
+    return normalized
 
 
 def fingerprint(value):
@@ -32,18 +46,41 @@ class AnswerCache:
         if dimension <= 0:
             raise ValueError("embedding dimension must be positive")
         self.mode, self.threshold = mode, threshold
-        self.namespace = fingerprint(identity)
+        self.namespace = fingerprint({"identity": identity, "mode": mode,
+                                      "exact_normalization": NORMALIZATION_VERSION})
+        self.identity_hash = fingerprint(identity)
         self.dimension = dimension
         self.entries, self.exact = {}, {}
         self.labels = {}  # explicit FAISS int64 label -> stable cache_id
         self.index = None
+        self.valid = True
         if mode == "semantic":
             import faiss
             self.index = faiss.IndexIDMap2(faiss.IndexFlatIP(dimension))
 
     def check_identity(self, identity):
-        if fingerprint(identity) != self.namespace:
+        if fingerprint(identity) != self.identity_hash:
             raise ValueError("Cache identity changed: create a fresh cache; answers cannot be reused")
+
+    def key(self, query):
+        normalized = normalize_question(query)
+        return normalized if self.mode == "exact" else query
+
+    def check_consistency(self):
+        if not self.valid:
+            raise RuntimeError("Cache invalid after index mutation failure; create a fresh cache")
+        if (len(self.exact) != len(self.entries) or set(self.exact.values()) != set(self.entries)
+                or any(e.namespace != self.namespace or e.cache_id != key
+                       or self.exact.get(self.key(e.query)) != key for key, e in self.entries.items())):
+            raise RuntimeError("Cache entry/key/namespace mapping inconsistent")
+        if self.index is not None:
+            import faiss
+            labels = [int(v) for v in faiss.vector_to_array(self.index.id_map)]
+            if (self.index.ntotal != len(self.entries) or len(labels) != len(set(labels))
+                    or set(labels) != set(self.labels)
+                    or set(self.labels.values()) != set(self.entries)
+                    or len(self.labels) != len(self.entries)):
+                raise RuntimeError("FAISS labels and Cache IDs inconsistent")
 
     def vector(self, value):
         import numpy as np
@@ -51,16 +88,17 @@ class AnswerCache:
         if array.shape != (1, self.dimension) or not np.isfinite(array).all():
             raise ValueError("invalid cache embedding shape or non-finite values")
         norm = float(np.linalg.norm(array))
-        if norm <= 0:
-            raise ValueError("zero cache embedding")
+        if not math.isfinite(norm) or norm <= 0:
+            raise ValueError("zero or invalid cache embedding norm")
         return np.ascontiguousarray(array / norm)
 
     def lookup(self, query, vector=None):
+        self.check_consistency()
+        key = self.key(query)
         if self.mode == "none":
             return None, None, None
         if self.mode == "exact":
-            key = self.exact.get(query)  # deliberately no strip/case/Unicode folding
-            entry = self.entries.get(key)
+            entry = self.entries.get(self.exact.get(key))
             return entry, None, entry
         if self.index.ntotal == 0:
             return None, None, None
@@ -72,19 +110,30 @@ class AnswerCache:
         return (candidate if score >= self.threshold else None), score, candidate
 
     def insert(self, query, answer, vector=None):
+        self.check_consistency()
+        key = self.key(query)
         if self.mode == "none":
             return None
         if not isinstance(answer, str) or not answer.strip():
             raise ValueError("empty/invalid generation must not be cached")
-        if query in self.exact:
-            return self.exact[query]
-        cache_id = fingerprint({"namespace": self.namespace, "query": query})
+        if key in self.exact:
+            existing = self.entries[self.exact[key]]
+            if answer != existing.answer:
+                raise ValueError("append-only Cache cannot overwrite an existing key with a different answer")
+            return existing.cache_id
+        cache_id = fingerprint({"namespace": self.namespace, "key": key})
         entry = Entry(cache_id, query, answer, self.namespace)
         if self.index is not None:
             import numpy as np
             label = len(self.labels)
-            self.index.add_with_ids(self.vector(vector), np.asarray([label], dtype=np.int64))
+            array = self.vector(vector)
+            try:
+                self.index.add_with_ids(array, np.asarray([label], dtype=np.int64))
+            except Exception:
+                self.valid = False  # never serve an index that may have partially mutated
+                raise
             self.labels[label] = cache_id
         self.entries[cache_id] = entry
-        self.exact[query] = cache_id
+        self.exact[key] = cache_id
+        self.check_consistency()
         return cache_id

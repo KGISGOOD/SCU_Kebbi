@@ -11,3 +11,6 @@ venv/
 *.log
 
 experiments/models/
+
+# Machine-local algorithm resource paths; keep example configs tracked.
+/experiments/algorithms/**/config*.local.json

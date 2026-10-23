@@ -126,7 +126,8 @@ class A0Adapter:
             torch.cuda.manual_seed_all(config["seed"])
         self.pipeline = RAGPipeline(store, self.embedder, llm, top_k=5)
         self.identity = {
-            "schema": "semantic_cache_a0_v1", "resources": self.source_hashes,
+            "schema": "semantic_cache_a0_v2", "context_scope": "single_turn",
+            "resources": self.source_hashes,
             "resource_paths": {k: str(v) for k, v in paths.items()},
             "prompt_version": prompts.PROMPT_VERSION,
             "code": self.code_hash(),

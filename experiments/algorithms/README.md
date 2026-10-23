@@ -21,20 +21,29 @@
   Embedding 維度、非空文件數及完整映射檢查。`identity.json` 的
   `resources.knowledge_index` 分別保存兩個檔案的 SHA-256，結束時重新核對；
   這是內容識別，不代表已證明原建置模型或向量正規化來源，仍須使用已確認的 A0 索引。
-- 開發機沒有執行 Python、測試或模型。套件相容性、生成與數值均未驗證。
+- 開發機沒有執行 Python、測試或模型。先前 Exact 的 8 題 3 Hit／5 Miss 為使用者
+  回報的 GPU 結果；本輪正規化、映射檢查與新輸出尚未在 GPU 驗證。
 
 ## 模式與資料流
 
 `none`：不查／不存 Cache，每題進 A0。
 
-`exact`：依原始問題字串完全比對，不 strip、大小寫轉換或 Unicode 正規化。
+`exact`：先 NFC Unicode 正規化、移除首尾空白、將連續空白縮成一個半形空白，再完全
+比對。保留大小寫、標點、數字、否定詞，不做簡繁轉換或模糊匹配。原始問題仍原樣保存，
+Miss 時原樣傳給 A0；正規化僅用於 Exact key。這是自然語言問題的明確政策，不適合將
+排版有意義的程式碼當成 Exact 重用輸入。版本為 `nfc_strip_collapse_whitespace_v1`。
 
 `semantic`：問題經本機 BGE-M3、L2 正規化，搜尋獨立 `IndexIDMap2(IndexFlatIP)`。
 分數達門檻才回傳答案；否則進 A0。0.75 只是可覆寫的候選值，不是最佳值或正確性保證。
 
-每筆 ID 是 namespace 與原始問題的 SHA-256。FAISS int64 label 透過獨立映射找到
+每筆 ID 是 namespace 與 key 的 SHA-256（Exact 為正規化 key，Semantic 為原始問題）。
+namespace 另外綁定模式與正規化版本，因此不同模式不共享 Cache 或 ID。
+FAISS int64 label 透過獨立映射找到
 cache_id，再由字典取得答案；與任何容器順序無關。沒有 LRU、淘汰、Semantic Forest、
 KV Cache、跨 Session 共享或持久化。程式為單執行緒順序入口，不支援併發服務。
+每次搜尋及插入都檢查 key／Entry／namespace；Semantic 另檢查 FAISS 實際 id_map、
+向量數與標籤對應。插入後再核對。索引新增若失敗，Cache 失效並停止，不繼續提供答案。
+同 key 不允許覆寫成另一個答案；這版採 append-only，不提供更新／刪除介面。
 
 namespace 包含本機模型／BGE／知識庫內容 hash、相關 Python 原始碼 hash、Prompt 版本、
 生成設定、Tokenizer 特殊 Token、套件資訊。每次請求核對 namespace；執行前後另外核對
@@ -59,6 +68,18 @@ notepad experiments/algorithms/semantic_cache/config.gpu.local.json
 確認 knowledge_index 指向原 A0 dense 索引。JSON 中 Windows 路徑可使用 `/`。
 CPU 必須同時設定 device=cpu、precision=fp32；CUDA 可使用 fp16 或硬體支援的 bf16。
 模型與知識庫會完整讀取並雜湊，初次準備可能耗時；不計入單題延遲。
+
+根目錄 `.gitignore` 已限定忽略 `/experiments/algorithms/**/config*.local.json`，
+範本仍可追蹤。本機唯讀 `git ls-files` 未列出此類個人設定；GPU 若曾追蹤它，新增 ignore
+不會自動解除追蹤，不應宣稱已防止 Pull 覆蓋。可在 GPU 唯讀確認：
+
+```powershell
+git check-ignore -v -- experiments/algorithms/semantic_cache/config.gpu.local.json
+git ls-files -- experiments/algorithms/semantic_cache/config.gpu.local.json
+```
+
+第二個指令應無輸出；若列出檔案，先人工處理其追蹤與備份，不在本輪執行 Git 變更。
+忽略規則不是備份，也不抵禦手動刪除；本工具從不寫入個人設定。
 
 先跑容易核對的 Exact 模式，使用從未存在的新 Run：
 
@@ -98,24 +119,52 @@ GPU 人工核對：none 應為 0 Hit／8 Miss；exact 應為 3 Hit／5 Miss，SC
 分別取回 SC01/04/06 的 cache_id 與完全相同答案。Semantic 不預設固定命中數：
 檢查 SC03 是否正確重用，SC04/06/07 是否錯誤命中；高分不代表答案可共用。
 
+另新增 `semantic_cache/scenarios_normalization.jsonl`，保留原 8 題不變。這 4 筆使用
+P05／P06 與首尾空白、Tab、換行變體；Exact 預期 2 Hit／2 Miss，None 為 0 Hit／4 Miss。
+尚未實際執行。GPU 可使用新目錄驗證：
+
+```powershell
+$cacheRun = "experiments/results/algorithms/normalization_" + [guid]::NewGuid().ToString('N')
+python -m experiments.algorithms.semantic_cache.benchmark --project-root . --config experiments/algorithms/semantic_cache/config.gpu.local.json --mode exact --scenarios experiments/algorithms/semantic_cache/scenarios_normalization.jsonl --run-dir $cacheRun --allow-unreviewed
+```
+
+目前只支援獨立單輪問題。`CachedA0.answer(query, history=...)` 在非空歷史時明確失敗；
+benchmark 也拒絕含非空 history/messages/context/session_id/dialogue_id 的情境，避免默默
+忽略上下文。這不會自動辨識字串中的「那它呢」等隱含指代；呼叫方必須確認每題可獨立
+理解，不能把多輪問題刪掉歷史後當作單輪輸入。沒有 context-aware 重用保證。
+
 ## 輸出與計時
 
 - run.json：有效設定、資料來源 hash、用途與 provisional。
 - identity.json：模型／資料／程式來源識別。
+- scenarios.snapshot.json：本輪完整題序與人工標註快照。
 - 每模式 0001.json 等：答案、候選問題／ID、相似度、Hit、原始插入題 ID、時間。
-- summary.json：Hit/Miss、平均時間與意圖不相容命中數。
+- 每模式 results.jsonl：相同逐題紀錄的 UTF-8 JSONL，依序保存，方便分析。
+- summary.json：Hit/Miss、平均／中位數／總時間、分項平均及意圖相容／不相容命中數。
+- comparisons.json：有 None 對照時，逐題保存答案文字是否相同與節省秒數；
+  文字相同不代表答案正確，文字不同亦不必然表示錯誤重用。
 - completed.json：只有全程完成且來源核對通過才建立。
 - failed.json／逐題 .failed.json：例外與 traceback。既有成功逐題檔保留，但不能因而
   將整次失敗的 Run 當作完成實驗。
 
-端到端包含 identity、Cache Embedding、搜尋、A0、插入更新、必要 GPU 同步；不把 Hit
+端到端包含正規化、identity、Cache Embedding、搜尋與一致性檢查、A0、插入更新、必要 GPU 同步；不把 Hit
 設成零。分項包含 A0 retrieval、Prompt 長度檢查、生成呼叫。生成呼叫包含既有 A0 的
 Prompt 建構、tokenize、generate、decode，不是純 GPU decoding。端到端不含結果寫檔／
 終端輸出、模型載入與暖機。錯誤情況仍保存失敗階段與總耗時。
+Hit 的本次 retrieval／generation 明確為 0，表示沒有執行 A0，不代表整題零延遲；
+原始插入題 ID 與答案來源問題可追溯到先前 Miss 的完整檢索紀錄。
+相似度使用正規化 float32 inner product；Exact／None／空 Cache 沒有 cosine 時記 null，
+不虛構分數。近似向量浮點誤差仍需 GPU 驗證。
 
 `intent_reuse_proxy` 只比較來源意圖，不驗證回答品質；正確意圖仍可能有錯誤生成。
 所有模式的答案需人工審核。僅非空、成功返回的字串可插入，但本版沒有事實驗證器；
 拒答也可能被保存。沒有檢索命中、模型成功載入，都不能直接算回答正確。
+結果明確記錄 `semantic_safety_verified: false`。固定門檻不能防止相近不同意圖的錯誤
+命中，本版沒有語意驗證器。相同意圖不等於相同答案需求，人工仍應核對條件與回答。
+
+三模式使用同一個已載入的 A0、BGE、知識庫、生成參數、seed 與相同題序；各自空 Cache、
+各自暖機。順序固定 none/exact/semantic，沒有多次重複／順序平衡，不足以支持正式效能
+結論。完整一致性掃描的成本已包含計時，小題庫可用，但不是大規模 Cache 的最佳化實作。
 
 ## 文獻定位
 

@@ -1,0 +1,4 @@
+{"query_id":"SCN01","query":"系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？","intent_key":"P05","category":"seed","review_status":"needs_review","rationale":"獨立正規化診斷的首次 P05。"}
+{"query_id":"SCN02","query":"　 系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？\t\n","intent_key":"P05","category":"normalized_exact_repeat","review_status":"needs_review","rationale":"只增加首尾全形空白、Tab 與換行；Exact 應對應 SCN01。"}
+{"query_id":"SCN03","query":"讀完四年大學，有需要一定要讀研究所才能找到好工作嗎？","intent_key":"P06","category":"similar_different_intent","review_status":"needs_review","rationale":"與 P05 主題相近但意圖不同，Exact 必須 Miss。"}
+{"query_id":"SCN04","query":"\t讀完四年大學，有需要一定要讀研究所才能找到好工作嗎？　","intent_key":"P06","category":"normalized_exact_repeat","review_status":"needs_review","rationale":"只改首尾空白；Exact 應對應 SCN03。"}

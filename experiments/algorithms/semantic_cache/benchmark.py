@@ -26,6 +26,7 @@ def main():
     parser.add_argument("--scenarios", type=Path, default=Path("experiments/algorithms/semantic_cache/scenarios.jsonl"))
     parser.add_argument("--allow-unreviewed", action="store_true", help="development run only")
     args = parser.parse_args()
+    from .cache import normalize_question, NORMALIZATION_VERSION
     root = args.project_root.resolve()
     def locate(path):
         return path.resolve() if path.is_absolute() else (root / path).resolve()
@@ -53,9 +54,18 @@ def main():
                 raise ValueError(f"scenario line {number}: invalid {key}")
         if row["review_status"] not in {"approved", "needs_review"}:
             raise ValueError(f"scenario line {number}: unknown review_status")
+        for key in ("history", "messages", "context", "session_id", "dialogue_id"):
+            if row.get(key):
+                raise ValueError(f"scenario line {number}: {key} is unsupported by single-turn Cache")
         cases.append(row)
     if not cases or len({r["query_id"] for r in cases}) != len(cases):
         raise ValueError("empty scenarios or duplicate query IDs")
+    labeled_keys = {}
+    for case in cases:
+        key = normalize_question(case["query"])
+        if key in labeled_keys and labeled_keys[key] != case["intent_key"]:
+            raise ValueError(f"{case['query_id']}: identical normalized queries have conflicting intent labels; review data")
+        labeled_keys[key] = case["intent_key"]
     provisional = any(r["review_status"] != "approved" for r in cases)
     if provisional and not args.allow_unreviewed:
         raise ValueError("scenarios need human review; use --allow-unreviewed only for development")
@@ -74,14 +84,17 @@ def main():
                "provisional": provisional, "config": config, "mode": args.mode,
                "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                "scenarios_sha256": file_hash(scenarios_path), "config_sha256": file_hash(config_path),
+               "exact_normalization": NORMALIZATION_VERSION, "semantic_safety_verified": False,
                "scenario_count": len(cases)}
     write(run / "run.json", initial)
+    write(run / "scenarios.snapshot.json", cases)
     try:
         adapter = A0Adapter(root, config)
         write(run / "identity.json", adapter.identity)
         # Warm the same A0 before each mode; warmup never populates the cache.
         modes = ("none", "exact", "semantic") if args.mode == "all" else (args.mode,)
         summary = {}
+        all_records = {}
         for mode in modes:
             import torch
             torch.manual_seed(config["seed"])
@@ -92,6 +105,8 @@ def main():
             records, origins = [], {}
             output = run / mode
             output.mkdir(exist_ok=False)
+            with (output / "results.jsonl").open("x", encoding="utf-8", newline="\n") as stream:
+                stream.write("")  # create a fresh result stream before the first request
             for case in cases:
                 try:
                     # Only the query string enters the online pipeline.
@@ -106,6 +121,8 @@ def main():
                         origins[result["cache_id"]] = case
                     # intent_reuse_proxy is not human answer-quality verification.
                     write(output / f"{len(records) + 1:04d}.json", result)
+                    with (output / "results.jsonl").open("a", encoding="utf-8", newline="\n") as stream:
+                        stream.write(json.dumps(result, ensure_ascii=False, allow_nan=False) + "\n")
                     records.append(result)
                     print(f"{mode} {case['query_id']} hit={result['hit']} "
                           f"seconds={result['timings']['end_to_end_seconds']:.4f}", flush=True)
@@ -122,12 +139,35 @@ def main():
                              "hit_rate": len(hits) / len(records), "mean_end_to_end_seconds": average(records),
                              "mean_hit_seconds": average(hits), "mean_miss_seconds": average(misses),
                              "intent_proxy_incompatible_hits": sum(r["intent_reuse_proxy"] is False for r in hits),
+                             "intent_proxy_compatible_hits": sum(r["intent_reuse_proxy"] is True for r in hits),
+                             "median_end_to_end_seconds": statistics.median(
+                                 r["timings"]["end_to_end_seconds"] for r in records),
+                             "total_end_to_end_seconds": sum(r["timings"]["end_to_end_seconds"] for r in records),
+                             "stage_mean_seconds": {
+                                 key: statistics.mean(r["timings"][key] for r in records)
+                                 for key in records[0]["timings"]},
                              "warmup_seconds_excluded": warmup_seconds}
+            all_records[mode] = records
         adapter.verify_sources()
         if file_hash(scenarios_path) != initial["scenarios_sha256"] or file_hash(config_path) != initial["config_sha256"]:
             raise ValueError("config or scenarios changed during run")
         write(run / "summary.json", {"provisional": provisional, "modes": summary,
-                                     "answer_quality_verified": False})
+                                     "answer_quality_verified": False, "semantic_safety_verified": False})
+        if "none" in all_records:
+            comparisons = []
+            for mode, rows in all_records.items():
+                if mode == "none":
+                    continue
+                for baseline, result in zip(all_records["none"], rows):
+                    if baseline["query_id"] != result["query_id"]:
+                        raise RuntimeError("mode query sequence mismatch")
+                    comparisons.append({
+                        "query_id": result["query_id"], "mode": mode, "hit": result["hit"],
+                        "answer_equal_to_none": result["answer"] == baseline["answer"],
+                        "seconds_saved_vs_none": baseline["timings"]["end_to_end_seconds"]
+                                                 - result["timings"]["end_to_end_seconds"],
+                        "note": "answer equality is not answer correctness; one fixed-order development pass"})
+            write(run / "comparisons.json", comparisons)
         write(run / "completed.json", {"status": "completed", "source_verification": "passed"})
     except Exception:
         write(run / "failed.json", {"status": "failed", "traceback": traceback.format_exc()})
