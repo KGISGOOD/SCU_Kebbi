@@ -72,7 +72,9 @@ embedding/head 尺寸檢查。兩個 chat_template 都記錄，但只使用 Targ
 - greedy、num_beams=1、相同 max_new_tokens、repetition_penalty=1.0。
 - EOS／PAD 與現有 A0 生成呼叫一樣採 Target tokenizer 的值。
 - 每次重新複製相同 Target GenerationConfig，保留來源模型其他設定並保存完整有效設定。
-- 所有版本 use_cache=True、dynamic cache；不跨請求重用 KV。
+- 所有版本 use_cache=True，仍使用 DynamicCache，不跨請求重用 KV。SD0 保持明確的
+  cache_implementation="dynamic"；assisted 呼叫及該次 Target／Draft 預設則清空 selector，
+  由 HF 初始化／延續 DynamicCache，避免候選第二輪的 past_key_values 衝突。
 - 所有版本停用自動 compile，讓 forward 路徑與計數可觀察；模型不是量化或 offload。
 - 依 repeat 取 seed+repeat，各版本相同；seed 不等於數值確定性保證。
 - 完整輸入超過設定上限或模型 context window 就失敗；不截斷 Top-5。此階段上限
@@ -82,6 +84,27 @@ embedding/head 尺寸檢查。兩個 chat_template 都記錄，但只使用 Targ
 temperature/top_p/top_k 不作抽樣使用，並明確記錄。若未來變更生成政策，必須另開 Run。
 
 ## 計時與顯存
+
+### 5.16.1 Draft KV Cache 衝突修復
+
+舊版共同 GenerationConfig 固定 cache_implementation="dynamic"。官方
+AssistedCandidateGenerator 會複製 Target 呼叫的 GenerationConfig，並將前次 Draft
+輸出的 past_key_values 保存到 assistant_kwargs，下一輪再次傳入 Draft.generate。
+因此同時出現非空 selector 與已存在的 Cache，觸發 _prepare_cache_for_generation 的互斥檢查。
+
+修正僅在 assisted 呼叫清空 cache_implementation／cache_config，保持 use_cache=True；
+5.16.1 還會從模型 generation_config 補齊 None，所以用 request-local 複本暫時清空
+Target／Draft 模型的同名預設，finally 還原原物件，即使 OOM／中斷也不污染 SD0 或 Repeat。
+沒有修改套件、攔截 Draft.generate、刪除官方需要的 past，也沒有改成 SD0 fallback。
+本程序為順序執行，這個暫時設定介面不適用併發共用同一模型。
+
+官方在沒有 past 的首次呼叫以 selector=None 初始化 DynamicCache；後續候選帶入 past 時
+直接沿用並由候選生成器 crop。每個 outer generate 重新建立候選生成器，程式不保存其
+past；入口也拒絕外部提供舊 Cache。候選長度、confidence、固定排程與 Token 比對不變。
+identity.json 與逐題輸出另外記錄快取政策。這是靜態修正，尚未在 GPU 驗證。
+
+參考互斥檢查與 default DynamicCache 分支：
+https://raw.githubusercontent.com/huggingface/transformers/refs/tags/v5.16.1/src/transformers/generation/utils.py
 
 - Generation-only：同步 → Target.generate（含 Draft 草擬／Target 驗證）→ 同步。
   不含 tokenization、decode、寫檔與模型載入；含輕量 forward 計數 hook 的成本。

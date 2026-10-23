@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from contextlib import contextmanager, nullcontext
 import json
 from pathlib import Path
 import time
@@ -9,6 +10,28 @@ import time
 from experiments.algorithms.shared.a0_adapter import A0Adapter, measured, sync, tree_hash
 from experiments.algorithms.semantic_cache.cache import fingerprint
 from .compatibility import check_api, check_pair, tokenizer_identity
+
+
+@contextmanager
+def assisted_cache_policy(target, draft):
+    """HF 5.16.1 fills None fields from model.generation_config too.
+
+Sanitize both request-local model defaults, not the installed package. HF
+creates DynamicCache initially and reuses candidate-generator-owned past
+within this request. Restore the exact original objects even on an error.
+This engine is sequential; temporary model configuration is not thread-safe.
+"""
+    target_original, draft_original = target.generation_config, draft.generation_config
+    target_local, draft_local = deepcopy(target_original), deepcopy(draft_original)
+    for config in (target_local, draft_local):
+        config.use_cache = True
+        config.cache_implementation = None
+        config.cache_config = None
+    try:
+        target.generation_config, draft.generation_config = target_local, draft_local
+        yield
+    finally:
+        target.generation_config, draft.generation_config = target_original, draft_original
 
 
 class SDEngine:
@@ -80,6 +103,10 @@ class SDEngine:
                          "draft_path": str(self.draft_path) if self.draft_path else None,
                          "compatibility": self.compatibility,
                          "effective_generation_config": self.generation.to_dict(),
+                         "cache_policy_by_mode": {
+                             "SD0": "use_cache=True, explicit dynamic (unchanged)",
+                             "assisted": "use_cache=True, selector=None in call and temporary model defaults; HF DynamicCache",
+                             "request_scope": "fresh outer call; only HF candidate generator reuses Draft past within call"},
                          "target_parameters": sum(p.numel() for p in self.target.parameters()),
                          "draft_parameters": sum(p.numel() for p in self.draft.parameters()) if self.draft else None,
                          "residency": "target+bge+draft" if self.draft else "target+bge",
@@ -136,17 +163,27 @@ class SDEngine:
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
         common = deepcopy(self.generation)
+        if any(key in inputs for key in ("past_key_values", "cache_params", "mems", "past_buckets_states", "state", "cache_implementation")):
+            raise ValueError("fresh benchmark requests must not supply a previous request's KV cache/selector")
         assistant = self.draft if version != "SD0" else None
         if version != "SD0" and assistant is None:
             raise ValueError("assisted mode requested without local Draft; no fallback")
         settings = None
         if assistant is not None:
+            # CandidateGenerator copies this TARGET call config for Draft
+            # generate(), then passes its own past_key_values on later rounds.
+            common.cache_implementation = None
+            common.cache_config = None
             assistant.generation_config = deepcopy(self.draft_defaults)
+            assistant.generation_config.use_cache = True
+            assistant.generation_config.cache_implementation = None
+            assistant.generation_config.cache_config = None
             assistant.generation_config.num_assistant_tokens = length
             assistant.generation_config.num_assistant_tokens_schedule = "constant"
             assistant.generation_config.assistant_confidence_threshold = 0.0
             settings = {k: getattr(assistant.generation_config, k) for k in
-                        ("num_assistant_tokens", "num_assistant_tokens_schedule", "assistant_confidence_threshold")}
+                        ("num_assistant_tokens", "num_assistant_tokens_schedule", "assistant_confidence_threshold",
+                         "use_cache", "cache_implementation", "cache_config")}
         selected = common.get_generation_mode(assistant_model=assistant).value
         if selected != ("assisted_generation" if assistant is not None else "greedy_search"):
             raise ValueError(f"unexpected generation mode {selected}; no fallback")
@@ -165,14 +202,16 @@ class SDEngine:
             torch.cuda.reset_peak_memory_stats()
         before = torch.cuda.memory_allocated() if cuda else None
         free_before = list(torch.cuda.mem_get_info()) if cuda else None
+        policy = assisted_cache_policy(self.target, assistant) if assistant is not None else nullcontext()
         try:
-            sync()
-            start = time.perf_counter()
-            with torch.inference_mode():
-                output = self.target.generate(**local_inputs, generation_config=common,
-                                              **({"assistant_model": assistant} if assistant is not None else {}))
-            sync()
-            generation_seconds = time.perf_counter() - start
+            with policy:
+                sync()
+                start = time.perf_counter()
+                with torch.inference_mode():
+                    output = self.target.generate(**local_inputs, generation_config=common,
+                                                  **({"assistant_model": assistant} if assistant is not None else {}))
+                sync()
+                generation_seconds = time.perf_counter() - start
             if generation_seconds <= 0:
                 raise RuntimeError("nonpositive generation timer; cannot calculate throughput")
             peak = torch.cuda.max_memory_allocated() if cuda else None
@@ -208,6 +247,9 @@ class SDEngine:
                 "end_to_end_kind": "controlled sum: shared preparation measured once + this mode execution",
                 "assistant_candidate_limit": length, "assistant_settings_before": settings,
                 "assistant_settings_after": after, "generation_mode": selected, "forward_calls": calls,
+                "effective_use_cache": common.use_cache,
+                "effective_cache_implementation": common.cache_implementation,
+                "kv_cache_scope": "fresh request; HF internal reuse within generation only",
                 "acceptance_rate": None, "acceptance_status": "unavailable; forward counts are not accepted token counts",
                 "cuda_peak_allocated_bytes": peak, "cuda_peak_reserved_bytes": reserved,
                 "cuda_allocated_before_bytes": before, "cuda_free_total_before_bytes": free_before,
