@@ -98,6 +98,70 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
+def overview(root, data, output, view=None):
+    """Read-only source projection, not a second dataset or a review decision.
+
+    Rebuild only to a NEW CSV; manual review remains in separate merged views.
+    An absent human view is blank, never inferred verified from source status.
+    """
+    allowed = (root / "experiments/datasets").resolve()
+    if (not output.is_relative_to(allowed) or output.parent != allowed
+            or output.suffix.lower() != ".csv" or output.exists()):
+        raise ValueError("overview must be a NEW CSV directly under experiments/datasets")
+    descriptions = {"A": "直接", "B": "改寫", "C": "近意圖", "D": "多資訊",
+                    "U": "資訊不足", "O": "領域外", "T": "時效", "R": "重複",
+                    "E": "條件／否定", "F": "數字／計算", "G": "模糊",
+                    "H": "口語／錯字", "I": "來源衝突", "J": "干擾／注入"}
+    order = {"historical": 0, "calibration": 1, "evaluation": 2}
+    questions = data["questions"]
+    if (len(questions) != 230 or len({q["question_id"] for q in questions}) != 230
+            or {s: sum(q["split"] == s for q in questions) for s in order}
+            != {"historical": 60, "calibration": 60, "evaluation": 110}):
+        raise ValueError("overview requires exactly the original 60/60/110 unique main questions")
+    from .adapters import get_views
+    human, _, _, view_hash = get_views(data, view)
+    rows = []
+    for q in sorted(questions, key=lambda q: (order[q["split"]], q["question_id"])):
+        sheet = question_sheet(q, data)
+        if q["primary_type"] not in descriptions:
+            raise ValueError(f"undefined category: {q['primary_type']}; do not guess a label")
+        h = human[q["question_id"]].get("human_review", {}) if view else {}
+        rows.append({"question_id": q["question_id"], "split": q["split"],
+                     "category": q["primary_type"], "category_description": descriptions[q["primary_type"]],
+                     "family_id": q["family_id"], "question": sheet["question"],
+                     "candidate_answer": sheet["candidate_answer"], "expected_behavior": sheet["expected_behavior"],
+                     "source_document_ids": cell(q["source_document_ids"]),
+                     "source_reference": sheet["source_documents"],
+                     "training_overlap_status": q["training_overlap_status"],
+                     "training_overlap_details": sheet["train_exposure"],
+                     "question_review_status": q["review_status"],
+                     "answer_review_status": q["reference_answer_status"],
+                     "human_question_review_status": h.get("question_status", ""),
+                     "human_answer_review_status": h.get("answer_status", ""),
+                     "human_answer_action": h.get("answer_action", ""),
+                     "human_answer_override": h.get("answer_override", ""),
+                     "human_reviewer": h.get("reviewer", ""), "human_reviewed_at": h.get("reviewed_at", ""),
+                     "notes": cell({"usage": "derived_reading_view_not_gold_or_benchmark_input",
+                                    "source_support_level": q.get("source_support_level"),
+                                    "provenance": q.get("provenance"), "human_notes": h.get("notes", "")}),
+                     "source_record_sha256": sheet["record_sha256"],
+                     "dataset_identity": data["identity"], "review_view_sha256": view_hash or ""})
+    # Verify both source and optional review snapshot before writing any CSV.
+    if load_dataset(root)["identity"] != data["identity"]:
+        raise ValueError("dataset changed while preparing overview")
+    if view and get_views(data, view)[3] != view_hash:
+        raise ValueError("human view changed while preparing overview")
+    write_csv(output, rows)
+    # Parse our projection only: exact per-cell check, including embedded commas/newlines.
+    with output.open(encoding="utf-8-sig", newline="") as stream:
+        actual = list(csv.DictReader(stream, strict=True))
+    if actual != rows or load_dataset(root)["identity"] != data["identity"]:
+        raise ValueError("overview/source consistency check failed; CSV is not certified")
+    print(cell({"status": "derived_overview_written_semantics_unverified", "rows": len(rows),
+                "path": str(output), "sha256": sha(output), "dataset_identity": data["identity"],
+                "review_view_sha256": view_hash, "encoding": "UTF-8 BOM", "gold_created": False}))
+
+
 def export(data, output):
     by_id, pairs = catalogue(data)
     questions = sorted(by_id.values(), key=lambda q: (q["split"], q["family_id"], q["question_id"]))
@@ -215,9 +279,11 @@ def merge(data, bundle, output, questions_csv=None, pairs_csv=None, turns_csv=No
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("export", "merge"))
+    parser.add_argument("action", choices=("export", "merge", "overview"))
     parser.add_argument("--project-root", type=Path, default=ROOT)
-    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--output-dir", help="required for export/merge; NEW result directory")
+    parser.add_argument("--output", default="experiments/datasets/題庫總覽.csv", help="overview-only NEW CSV")
+    parser.add_argument("--view", help="overview-only completed human-merged view")
     parser.add_argument("--bundle")
     parser.add_argument("--questions-csv")
     parser.add_argument("--pairs-csv")
@@ -225,6 +291,13 @@ def main():
     args = parser.parse_args()
     root = args.project_root.resolve()
     data = load_dataset(root)
+    if args.action == "overview":
+        if args.output_dir or args.bundle or args.questions_csv or args.pairs_csv or args.turns_csv:
+            parser.error("overview uses --output and optional --view, not review merge/export arguments")
+        overview(root, data, locate(root, args.output), locate(root, args.view) if args.view else None)
+        return
+    if not args.output_dir or args.view:
+        parser.error("export/merge require --output-dir; --view belongs to overview")
     if args.action == "merge" and not args.bundle:
         parser.error("merge requires --bundle")
     output = new_output(root, args.output_dir)

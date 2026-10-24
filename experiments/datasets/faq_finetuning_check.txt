@@ -1,1 +1,0 @@
-Checking if faq_finetuning is a file or directory
