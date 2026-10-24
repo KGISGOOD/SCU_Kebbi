@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from .common import sha
 from .reporting import workbook
+from .review import catalogue, turn_reason
 
 
 def tables(data):
@@ -39,9 +40,32 @@ def tables(data):
            "topic_ids": c["topic_ids"], "shift_labels": c["shift_labels"],
            "required_history": c["required_history_turn_indices"], "prior_exposure": c["prior_exposure"],
            "annotation_basis": c["topic_annotation_basis"], "status": "needs_review"} for c in plan["ti"]]
+    by_id, pairs = catalogue(data)
+    required = [p for p in pairs.values() if p.get("required_for")]
+    rules = []
+    for rule in sorted({p["candidate_rule_id"] for p in required}):
+        members = [p for p in required if p["candidate_rule_id"] == rule]
+        rules.append({"candidate_rule_id": rule, "count": len(members),
+                      "candidate_reason": members[0]["candidate_reason"],
+                      "scope": "workload-reachable pairs only; cold SC and cold/prefilled INT",
+                      "status": "needs_review", "human_gold": False,
+                      "limitation": "Grouping is navigation only, NOT a shared safety proof. Review exact answers, conditions and source hashes for every applicable pair."})
+    trace = [{**p,
+              "origin_question": by_id[p["origin_question_id"]]["question"],
+              "current_question": by_id[p["current_question_id"]]["question"],
+              "origin_candidate_answer": by_id[p["origin_question_id"]].get("reference_answer"),
+              "current_candidate_answer": by_id[p["current_question_id"]].get("reference_answer"),
+              "origin_source_hash": by_id[p["origin_question_id"]].get("source_hash"),
+              "current_source_hash": by_id[p["current_question_id"]].get("source_hash"),
+              "human_status": "needs_review"} for p in required]
+    reasons = [{"turn_id": t["turn_id"], "conversation": t.get("suite_conversation_id"),
+                "question": t["question"], "history": t["history"],
+                "candidate_label": t["same_topic_or_shift"], "reason": turn_reason(t),
+                "status": "needs_review"} for t in data["turns"]]
     return {"Overview": [{"version": plan["revision"], "human_gold_certified": False,
                           "counts": plan["counts"], **audit["counts"], "input_files": audit["inputs"]}],
             "Questions": questions, "Answer Sources": sources, "SC Review": sc, "TI Review": ti,
+            "SC Pair Rules": rules, "SC Pair Trace": trace, "TI Turn Reasons": reasons,
             "Blocking Issues": audit["blocking_issues"]}
 
 

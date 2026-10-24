@@ -44,6 +44,7 @@ def arguments():
     parser.add_argument("--output-dir", help="must not exist; default: unique timestamped A3 run")
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--allow-unreviewed", action="store_true")
+    parser.add_argument("--training-review", help="external human approval JSON bound to the exact Train and dataset manifest hashes")
     parser.add_argument("--check-only", action="store_true", help="check data and tokenizer labels; no model weights")
     args = parser.parse_args()
     for name in ("lora_r", "lora_alpha", "epochs", "batch_size", "gradient_accumulation", "max_length"):
@@ -74,6 +75,25 @@ def main():
             raise DataError("--training-data must be the validated data-dir/train.jsonl; no split substitution")
         dataset_hashes = file_hashes(directory)
         pending = [row["faq_id"] for row in data["train"] if row["review_status"] != "approved"]
+        review_path, review_hash, training_review = None, None, None
+        if args.training_review:
+            review_path = resolve(root, args.training_review)
+            review_hash = sha(review_path)
+            training_review = read_json(review_path)
+            ids = [row["faq_id"] for row in data["train"]]
+            approved = training_review.get("approved_faq_ids")
+            if (training_review.get("schema_version") != "a3_training_review_v1"
+                    or training_review.get("train_sha256") != sha(training_path)
+                    or training_review.get("dataset_manifest_sha256") != sha(directory / "dataset_manifest.json")
+                    or not isinstance(approved, list) or any(not isinstance(i, str) for i in approved)
+                    or len(approved) != len(ids) or set(approved) != set(ids)
+                    or any(not isinstance(training_review.get(k), str) or not training_review[k].strip()
+                           for k in ("reviewer", "reviewed_at", "evidence"))):
+                raise DataError("invalid human Train approval: require exact 42 IDs, hashes, reviewer, timestamp and evidence")
+            reviewed_at = datetime.fromisoformat(training_review["reviewed_at"].replace("Z", "+00:00"))
+            if reviewed_at.tzinfo is None or sha(review_path) != review_hash:
+                raise DataError("Train approval needs a timezone and must remain unchanged")
+            pending = []  # Explicit external human approval; immutable dataset stays needs_review.
         if pending and not args.allow_unreviewed and not args.check_only:
             raise DataError("Train rows need human review: %s; --allow-unreviewed permits provisional smoke only"
                             % ",".join(pending))
@@ -121,6 +141,10 @@ def main():
             "optimizer": "AdamW; constant LR; token-weighted gradient accumulation",
         })
         write_json(output / "dataset_manifest.json", dataset_manifest)
+        if training_review is not None:
+            if sha(review_path) != review_hash:
+                raise DataError("human Train approval changed before training")
+            write_json(output / "training_review.snapshot.json", training_review)
         random.seed(args.seed)
         torch.manual_seed(args.seed)
         if torch.cuda.is_available():
@@ -177,9 +201,12 @@ def main():
             "versions": runtime_versions, "matched_target_modules": matched,
             "trainable_parameters": sum(p.numel() for p in parameters),
             "training_precision": args.precision, "max_length": args.max_length,
+            "training_review_sha256": review_hash,
         }
 
         def save_adapter(destination, epoch):
+            if review_path is not None and sha(review_path) != review_hash:
+                raise DataError("human Train approval changed during training")
             if file_hashes(directory) != dataset_hashes:
                 raise DataError("prepared inputs changed during training")
             # Recheck source files and split against the preparation snapshot.

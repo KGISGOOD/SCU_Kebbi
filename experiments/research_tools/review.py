@@ -69,7 +69,59 @@ def catalogue(data):
                 for earlier in sorted(earlier_ids):
                     pair(earlier, event["question_id"], workload_id + ":prefilled_possible_actual_origin")
                 earlier_ids.add(event["question_id"])
+    if data.get("dataset_name") == "experiment_suites_v1_r4":
+        # Tag only workload-reachable pairs. Extra historical catalogue entries
+        # remain reviewable but are NOT mandatory for these fixed experiments.
+        from .suites import execution
+        for state in ("cold", "prefilled"):
+            scoped = execution(data, state)
+            for wid in dict.fromkeys(r["workload_id"] for r in scoped["workloads"]):
+                if state == "prefilled" and not wid.startswith("INT-"):
+                    continue
+                prior = set()
+                events = [r for r in scoped["fills"] if r["workload_id"] == wid]
+                events += [r for r in scoped["workloads"] if r["workload_id"] == wid]
+                for event in events:
+                    for origin in prior:
+                        identifier = "PAIR_" + fingerprint([origin, event["question_id"]])[:24]
+                        scopes = pairs[identifier].setdefault("required_for", [])
+                        scope = wid + ":" + state
+                        if scope not in scopes:
+                            scopes.append(scope)
+                    prior.add(event["question_id"])
+        for p in pairs.values():
+            p["required_for"] = sorted(p.get("required_for", []))
+            p.update(candidate_pair_review(by_id[p["origin_question_id"]], by_id[p["current_question_id"]]))
     return by_id, pairs
+
+
+def candidate_pair_review(a, b):
+    """Five evidence classes, never a human reusable/not-reusable decision."""
+    same_basis = (bool(a.get("source_hash")) and bool(a.get("source_document_ids"))
+                  and a.get("source_hash") == b.get("source_hash")
+                  and a.get("source_document_ids") == b.get("source_document_ids")
+                  and a.get("reference_answer") == b.get("reference_answer")
+                  and bool(a.get("reference_answer")))
+    intents = {a.get("intent_id"), b.get("intent_id")}
+    overlaps = ({"P18", "P19"}, {"P21", "S13"}, {"P24", "S11"})
+    weak = any(q.get("source_audit", {}).get("insufficient_evidence", True) for q in (a, b))
+    if same_basis and a["question"] == b["question"]:
+        cls, reason = "1_same_question_basis", "問題與候選答案/來源Hash相同；仍須審個人化、年度及原答案真實性。"
+    elif any(intents == group for group in overlaps):
+        cls, reason = "4_partial_overlap", "已知完整候選答案可能同時涵蓋兩個資訊需求；須逐答案核對。"
+    elif same_basis and a.get("intent_id") == b.get("intent_id"):
+        cls, reason = "2_paraphrase_candidate", "來源意圖與候選答案一致的改寫候選；未證實整份答案可安全重用。"
+    elif weak:
+        cls, reason = "5_evidence_or_conditions_missing", "來源不足、年度/資格或逐題答案尚未核定，無法安全判斷。"
+    else:
+        cls, reason = "3_different_intent_candidate", "來源意圖不同的候選；不同ID不證明完整答案沒有交集，仍需人工核對。"
+    return {"candidate_class": cls, "candidate_reason": reason,
+            "candidate_rule_id": cls + (":source_unverified" if weak else ":partial_source_only"),
+            "answer_evidence_sha256": fingerprint({"origin": a.get("reference_answer"),
+                                                   "current": b.get("reference_answer"),
+                                                   "origin_source": a.get("source_hash"),
+                                                   "current_source": b.get("source_hash")}),
+            "candidate_is_human_gold": False}
 
 
 def question_sheet(q, data):
@@ -102,7 +154,22 @@ def turn_sheet(t):
             "candidate_required_history": cell(t["required_history_turn_ids"]),
             "source_question_ids": cell(t["source_question_ids"]), "record_sha256": fingerprint(t),
             "turn_status": "needs_review", "turn_action": "", "topic_label_override": "", "required_history_override": "",
-            "reviewer": "", "reviewed_at": "", "evidence": "", "notes": ""}
+            "reviewer": "", "reviewed_at": "", "evidence": "", "notes": "",
+            "candidate_relation_reason": turn_reason(t)}
+
+
+def turn_reason(t):
+    # Compare against preserved history queries; topic identity comes from the
+    # source annotation and is not inferred from model performance.
+    label = t["same_topic_or_shift"]
+    reason = {"initial": "首輪，無前輪主題可比較。", "same_topic": "候選定義為同一對話任務/對象的延續。",
+              "shift": "候選定義為相對上一輪切換資訊任務；回到更早主題也屬相對上一輪切換。"}[label]
+    conversation = t.get("suite_conversation_id", "")
+    if conversation in {"TI-10", "TI-19"}:
+        reason += "含課程/年度指代，需核對是否應澄清及必要歷史，不能只按字面主題核准。"
+    if conversation in {"TI-12", "TI-20"}:
+        reason += "開始、找老師、分組與選題仍採專題規劃同主題粒度，待人工確認。"
+    return reason + "必要歷史候選：" + cell(t["required_history_turn_ids"]) + "；未經人工認證。"
 
 
 def write_csv(path, rows):

@@ -360,6 +360,7 @@ def main():
     parser.add_argument("--project-root", type=Path, default=ROOT)
     parser.add_argument("--revision", choices=("spoken_candidate_r3", "spoken_candidate_r4"), default="spoken_candidate_r3")
     parser.add_argument("--output", default="experiments/datasets/研究題目審核表.csv")
+    parser.add_argument("--integrated-output", help="export-integrated only: NEW .xlsx path; preserve existing human edits")
     args = parser.parse_args()
     root = args.project_root.resolve()
     data = load(root, args.revision)
@@ -367,7 +368,7 @@ def main():
     if args.action == "export-integrated":
         if args.revision != "spoken_candidate_r4":
             raise ValueError("integrated workbook is available only for explicit r4")
-        path = root / "experiments/datasets/研究題庫整合審核_r4.xlsx"
+        path = locate(root, args.integrated_output) if args.integrated_output else root / "experiments/datasets/研究題庫整合審核_r4.xlsx"
         from .suite_review import export
         digest = export(data, path)
         if load(root, args.revision)["identity"] != data["identity"]:

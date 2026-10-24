@@ -53,6 +53,8 @@ QA設定指向`experiments/models/a2_1_smoke_task8/final_model`與`a2_2_smoke_ta
 
 A2操作與相容性見 [TRAINING.md](experiments/a2_faq_finetuning/TRAINING.md)、[TRAINING_COMPATIBILITY.md](experiments/a2_faq_finetuning/TRAINING_COMPATIBILITY.md)。A2／A3的needs_review預設阻擋正式訓練，allow-unreviewed只作provisional。A3使用原生Chat Template及assistant標籤邊界檢查；A5沿用模型載入器並保留完整Top-5 Prompt，不以截斷文件規避輸入限制。訓練參數與來源以實際設定／Checkpoint為準。
 
+A3準備資料的狀態固定為needs_review，來源驗證不允許改寫資料列。正式訓練可另提供`--training-review <人工收據.json>`：`schema_version`須為`a3_training_review_v1`，`train_sha256`與`dataset_manifest_sha256`須對應該data-dir的原始檔案位元組，`approved_faq_ids`須完整且唯一涵蓋42個Train ID，並含非空`reviewer`、具時區的`reviewed_at`及`evidence`。收據由人類實際審核後簽認，程式不自動生成批准；原資料不變，訓練輸出保留收據快照與來源Hash。`--allow-unreviewed`或`--max-steps`仍使模型provisional；題庫Gold簽認不能代替訓練資料批准。
+
 ## 推論效率演算法
 
 **Semantic Cache**：SC0 None不查Cache；SC1-1 Exact以正規化問題匹配；SC1-2 Semantic以BGE-M3正規化向量搜尋獨立FAISS Cache。Hit回原答案；Miss走完整A0 RAG與生成再寫入。穩定Cache ID與FAISS label分開管理，namespace保留模型、Prompt、知識庫、生成設定識別。模式、門檻、Repeat使用獨立Cache；第一版無LRU或持久化。Hit／Miss都記真實E2E與分項時間，相似度高不是安全重用證明。SC1-3預設比較0.75／0.80／0.85／0.90／0.95，各門檻實際重跑序列，不事後套用單一命中軌跡。
