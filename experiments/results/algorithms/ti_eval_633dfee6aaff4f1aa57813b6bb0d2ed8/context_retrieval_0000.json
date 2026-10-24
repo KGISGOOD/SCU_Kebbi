@@ -1,0 +1,97 @@
+{
+  "scenario_id": "TIE01",
+  "retrieval_seconds": 0.023333000019192696,
+  "shared_across_arms_and_repeats": true,
+  "documents": [
+    {
+      "content": "標題: 東吳資科系 數學很重要嗎 | 時間: 2024/8/14 上午 2:17:31 | 內文: 想問各位學長姐 我自己本身數學能力沒有很好，看到課程規劃有微積分跟統計的部分，但都只有在一、二年級，想問到大四微積分跟統計的應用會很多嗎？ 如果數學能力沒有這麼好會影響嗎？ | 問題摘要: 詢問東吳資科系到大四時微積分與統計的應用是否很多，以及數學能力不好是否會嚴重影響學習。 | type: 2 | 回答: 你好！我是資科系學長。數學在資科系算是重要的地基，大一大二的微積分、線性代數跟機率統計，其實是為了大三大四的「機器學習、資料探勘、深度學習」做準備（因為演算法的背後原理都是數學）。不過，實務應用上很多都已經包裝成程式套件了，所以如果你數學普通，但程式寫得不錯、邏輯好，也是可以順利發展的，不用過度焦慮！",
+      "metadata": {
+        "source_group": "type2",
+        "source_file": "Dcard_ai_clean_abstract.csv",
+        "source_path": "畢業專題_爬蟲\\type2\\Dcard_ai_clean_abstract.csv",
+        "content_type": "社群貼文",
+        "title": "Dcard_ai_clean_abstract.csv_row_18",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 18,
+        "document_id": "type2_Dcard_ai_clean_abstract.csv_row_18_2391e36f_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type2_Dcard_ai_clean_abstract.csv_row_18_2391e36f"
+      },
+      "score": 0.6335049867630005
+    },
+    {
+      "content": "問題 / 提問: 資料科學系學生為什麼需要具備數學基礎？ | 回覆 / 說明: 為了要有能力看懂機器學習與程式設計背後的數學推導。 | ai答覆: 因為機器學習與深度學習演算法背後全是數理統計的運作機制。具備良好的微積分與線性代數基礎，才能看懂演算法背後的推導邏輯與最佳化過程，而不只是淪為套套件的黑手。",
+      "metadata": {
+        "source_group": "type2",
+        "source_file": "資料擴充 - 育瑞FAQ.csv",
+        "source_path": "畢業專題_爬蟲\\type2\\資料擴充 - 育瑞FAQ.csv",
+        "content_type": "FAQ",
+        "title": "資料擴充 - 育瑞FAQ.csv_row_53",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 53,
+        "document_id": "type2_資料擴充 - 育瑞FAQ.csv_row_53_c8487e09_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type2_資料擴充 - 育瑞FAQ.csv_row_53_c8487e09"
+      },
+      "score": 0.629571259021759
+    },
+    {
+      "content": "編號: S05 | 問題分類: 數學能力 | 問題內容: 數學不好（如學測數 A 沒頂標）讀這個系會很吃力嗎？ | ai答覆: 數 A 沒頂標完全不需要自己嚇自己。大學的數學（如微積分、線性代數）主要是為了讓我們看懂機器學習演算法與程式背後的數學原理與推導，不是要你去考數學競賽。只要上課有搞懂觀念、按時完成習題，並不需要極高的數學天賦。",
+      "metadata": {
+        "source_group": "type2",
+        "source_file": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "source_path": "畢業專題_爬蟲\\type2\\資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "content_type": "FAQ",
+        "title": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_5",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 5,
+        "document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_5_bb5d4a7f_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_5_bb5d4a7f"
+      },
+      "score": 0.6289116144180298
+    },
+    {
+      "content": "編號: S08 | 問題分類: 數學能力 | 問題內容: 統計學跟一般高中數學有什麼不同？需要背很多公式嗎？ | ai答覆: 高中數學的機率多偏向排列組合的計算，大學的統計學則更聚焦在資料分布、抽樣推論、假設檢定與信賴區間。實務上不需要死背繁雜的計算公式，大部分繁瑣計算會交由 Python 或 R 等軟體處理，課程更看重的是你能不能看懂數據背後的意涵與統計邏輯。",
+      "metadata": {
+        "source_group": "type2",
+        "source_file": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "source_path": "畢業專題_爬蟲\\type2\\資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "content_type": "FAQ",
+        "title": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_8",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 8,
+        "document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_8_bb5d4a7f_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_8_bb5d4a7f"
+      },
+      "score": 0.6231681704521179
+    },
+    {
+      "content": "id,text: 🎓 在高中階段可以準備的學習方法或方向？",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_307",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 307,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_307_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_307_350ce8d9"
+      },
+      "score": 0.6069709658622742
+    }
+  ]
+}

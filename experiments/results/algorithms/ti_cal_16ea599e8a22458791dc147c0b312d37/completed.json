@@ -1,0 +1,11 @@
+{
+  "status": "completed",
+  "provisional": true,
+  "source_hashes_final": {
+    "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\algorithms\\topic_identification\\config.gpu.local.json": "be2846831d54e7daf7a6448be54f6e1df214cd9fa240c769e874101d4036f359",
+    "C:\\Users\\rsy\\Desktop\\SCU_Kebbi\\experiments\\algorithms\\topic_identification\\calibration.jsonl": "b7f9190997e185b70ec343bb692decd49375c5a84385b9cde41222da009d3f4a"
+  },
+  "source_verification": "passed",
+  "wall_seconds": 37.211152800009586,
+  "quality_preservation_verified": false
+}

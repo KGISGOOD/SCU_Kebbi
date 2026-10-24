@@ -1,0 +1,153 @@
+{
+  "payload": {
+    "schema": "ti_thresholds_v1",
+    "identity_id": "65c0677f4d86117103b81a8f71bb7dea5befde0eb3cf988bc578bbc08aa1dc4a",
+    "methods": {
+      "TI0": {
+        "threshold": 0.6076127290725708,
+        "rule": "score < threshold predicts topic_shift",
+        "selection": "calibration F1, then accuracy, then smaller threshold",
+        "calibration_metrics": {
+          "count": 8,
+          "accuracy": 0.875,
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.888888888888889,
+          "confusion_matrix": {
+            "tp_shift": 4,
+            "tn_same": 3,
+            "fp_shift": 1,
+            "fn_shift": 0
+          },
+          "positive_label": "topic_shift",
+          "zero_division_policy": 0.0
+        }
+      },
+      "TI3-1": {
+        "threshold": 0.4056515411606857,
+        "rule": "score < threshold predicts topic_shift",
+        "selection": "calibration F1, then accuracy, then smaller threshold",
+        "calibration_metrics": {
+          "count": 8,
+          "accuracy": 0.875,
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571428571428571,
+          "confusion_matrix": {
+            "tp_shift": 3,
+            "tn_same": 4,
+            "fp_shift": 0,
+            "fn_shift": 1
+          },
+          "positive_label": "topic_shift",
+          "zero_division_policy": 0.0
+        }
+      },
+      "TI3-2-early": {
+        "threshold": 0.42167899592055214,
+        "rule": "score < threshold predicts topic_shift",
+        "selection": "calibration F1, then accuracy, then smaller threshold",
+        "calibration_metrics": {
+          "count": 8,
+          "accuracy": 0.875,
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.888888888888889,
+          "confusion_matrix": {
+            "tp_shift": 4,
+            "tn_same": 3,
+            "fp_shift": 1,
+            "fn_shift": 0
+          },
+          "positive_label": "topic_shift",
+          "zero_division_policy": 0.0
+        }
+      },
+      "TI3-2-middle": {
+        "threshold": 0.4324810372458564,
+        "rule": "score < threshold predicts topic_shift",
+        "selection": "calibration F1, then accuracy, then smaller threshold",
+        "calibration_metrics": {
+          "count": 8,
+          "accuracy": 0.875,
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571428571428571,
+          "confusion_matrix": {
+            "tp_shift": 3,
+            "tn_same": 4,
+            "fp_shift": 0,
+            "fn_shift": 1
+          },
+          "positive_label": "topic_shift",
+          "zero_division_policy": 0.0
+        }
+      },
+      "TI3-2-late": {
+        "threshold": 0.39219244271516795,
+        "rule": "score < threshold predicts topic_shift",
+        "selection": "calibration F1, then accuracy, then smaller threshold",
+        "calibration_metrics": {
+          "count": 8,
+          "accuracy": 0.875,
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571428571428571,
+          "confusion_matrix": {
+            "tp_shift": 3,
+            "tn_same": 4,
+            "fp_shift": 0,
+            "fn_shift": 1
+          },
+          "positive_label": "topic_shift",
+          "zero_division_policy": 0.0
+        }
+      }
+    },
+    "calibration_manifest": {
+      "scenario_ids": [
+        "TIC01",
+        "TIC02",
+        "TIC03",
+        "TIC04",
+        "TIC05",
+        "TIC06",
+        "TIC07",
+        "TIC08"
+      ],
+      "family_ids": [
+        "cal_admission_certificate",
+        "cal_exchange_jobs",
+        "cal_financial_support",
+        "cal_goal_compute",
+        "cal_linked_degree",
+        "cal_math_cost",
+        "cal_personal_study",
+        "cal_project_planning"
+      ],
+      "case_signatures": [
+        "ebc4a3b2e47a0ff6ed27d3151cacae4b5996a4d392688cf45a1f48397628f224",
+        "48ff256614faf49bc264e5282273a7832a1f3e587746e630dfa298af7b31cad9",
+        "d0dc43362d35c70c5cec5bb62dc10cf5a53571fe3ab480bf29749d92bcf6daac",
+        "fd319e60fd6dd8e540548672a8da86e57fe62dc055015a7e76fe4cdf85af40b5",
+        "47cc6ce72fa16439bc6f40fcb24879f25fa124fbcbcbe5f7b8be31fce34b9737",
+        "ef6eed04b7b6e0e66e24cd1d07862bc4183fc64338d51e3c0259668d5775e309",
+        "12ce4b88240d2c4b6276255e240df897fb3106536fbe3e0ded40393deb0b1318",
+        "cc319f56775baaf4521d504706f6a80513ffded946061fc01785608927a57fdc"
+      ],
+      "query_signatures": [
+        "294f7f2dcd80eab6745d37c1948132024c9ac0400bf6333425cb1ebb2fc7a743",
+        "71b29fdf568335371382e085f355452356a9029ac88a5efc888628b135cc8f86",
+        "54e576134bb42052ee9bca05a04671dad0e9a687a4e852b25d675e19a3306ee5",
+        "828e1eac09093442e415ab9a3620632cb0e80e4696548b3f18db6059fbeeceb7",
+        "36086310de081b0203228860d891367ee60d3fcc0044a233a9096f73097333a2",
+        "763b97059e11ed4e3fffef159302238f65f297e17966996b2baf796012d6f646",
+        "b76c90d15ee5606ee9ffd3c213eae542f95d3a5ed6a696742ea02c7132b8d855",
+        "e7b9bda21622097ed1a513900ad5cc48e84aef851dd4322874cbaa7504b194cb"
+      ]
+    },
+    "calibration_sha256": "b7f9190997e185b70ec343bb692decd49375c5a84385b9cde41222da009d3f4a",
+    "provisional": true
+  },
+  "payload_sha256": "29d5bdfa48a7915ceeb539d890f8e3c382e040e49b3e0fc7adfb63490bd53fb4"
+}

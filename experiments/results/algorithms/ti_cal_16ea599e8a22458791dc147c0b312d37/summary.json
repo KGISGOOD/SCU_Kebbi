@@ -1,0 +1,109 @@
+{
+  "calibration": {
+    "TI0": {
+      "threshold": 0.6076127290725708,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1": 0.888888888888889,
+        "confusion_matrix": {
+          "tp_shift": 4,
+          "tn_same": 3,
+          "fp_shift": 1,
+          "fn_shift": 0
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-1": {
+      "threshold": 0.4056515411606857,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571,
+        "confusion_matrix": {
+          "tp_shift": 3,
+          "tn_same": 4,
+          "fp_shift": 0,
+          "fn_shift": 1
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-2-early": {
+      "threshold": 0.42167899592055214,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1": 0.888888888888889,
+        "confusion_matrix": {
+          "tp_shift": 4,
+          "tn_same": 3,
+          "fp_shift": 1,
+          "fn_shift": 0
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-2-middle": {
+      "threshold": 0.4324810372458564,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571,
+        "confusion_matrix": {
+          "tp_shift": 3,
+          "tn_same": 4,
+          "fp_shift": 0,
+          "fn_shift": 1
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-2-late": {
+      "threshold": 0.39219244271516795,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571,
+        "confusion_matrix": {
+          "tp_shift": 3,
+          "tn_same": 4,
+          "fp_shift": 0,
+          "fn_shift": 1
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    }
+  },
+  "evaluation": null,
+  "context_reduction": null,
+  "answer_quality_verified": false,
+  "causal_explanation_claim": false,
+  "provisional": true
+}

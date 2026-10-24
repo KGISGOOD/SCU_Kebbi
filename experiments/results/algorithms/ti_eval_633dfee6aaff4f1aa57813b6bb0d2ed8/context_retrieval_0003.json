@@ -1,0 +1,97 @@
+{
+  "scenario_id": "TIE04",
+  "retrieval_seconds": 0.01665790006518364,
+  "shared_across_arms_and_repeats": true,
+  "documents": [
+    {
+      "content": "id,text: 👉 備審怎麼準備",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_773",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 773,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_773_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_773_350ce8d9"
+      },
+      "score": 0.6587468385696411
+    },
+    {
+      "content": "publish_date,caption: 👉 備審怎麼準備",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資科_IG貼文.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資科_IG貼文.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資科_IG貼文.csv_row_730",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 730,
+        "document_id": "type1_東吳資科_IG貼文.csv_row_730_8234dc6b_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資科_IG貼文.csv_row_730_8234dc6b"
+      },
+      "score": 0.6435360908508301
+    },
+    {
+      "content": "publish_date,caption: 💁‍♂️想要瞭解如何準備備審資料及面試嗎？",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資科_IG貼文.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資科_IG貼文.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資科_IG貼文.csv_row_2750",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 2750,
+        "document_id": "type1_東吳資科_IG貼文.csv_row_2750_8234dc6b_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資科_IG貼文.csv_row_2750_8234dc6b"
+      },
+      "score": 0.6288166642189026
+    },
+    {
+      "content": "publish_date,caption: 10:05-11:00 準備指引以及QA回答",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資科_IG貼文.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資科_IG貼文.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資科_IG貼文.csv_row_2731",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 2731,
+        "document_id": "type1_東吳資科_IG貼文.csv_row_2731_8234dc6b_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資科_IG貼文.csv_row_2731_8234dc6b"
+      },
+      "score": 0.6272293329238892
+    },
+    {
+      "content": "id,text: 一起提前為未來加分 🚀",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_871",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 871,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_871_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_871_350ce8d9"
+      },
+      "score": 0.618954062461853
+    }
+  ]
+}

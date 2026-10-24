@@ -1,0 +1,97 @@
+{
+  "scenario_id": "TIE09",
+  "retrieval_seconds": 0.01710669999010861,
+  "shared_across_arms_and_repeats": true,
+  "documents": [
+    {
+      "content": "id,text: 86,\"選校還是選系？頭痛嗎？",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_461",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 461,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_461_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_461_350ce8d9"
+      },
+      "score": 0.6444860696792603
+    },
+    {
+      "content": "編號: S20 | 問題分類: 專題製作 | 問題內容: 專題是分組進行還是一個人做？題目通常是怎麼決定的？ | ai答覆: 專題多半以團隊分組進行（通常 3 到 5 人一組），強調分工合作。題目決定方式主要有兩種：一種是由指導教授提供企業產學合作的真實數據案（如醫療、商業數據），另一種是小組成員發想感興趣的生活或 AI 應用題目，經教授指導後推進實作。",
+      "metadata": {
+        "source_group": "type2",
+        "source_file": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "source_path": "畢業專題_爬蟲\\type2\\資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "content_type": "FAQ",
+        "title": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_20",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 20,
+        "document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_20_bb5d4a7f_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_20_bb5d4a7f"
+      },
+      "score": 0.6423794031143188
+    },
+    {
+      "content": "id,text: 🌟 不同科系的核心學習內容是什麼？",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_1203",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 1203,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_1203_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_1203_350ce8d9"
+      },
+      "score": 0.6353119611740112
+    },
+    {
+      "content": ". 指導老師：金凱儀老師 參賽同學：吳姿伶 黃郁庭 呂艾庭 佳作 (共7組，依組別排序) 專題主題：在虛擬實境中分析眼球追蹤軌跡 指導老師：葉向原老師 參賽同學：王奕心 陳尚恩 孔崧羽 廖劭宇 練恩 佳作 專題主題：以東吳大學學生設計機車的共乘平台–SCUber 指導老師：蘇維宗老師 參賽同學：吳紫寧 郭蕙瑄 范儀卉 姚采萱 李穎瑄 佳作 專題主題：衣櫥魔法使 指導老師：吳政隆老師 參賽同學：許家銘 何旻芹 徐庠杰 周夆燁 佳作 專題主題：政變 — 增強式學習在吹牛類型遊戲的發揮 指導老師：李佳蓉老師 參賽同學：陳韋翰 羅紀麒 凃曜騏 陶柏宇 洪崇祐 佳作 專題主題：「癌」see you coming 指導老師：丁德天老師 參賽同學：彭宇婕 杜凡煜 楊淇 李香瑩 蔡芸宣 佳作 專題主題：遊樂園解決排隊問題的路徑規劃 指導老師：丁德天老師 參賽同學：劉語萱 張泰睿 陳柏尹 楊愷廉 廖曉珺 佳作 專題主題：VR於神經行銷學的應用：探討環境因子對z世代旅遊意圖的影響 指導老師：呂明頴老師 參賽同學：蔡成杰 林承頤 陳羽筠 宋乃玟 周子傑 01 112年12月 【112學年】繳交專題實作期末成果資料",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "課程資訊_專題實作專區.txt",
+        "source_path": "畢業專題_爬蟲\\type1\\課程資訊_專題實作專區.txt",
+        "content_type": "課程資訊",
+        "title": "課程資訊_專題實作專區",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": null,
+        "document_id": "type1_課程資訊_專題實作專區.txt_c6f83913_chunk_9",
+        "chunk_id": 9,
+        "parent_document_id": "type1_課程資訊_專題實作專區.txt_c6f83913"
+      },
+      "score": 0.6212421655654907
+    },
+    {
+      "content": "編號: S19 | 問題分類: 專題製作 | 問題內容: 畢業專題大約是在大幾開始做？是自己找教授嗎？ | ai答覆: 畢業專題通常是在大三開始啟動（大三上學期尋找指導老師與確定方向，大三下至大四進行系統開發與成果發表）。專題題目與指導教授是由同學們自行組隊後，依照感興趣的研究領域主動洽詢系上教授洽談媒合。",
+      "metadata": {
+        "source_group": "type2",
+        "source_file": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "source_path": "畢業專題_爬蟲\\type2\\資料擴充 - 高中生 FAQ 資料集（30 題）.csv",
+        "content_type": "FAQ",
+        "title": "資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_19",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 19,
+        "document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_19_bb5d4a7f_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type2_資料擴充 - 高中生 FAQ 資料集（30 題）.csv_row_19_bb5d4a7f"
+      },
+      "score": 0.6198105812072754
+    }
+  ]
+}

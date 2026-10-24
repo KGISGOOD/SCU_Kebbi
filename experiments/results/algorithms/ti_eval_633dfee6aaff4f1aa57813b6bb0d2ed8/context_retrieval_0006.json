@@ -1,0 +1,97 @@
+{
+  "scenario_id": "TIE07",
+  "retrieval_seconds": 0.016954499995335937,
+  "shared_across_arms_and_repeats": true,
+  "documents": [
+    {
+      "content": "id,text: 讓學習不只在課堂，更走進真實職場✨",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_870",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 870,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_870_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_870_350ce8d9"
+      },
+      "score": 0.6097937822341919
+    },
+    {
+      "content": "id,text: 🔅課程包含實作操作，建議全程參與",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_157",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 157,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_157_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_157_350ce8d9"
+      },
+      "score": 0.6047276854515076
+    },
+    {
+      "content": "id,text: 想提早累積職場經驗、了解產業實務嗎？",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_869",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 869,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_869_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_869_350ce8d9"
+      },
+      "score": 0.5968718528747559
+    },
+    {
+      "content": "publish_date,caption: 這次工作坊讓各位學員更深刻理解人工智慧在生活與職場中的重要性，也學到許多實用知識！通過考照的那一刻，不僅感到成就滿滿，更看到未來在AI領域的無限可能！",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資科_IG貼文.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資科_IG貼文.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資科_IG貼文.csv_row_2084",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 2084,
+        "document_id": "type1_東吳資科_IG貼文.csv_row_2084_8234dc6b_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資科_IG貼文.csv_row_2084_8234dc6b"
+      },
+      "score": 0.5964674949645996
+    },
+    {
+      "content": "id,text: 實際接觸企業產學專案，畢業後履歷加分💯",
+      "metadata": {
+        "source_group": "type1",
+        "source_file": "東吳資料科學系_threads_texts_cleaned.csv",
+        "source_path": "畢業專題_爬蟲\\type1\\東吳資料科學系_threads_texts_cleaned.csv",
+        "content_type": "社群貼文",
+        "title": "東吳資料科學系_threads_texts_cleaned.csv_row_759",
+        "published_date": null,
+        "updated_date": null,
+        "category": null,
+        "original_row": 759,
+        "document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_759_350ce8d9_chunk_0",
+        "chunk_id": 0,
+        "parent_document_id": "type1_東吳資料科學系_threads_texts_cleaned.csv_row_759_350ce8d9"
+      },
+      "score": 0.5901066064834595
+    }
+  ]
+}

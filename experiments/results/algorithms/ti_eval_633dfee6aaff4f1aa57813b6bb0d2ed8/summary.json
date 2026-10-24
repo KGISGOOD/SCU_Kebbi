@@ -1,0 +1,223 @@
+{
+  "calibration": {
+    "TI0": {
+      "threshold": 0.6076127290725708,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1": 0.888888888888889,
+        "confusion_matrix": {
+          "tp_shift": 4,
+          "tn_same": 3,
+          "fp_shift": 1,
+          "fn_shift": 0
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-1": {
+      "threshold": 0.4056515411606857,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571,
+        "confusion_matrix": {
+          "tp_shift": 3,
+          "tn_same": 4,
+          "fp_shift": 0,
+          "fn_shift": 1
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-2-early": {
+      "threshold": 0.42167899592055214,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1": 0.888888888888889,
+        "confusion_matrix": {
+          "tp_shift": 4,
+          "tn_same": 3,
+          "fp_shift": 1,
+          "fn_shift": 0
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-2-middle": {
+      "threshold": 0.4324810372458564,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571,
+        "confusion_matrix": {
+          "tp_shift": 3,
+          "tn_same": 4,
+          "fp_shift": 0,
+          "fn_shift": 1
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    },
+    "TI3-2-late": {
+      "threshold": 0.39219244271516795,
+      "rule": "score < threshold predicts topic_shift",
+      "selection": "calibration F1, then accuracy, then smaller threshold",
+      "calibration_metrics": {
+        "count": 8,
+        "accuracy": 0.875,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571,
+        "confusion_matrix": {
+          "tp_shift": 3,
+          "tn_same": 4,
+          "fp_shift": 0,
+          "fn_shift": 1
+        },
+        "positive_label": "topic_shift",
+        "zero_division_policy": 0.0
+      }
+    }
+  },
+  "evaluation": {
+    "TI0": {
+      "count": 10,
+      "accuracy": 0.8,
+      "precision": 0.7142857142857143,
+      "recall": 1.0,
+      "f1": 0.8333333333333333,
+      "confusion_matrix": {
+        "tp_shift": 5,
+        "tn_same": 3,
+        "fp_shift": 2,
+        "fn_shift": 0
+      },
+      "positive_label": "topic_shift",
+      "zero_division_policy": 0.0,
+      "mean_detection_seconds": 0.03084048001328483,
+      "threshold": 0.6076127290725708
+    },
+    "TI3-1": {
+      "count": 10,
+      "accuracy": 0.8,
+      "precision": 1.0,
+      "recall": 0.6,
+      "f1": 0.7499999999999999,
+      "confusion_matrix": {
+        "tp_shift": 3,
+        "tn_same": 5,
+        "fp_shift": 0,
+        "fn_shift": 2
+      },
+      "positive_label": "topic_shift",
+      "zero_division_policy": 0.0,
+      "mean_detection_seconds": 0.04675700998632237,
+      "threshold": 0.4056515411606857
+    },
+    "TI3-2-early": {
+      "count": 10,
+      "accuracy": 0.6,
+      "precision": 0.5555555555555556,
+      "recall": 1.0,
+      "f1": 0.7142857142857143,
+      "confusion_matrix": {
+        "tp_shift": 5,
+        "tn_same": 1,
+        "fp_shift": 4,
+        "fn_shift": 0
+      },
+      "positive_label": "topic_shift",
+      "zero_division_policy": 0.0,
+      "mean_detection_seconds": 0.04675692999735474,
+      "threshold": 0.42167899592055214
+    },
+    "TI3-2-middle": {
+      "count": 10,
+      "accuracy": 0.8,
+      "precision": 1.0,
+      "recall": 0.6,
+      "f1": 0.7499999999999999,
+      "confusion_matrix": {
+        "tp_shift": 3,
+        "tn_same": 5,
+        "fp_shift": 0,
+        "fn_shift": 2
+      },
+      "positive_label": "topic_shift",
+      "zero_division_policy": 0.0,
+      "mean_detection_seconds": 0.04675700999796391,
+      "threshold": 0.4324810372458564
+    },
+    "TI3-2-late": {
+      "count": 10,
+      "accuracy": 0.8,
+      "precision": 1.0,
+      "recall": 0.6,
+      "f1": 0.7499999999999999,
+      "confusion_matrix": {
+        "tp_shift": 3,
+        "tn_same": 5,
+        "fp_shift": 0,
+        "fn_shift": 2
+      },
+      "positive_label": "topic_shift",
+      "zero_division_policy": 0.0,
+      "mean_detection_seconds": 0.04675698999781162,
+      "threshold": 0.39219244271516795
+    }
+  },
+  "context_reduction": {
+    "full": {
+      "count": 20,
+      "mean_topic_detection_seconds": 0.0,
+      "mean_generation_seconds": 3.8471765549853445,
+      "mean_controlled_end_to_end_seconds": 3.867127934988821,
+      "mean_prompt_token_reduction": 0,
+      "annotated_required_context_removed_count": 0,
+      "answer_quality": "unreviewed; no quality-preserving speedup claim"
+    },
+    "embedding": {
+      "count": 20,
+      "mean_topic_detection_seconds": 0.028340894996654244,
+      "mean_generation_seconds": 3.854640355007723,
+      "mean_controlled_end_to_end_seconds": 3.9027932849829083,
+      "mean_prompt_token_reduction": 12.1,
+      "annotated_required_context_removed_count": 0,
+      "answer_quality": "unreviewed; no quality-preserving speedup claim"
+    },
+    "attention": {
+      "count": 20,
+      "mean_topic_detection_seconds": 0.04582300498150289,
+      "mean_generation_seconds": 3.8340244600200095,
+      "mean_controlled_end_to_end_seconds": 3.899758539989125,
+      "mean_prompt_token_reduction": 5.9,
+      "annotated_required_context_removed_count": 0,
+      "answer_quality": "unreviewed; no quality-preserving speedup claim"
+    }
+  },
+  "answer_quality_verified": false,
+  "causal_explanation_claim": false,
+  "provisional": true
+}
