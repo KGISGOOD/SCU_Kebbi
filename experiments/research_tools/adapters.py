@@ -9,11 +9,15 @@ from .common import (ROOT, fingerprint, load_dataset, locate, new_output, read_j
 
 
 def metadata(q):
-    return {**{k: q[k] for k in ("question_id", "family_id", "split", "source_document_ids", "source_hash",
+    result = {**{k: q[k] for k in ("question_id", "family_id", "split", "source_document_ids", "source_hash",
                                  "review_status", "training_overlap_status", "training_overlap_details")},
             "effective_question_status": q["effective_question_status"],
             "effective_answer_status": q["effective_answer_status"],
             "human_review_trace": {k: q.get("human_review", {}).get(k) for k in ("reviewer", "reviewed_at")}}
+    if q.get("provenance", {}).get("kind") == "suite_spoken_candidate":
+        result["suite_provenance"] = q["provenance"]
+        result["source_parent_family_id"] = q["source_parent_family_id"]
+    return result
 
 
 def get_views(data, view):
@@ -144,6 +148,9 @@ def build(args, root, data, output):
             raise ValueError("calibration export/settings/dataset/target identity mismatch")
         if prior["review_view_sha256"] != view_hash:
             raise ValueError("review view changed since calibration selection; freeze and regenerate both exports")
+        if (prior.get("dataset_name", "unified_research_v1") != data.get("dataset_name", "unified_research_v1")
+                or prior.get("suite_cache_state", "cold") != args.suite_cache_state):
+            raise ValueError("suite dataset/cache initial-state policy differs from Calibration")
         if prior["tool_identity"]["code_sha256"] != tool_identity()["code_sha256"]:
             raise ValueError("adapter code changed since calibration export; review before comparing")
         parameter_source = sha(prior_dir / "adapter_manifest.json")
@@ -227,7 +234,8 @@ def build(args, root, data, output):
     elif target == "ti":
         selected_ids = {q["question_id"] for q in selected}
         eligible = [t for t in turns.values() if t["split"] == split
-                    and set(t["source_question_ids"]) & selected_ids]
+                    and (data.get("dataset_name") == "experiment_suites_v1"
+                         or set(t["source_question_ids"]) & selected_ids)]
         conversation_ids = list(dict.fromkeys(t["conversation_id"] for t in eligible))
         if args.limit is not None:
             conversation_ids = conversation_ids[:args.limit]
@@ -273,6 +281,8 @@ def build(args, root, data, output):
         raise ValueError("empty adapter output")
     write_rows(output / "scorer_only.jsonl", scorer)
     plan = {"schema": "research_adapter_v1", "dataset_identity": data["identity"], "dataset_hashes": data["hashes"],
+            "dataset_name": data.get("dataset_name", "unified_research_v1"),
+            "suite_cache_state": args.suite_cache_state, "suite_groups": args.groups,
             "tool_identity": tool_identity(),
             "review_view_sha256": view_hash, "target": target, "split": split, "purpose": purpose,
             "provisional": purpose == "functional", "formal_results_produced": False,
@@ -300,6 +310,9 @@ def main():
     parser.add_argument("--project-root", type=Path, default=ROOT)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--target", choices=("qa", "sc", "sc_threshold", "sd", "prompt_lookup", "ti", "int"), required=True)
+    parser.add_argument("--dataset", choices=("unified_research_v1", "experiment_suites_v1"), default="unified_research_v1")
+    parser.add_argument("--groups", type=int, help="suite functional-only complete SC/INT groups or TI conversations")
+    parser.add_argument("--suite-cache-state", choices=("cold", "prefilled"), default="cold", help="prefilled is suite INT-only; fill remains separate")
     parser.add_argument("--split", choices=("historical", "calibration", "evaluation"), required=True)
     parser.add_argument("--purpose", choices=("functional", "calibration", "evaluation"), default="functional")
     parser.add_argument("--view")
@@ -313,11 +326,16 @@ def main():
     parser.add_argument("--calibration-run", help="non-provisional, source-verified measured Calibration run")
     args = parser.parse_args()
     root = args.project_root.resolve()
-    data = load_dataset(root)
+    data = load_dataset(root, args.dataset)
+    if args.dataset == "experiment_suites_v1":
+        from .suites import prepare
+        data = prepare(args, data)
+    elif args.groups is not None or args.suite_cache_state != "cold":
+        parser.error("--groups/--suite-cache-state belong to experiment_suites_v1")
     output = new_output(root, args.output_dir)
     try:
         build(args, root, data, output)
-        if load_dataset(root)["identity"] != data["identity"]:
+        if load_dataset(root, args.dataset)["identity"] != data["identity"]:
             raise ValueError("dataset changed during adapter export")
         write_json(output / "completed.json", {"status": "completed", "kind": "data_adapter_only_no_model_run"})
     except BaseException as error:

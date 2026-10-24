@@ -20,7 +20,7 @@ SCU_Kebbi/
 │   ├── algorithms/{shared,semantic_cache,speculative_decoding,topic_identification,integrated_efficiency}/
 │   ├── evaluation/
 │   ├── research_tools/
-│   ├── datasets/{faq,faq_finetuning,unified_research_v1}/
+│   ├── datasets/{faq,faq_finetuning,unified_research_v1,experiment_suites_v1}/
 │   ├── models/
 │   ├── vector_stores/
 │   └── results/                 # 新Run輸出，不存模型或權威題庫
@@ -71,7 +71,7 @@ A2操作與相容性見 [TRAINING.md](experiments/a2_faq_finetuning/TRAINING.md)
 
 `review.py export`匯出UTF-8 BOM問題／配對／多輪審核CSV；人審後`merge`成獨立View，不改原JSONL。答案需明確選keep_candidate／override／unavailable並記錄審核人與證據；同Family、同FAQ、高相似度都不自動核准reusable，配對相容也不代表生成答案已驗證。
 
-唯一閱讀總覽的預設位置為`experiments/datasets/題庫總覽.csv`。本機只完成產生器，尚未執行Python產出CSV。於GPU或分析電腦執行：
+舊230題的完整技術總覽功能仍保留相容性，但本輪不產生另一份總覽。現在人工閱讀唯一使用`experiments/datasets/研究題目審核表.csv`的六欄Suite審核表，見下方研究Suite說明。需要舊技術檢視時，才另行使用原入口：
 
 ```powershell
 python -m experiments.research_tools.review overview --project-root .
@@ -142,4 +142,78 @@ python -m experiments.evaluation.run smoke --project-root . --run-dir $run --all
 
 Canonical LF恢復副本、A1恢復設定、舊FAQ索引／候選庫、訓練來源備份仍保留，避免破壞既有引用與Hash。`robot/`七個舊FAQ99 LoRA、模型測試及建庫腳本已確認無正式依賴並刪除；另清除舊比較題目檔與`experiments/test_imports.py`臨時Import診斷器。`robot/faq.txt`僅保留原始FAQ99來源，不是正式訓練、研究題庫或Baseline執行輸入。
 
-`experiments/baselines/`的test_baseline、test_faq、test_hybrid與test_retrieval仍是現有架構的專用固定題庫Benchmark／檢索檢查，不是舊robot演算法實驗，保留供必要診斷與歷史入口相容。`experiments/analysis/knowledge_inventory_v1.md`保留作來源盤點參考。前輪已刪114個檔案及25個空目錄，本輪再刪9個無依賴的舊檔；`experiments/results/`目前無歷史結果。既有 [CLEANUP_PLAN.md](experiments/CLEANUP_PLAN.md)只記錄前輪114項範圍，本輪不另建報告。靜態整理不代表GPU功能或答案品質重新通過驗證。
+`experiments/baselines/`的test_baseline、test_faq、test_hybrid與test_retrieval仍是現有架構的專用固定題庫Benchmark／檢索檢查，不是舊robot演算法實驗，保留供必要診斷與歷史入口相容。歷史結果、暫時清理計畫與盤點報告已清除；`experiments/results/`供新Run使用。靜態整理不代表GPU功能或答案品質重新通過驗證。
+
+## 研究Suite V1：固定用途與唯一人工審核表
+
+`experiments/datasets/experiment_suites_v1/`不覆寫原230題。目前修訂為`spoken_candidate_r2`；`suites.json`保存固定選取、SC題組、SD引用、TI候選主題／歷史依賴與INT引用。`questions.jsonl`保存60個QA口語覆寫及90個SC來源連結紀錄，SD與INT直接引用SC，不另複製問題。QA只在明確指定新Suite時建立記憶體資料視圖；原CSV與舊入口不變。原始資料Hash、Suite檔案Hash及修訂識別共同區分新舊收據，不得混用舊Adapter或人審View。
+
+| 研究 | Calibration | Evaluation | 資料方式 |
+|---|---:|---:|---|
+| QA | — | 60題 | P01–P30、S01–S30的獨立口語候選；沿用Historical曝光標記，研究用途是QA評估 |
+| SC | 10組×4＝40次 | 20組×4＝80次 | 原需求、完全重複、可重用改寫候選、不同需求候選 |
+| SD／Prompt Lookup | 20題 | 40題 | 引用SC的原需求與不同需求，共60個不同來源意圖 |
+| TI | 8組×4＝32輪 | 12組×4＝48輪 | 沿用20組原對話與主題順序，口語覆寫另存；首輪不計切換分類，因此24／36個判斷 |
+| INT | SC Calibration固定5組＝20次 | SC Evaluation固定10組＝40次 | 只存SC組ID，沒有另一套重複題目 |
+
+SC／SD按不同資訊意圖組成30個候選家族，60個來源FAQ意圖不跨本研究Calibration／Evaluation。廣義職涯、數學、升學主題仍可能相關，不能因不同ID就宣稱語意獨立；P18／P19、P24／S11等邊界及其他風險列在Suite機器資料，需人工仲裁。SC是控制式診斷工作負載，命中率不能冒充真實流量命中率。
+
+TI按完整對話家族重分8／12組，degree／math／fees留Calibration，career及其餘家族留Evaluation。原CV04／CV08曾在舊Calibration，現依career整體放Evaluation；既有資料曝光不會消失，不得稱為新盲測。每輪保留原問題、原Split、來源Turn、Topic候選、切換與所需歷史，均待人工確認。助手歷史沿用既有中性腳本，不是模型實測答案，不冒充真實多輪使用者紀錄。
+
+唯一人工閱讀檔是`experiments/datasets/研究題目審核表.csv`：UTF-8 BOM，只有「研究項目、階段、題組或對話編號、題號、使用者會說的話、審核備註」六欄。共380列研究用途紀錄，包含INT／SD對SC的共用引用，不代表380個獨立問題。QA60使用新版口語候選，歷史原文保留於來源。CSV不是Gold、不是Adapter輸入；修改CSV備註不會自動修改資料或核准審核。完整來源、原題、新題、原因、曝光、切分及needs_review留在機器資料／Reader投影。TI-08薪資、TI-19畢業要求適用年度及TI-20專題規劃的細節變化不自動算主題切換；必要歷史與標籤均為候選。跨演算法會共用FAQ意圖，不能用QA或Evaluation輸出回頭挑選其他研究的參數。
+
+本輪已直接建立這份CSV，沒有執行Python。未來重建可在GPU／分析電腦使用下面的`export-review`；已有檔案時拒絕覆寫，先自行保存審核內容或明確另存，再決定唯一閱讀版本。不要同時建立五份Excel。
+
+### GPU最小功能驗證（非正式研究結果）
+
+先從專案根目錄執行Suite檢查；這個命令不載入模型。開發電腦沒有執行過。
+
+```powershell
+python -m experiments.research_tools.suites check --project-root .
+# 僅在審核表不存在時重建，保留同一個六欄契約：
+# python -m experiments.research_tools.suites export-review --project-root .
+```
+
+所有Adapter加`--dataset experiment_suites_v1`，舊入口不加此參數仍使用原230題。QA用Historical；SC／SD／TI／INT用Calibration或Evaluation。SC／INT的功能前綴用`--groups 1`保留完整四問，TI用`--groups 1`保留完整四輪；QA／SD可用`--limit 3`。正式用途不接受這些縮減旗標。輸出使用新GUID目錄。
+
+```powershell
+$qaCfg = 'experiments/evaluation/config.json'
+$qaData = 'experiments/results/research_tools/suite_qa_data_' + [guid]::NewGuid().ToString('N')
+python -m experiments.research_tools.adapters --project-root . --dataset experiment_suites_v1 --target qa --split historical --purpose functional --limit 3 --settings $qaCfg --output-dir $qaData
+if ($LASTEXITCODE -ne 0) { throw 'QA export failed' }
+$qaRun = 'experiments/results/research_tools/suite_qa_run_' + [guid]::NewGuid().ToString('N')
+python -m experiments.research_tools.qa_benchmark --project-root . --adapter-dir $qaData --config $qaCfg --architectures all --run-dir $qaRun --allow-unreviewed
+
+$scCfg = 'experiments/algorithms/semantic_cache/config.gpu.local.json'
+$scData = 'experiments/results/research_tools/suite_sc_data_' + [guid]::NewGuid().ToString('N')
+python -m experiments.research_tools.adapters --project-root . --dataset experiment_suites_v1 --target sc --split calibration --purpose functional --groups 1 --settings $scCfg --output-dir $scData
+if ($LASTEXITCODE -ne 0) { throw 'SC export failed' }
+$scRun = 'experiments/results/algorithms/suite_sc_' + [guid]::NewGuid().ToString('N')
+python -m experiments.algorithms.semantic_cache.benchmark --project-root . --config $scCfg --mode all --scenarios "$scData/scenarios.jsonl" --run-dir $scRun --allow-unreviewed
+
+$sdCfg = 'experiments/algorithms/speculative_decoding/config.gpu.local.json'
+$sdData = 'experiments/results/research_tools/suite_sd_data_' + [guid]::NewGuid().ToString('N')
+python -m experiments.research_tools.adapters --project-root . --dataset experiment_suites_v1 --target sd --split calibration --purpose functional --limit 3 --settings $sdCfg --output-dir $sdData
+if ($LASTEXITCODE -ne 0) { throw 'SD export failed' }
+$sdRun = 'experiments/results/algorithms/suite_sd_' + [guid]::NewGuid().ToString('N')
+python -m experiments.algorithms.speculative_decoding.benchmark --project-root . --config $sdCfg --mode all --scenarios "$sdData/scenarios.jsonl" --repeats 1 --warmups 1 --run-dir $sdRun --allow-unreviewed
+# 同一個sdData/scenarios.jsonl可交給--mode sd2_4，需另一個新run-dir。
+
+$tiCfg = 'experiments/algorithms/topic_identification/config.gpu.local.json'
+$tiData = 'experiments/results/research_tools/suite_ti_data_' + [guid]::NewGuid().ToString('N')
+python -m experiments.research_tools.adapters --project-root . --dataset experiment_suites_v1 --target ti --split calibration --purpose functional --groups 1 --settings $tiCfg --output-dir $tiData
+if ($LASTEXITCODE -ne 0) { throw 'TI export failed' }
+$tiRun = 'experiments/results/algorithms/suite_ti_' + [guid]::NewGuid().ToString('N')
+python -m experiments.algorithms.topic_identification.benchmark --project-root . --config $tiCfg --phase calibrate --mode detection --calibration "$tiData/calibration.jsonl" --run-dir $tiRun --allow-unreviewed
+
+$intCfg = 'experiments/algorithms/integrated_efficiency/config.gpu.local.json'
+$intData = 'experiments/results/research_tools/suite_int_data_' + [guid]::NewGuid().ToString('N')
+python -m experiments.research_tools.adapters --project-root . --dataset experiment_suites_v1 --target int --split calibration --purpose functional --groups 1 --suite-cache-state prefilled --settings $intCfg --output-dir $intData
+if ($LASTEXITCODE -ne 0) { throw 'INT export failed' }
+$intRun = 'experiments/results/research_tools/suite_int_run_' + [guid]::NewGuid().ToString('N')
+python -m experiments.research_tools.int_benchmark --project-root . --adapter-dir $intData --config $intCfg --mode all --run-dir $intRun --allow-unreviewed
+```
+
+INT預設cold；`--suite-cache-state prefilled`可先以每個所選組的Q1填充，再量完整四問。Initial Fill在獨立檔與獨立報表，不改20／40次measured題數。SC舊Benchmark不接受warm-fill，因此該旗標只開放給phase-aware INT，不能靜默把fill混進SC量測。
+
+正式執行仍需完成問題／答案行為、配對與TI標籤審核，透過既有人審View及Calibration收據閘門。`review export/merge`新增同名`--dataset`選項供機器審核流程相容；本輪不另外產生技術CSV。所有新輸出目前是needs_review候選，沒有宣稱GPU成功、語意無洩漏或正式Gold已凍結。

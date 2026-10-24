@@ -39,7 +39,12 @@ def write_rows(path, rows):
             stream.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\n")
 
 
-def load_dataset(root):
+def load_dataset(root, name="unified_research_v1"):
+    if name == "experiment_suites_v1":
+        from .suites import load
+        return load(root)
+    if name != "unified_research_v1":
+        raise ValueError("unknown research dataset")
     directory = root / DATA
     manifest = read_json(directory / "dataset_manifest.json")
     hashes = {"dataset_manifest.json": sha(directory / "dataset_manifest.json")}
@@ -64,6 +69,7 @@ def load_dataset(root):
     if len({r["question_id"] for r in questions}) != len(questions):
         raise ValueError("duplicate question IDs")
     return {"identity": fingerprint(hashes), "hashes": hashes, "questions": questions,
+            "dataset_name": "unified_research_v1",
             "turns": read_rows(directory / "conversations.jsonl"),
             "workloads": read_rows(directory / "cache_workloads.jsonl"),
             "fills": read_rows(directory / "cache_initial_fill.jsonl"),

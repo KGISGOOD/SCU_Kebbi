@@ -8,7 +8,10 @@ from .adapters import get_views, metadata, pair_label, question_eligible
 
 def load_input(root, directory, target, config_path, allow_unreviewed, view=None):
     manifest = verify_bundle(directory, "adapter_manifest.json")
-    data = load_dataset(root)
+    data = load_dataset(root, manifest.get("dataset_name", "unified_research_v1"))
+    if data.get("dataset_name") == "experiment_suites_v1":
+        from .suites import execution
+        data = execution(data, manifest.get("suite_cache_state", "cold"), manifest.get("suite_groups"))
     if (manifest["target"] != target or manifest["dataset_identity"] != data["identity"]
             or manifest["dataset_hashes"] != data["hashes"]):
         raise ValueError("adapter target/dataset/source identity mismatch")

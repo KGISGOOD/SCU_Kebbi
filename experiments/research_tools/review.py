@@ -281,6 +281,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("export", "merge", "overview"))
     parser.add_argument("--project-root", type=Path, default=ROOT)
+    parser.add_argument("--dataset", choices=("unified_research_v1", "experiment_suites_v1"), default="unified_research_v1")
     parser.add_argument("--output-dir", help="required for export/merge; NEW result directory")
     parser.add_argument("--output", default="experiments/datasets/題庫總覽.csv", help="overview-only NEW CSV")
     parser.add_argument("--view", help="overview-only completed human-merged view")
@@ -290,8 +291,10 @@ def main():
     parser.add_argument("--turns-csv")
     args = parser.parse_args()
     root = args.project_root.resolve()
-    data = load_dataset(root)
+    data = load_dataset(root, args.dataset)
     if args.action == "overview":
+        if args.dataset != "unified_research_v1":
+            parser.error("suite uses experiments.research_tools.suites export-review for its six-column reading sheet")
         if args.output_dir or args.bundle or args.questions_csv or args.pairs_csv or args.turns_csv:
             parser.error("overview uses --output and optional --view, not review merge/export arguments")
         overview(root, data, locate(root, args.output), locate(root, args.view) if args.view else None)
@@ -308,7 +311,7 @@ def main():
             merge(data, locate(root, args.bundle), output,
                   **{k: locate(root, getattr(args, k)) if getattr(args, k) else None
                      for k in ("questions_csv", "pairs_csv", "turns_csv")})
-        if load_dataset(root)["identity"] != data["identity"]:
+        if load_dataset(root, args.dataset)["identity"] != data["identity"]:
             raise ValueError("dataset changed during review export/merge")
         write_json(output / "completed.json", {"status": "completed", "action": args.action, "dataset_identity": data["identity"]})
     except BaseException as error:
