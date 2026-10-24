@@ -14,3 +14,6 @@ experiments/models/
 
 # Machine-local algorithm resource paths; keep example configs tracked.
 /experiments/algorithms/**/config*.local.json
+/experiments/research_tools/run_all.local.json
+/experiments/evaluation/config*.local.json
+/experiments/results/

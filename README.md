@@ -304,3 +304,39 @@ Evaluation嚴格要求同題庫、同人審View、同設定、同程式與Cache�
 本機整合閱讀檔為`experiments/datasets/研究題庫整合審核_r4.csv`（單一分區UTF-8 BOM）；摘要與完整GPU命令見`研究題庫整合審核_r4_摘要.md`。開發端沒有執行Python產生XLSX。GPU可執行`python -m experiments.research_tools.suites export-integrated --project-root . --revision spoken_candidate_r4`，重用既有XLSX Writer產生6工作表的`研究題庫整合審核_r4.xlsx`，已存在時拒絕覆寫。
 
 版本檢查為`python -m experiments.research_tools.suites check --project-root . --revision spoken_candidate_r4`。r4仍needs_review、human_gold_certified=false；部分本機來源支持不能當完整官方答案認證，可能的範圍/時點差異不自動定為直接矛盾。正式結果仍沿用summary.xlsx、report.md與raw/證據，不建立第二套Benchmark或移除Guard。
+
+## 一鍵執行完整r4研究
+
+入口已實作於`experiments.research_tools.run_all`，開發端僅靜態檢查，尚待GPU驗證。不執行訓練、下載或索引重建。從專案根目錄執行：
+
+```powershell
+python -m experiments.research_tools.run_all --mode provisional
+python -m experiments.research_tools.run_all --mode formal
+```
+
+預設QA優先讀`experiments/evaluation/config.gpu.local.json`，不存在則讀既有`config.json`；SC、SD、TI、INT分別讀其演算法目錄下的`config.gpu.local.json`。路徑不同時，參考`experiments/research_tools/run_all.example.json`，在GPU另存並編輯`run_all.local.json`，設定五個config路徑，以及正式使用的`view`與`gold_certification`。可用`--config <總控設定>`指定其他位置；CLI的`--view`、`--gold-certification`優先。所有本機設定及results已受gitignore保護，不自動加入Git。
+
+Provisional會使用既有functional入口，但不傳limit/groups，執行完整題庫並標示非正式；Formal不加allow-unreviewed，先檢查Gold範圍、人工簽認、A2/A3批准來源、Checkpoint與資源Hash，不滿足即停止，不回退Provisional。模型及Tokenizer必須本機完整存在。演算法須共用Target/BGE/文件庫及device/precision/seed/max_new_tokens；總控不偷偷更改設定。A4維持原始BGE，A5沿用A3 Adapter。
+
+順序共11個階段：QA八架構60題Evaluation；SC、SD、TI各Calibration→Evaluation；INT分別Cold與Prefilled各Calibration→Evaluation。SC40/80次、SD20/40題、TI24/36個非首輪判斷（保留32/48輪對話）、INT20/40次。SD另執行SD2-4並保留各自SD0。每個INT狀態使用自己的Calibration收據。TI目前是Detection，不將Context Reduction冒充已量測。
+
+```text
+experiments/results/algorithms/research_full/<UTC_GUID>/
+  summary.xlsx                 # 九個中文工作表
+  report.md                    # 狀態、實際樣本、比較與限制
+  raw/
+    identity.json / settings.json / state.json / active.lock
+    stages/<階段>/attempt_<GUID>/  # 原Runner、Adapter、逐題證據與內部報告
+    prior_reports/             # Resume前的報告，保留原證據
+    receipt_<GUID>.json / failure_<GUID>.json
+```
+
+完成標記必須等全部11階段、最終來源驗證與整合報告都成功。單一階段失敗保留其他成果、阻擋其Evaluation，仍執行無相依的階段；預檢或身分變動則停止全Run。可續跑：
+
+```powershell
+python -m experiments.research_tools.run_all --mode provisional --resume <原research_full目錄>
+```
+
+Resume核對模型/設定/題庫/人審/程式/套件環境與已提交證據，成功階段不重跑；QA中斷時，只沿用同條件下具完整60題收據的架構，保留原答案及時間，未提交架構重跑。其他演算法以整個失敗階段為重跑單位，不接續不完整Cache或KV狀態。每次嘗試獨立目錄，不覆蓋歷史證據。
+
+Excel包含研究總覽、QA架構比較、QA逐題比較、SC、SD、TI、INT、跨實驗同題比較、研究設定與限制。表頭凍結/篩選/配色及欄寬由既有OOXML Writer輸出，不新增Excel套件。QA另分42個已見與18個保留意圖；Warmup與Initial Fill不混入Measured平均，P95少於20筆不估計。跨實驗只對齊相同ID/版本/文字，不合併不同計時意義。Provisional品質未評定；正式資料Gold也不等於生成答案已正確，缺乏指標以unavailable呈現。

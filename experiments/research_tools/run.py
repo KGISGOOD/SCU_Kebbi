@@ -58,6 +58,8 @@ def main():
     parser.add_argument("--limit", type=int, help="functional QA/SD only")
     parser.add_argument("--groups", type=int, help="functional SC/INT/TI complete-group prefix only")
     parser.add_argument("--cache-state", choices=("cold", "prefilled"), default="cold")
+    parser.add_argument("--run-dir", help="optional NEW managed result directory; defaults remain unchanged")
+    parser.add_argument("--qa-resume-from", help="prior QA benchmark; strict committed-architecture reuse only")
     args = parser.parse_args()
     root = args.project_root.resolve()
     if root != ROOT:
@@ -90,7 +92,7 @@ def main():
         if any(sha(previous / name) != digest for name, digest in prior["report_sha256"].items()):
             raise ValueError("Calibration report changed after evidence was committed")
     run_id = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ_") + uuid.uuid4().hex
-    run = new_output(root, root / "experiments/results/algorithms/research" / (args.target + "_" + run_id))
+    run = new_output(root, args.run_dir or root / "experiments/results/algorithms/research" / (args.target + "_" + run_id))
     raw = run / "raw"
     raw.mkdir()
     stage = "adapter_preflight"
@@ -140,6 +142,8 @@ def main():
             command += ["--architectures", "all"] if args.target == "qa" else ["--mode", "all"]
             if view:
                 command += ["--view", str(view)]
+            if args.target == "qa" and args.qa_resume_from:
+                command += ["--resume-from", args.qa_resume_from]
         elif args.target == "ti":
             command = prefix + ["experiments.algorithms.topic_identification.benchmark"] + common
             command += ["--run-dir", str(benchmark), "--mode", "detection",

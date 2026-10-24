@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse
 import csv
 import os
+import shutil
+from types import SimpleNamespace
 from pathlib import Path
 import statistics
 import subprocess
@@ -11,7 +13,7 @@ import sys
 import traceback
 
 from .common import (ROOT, locate, new_output, read_rows, read_json, write_json, write_rows,
-                     fingerprint, sha)
+                     fingerprint, sha, verify_bundle)
 from .runtime import load_input, verify_input, model_request
 
 
@@ -24,6 +26,7 @@ def main():
     parser.add_argument("--view", help="same merged review view used at export")
     parser.add_argument("--architectures", default="all", help="all or comma-separated A0,A1,A2-1,...")
     parser.add_argument("--allow-unreviewed", action="store_true")
+    parser.add_argument("--resume-from", help="prior QA benchmark; reuse only complete committed architectures with identical inputs")
     args = parser.parse_args()
     root = args.project_root.resolve()
     if root != ROOT:
@@ -58,10 +61,42 @@ def main():
                    "research_input": receipt, "architectures": arches, "config": config,
                    "scoring": "manual answer review; no inferred single-gold FAQ labels"})
         all_rows, summaries, failed = [], {}, []
+        previous = locate(root, args.resume_from) if args.resume_from else None
+        if previous:
+            old_contract = read_json(previous / "worker_contract.json")
+            unsigned = {k: v for k, v in old_contract.items() if k != "contract_sha256"}
+            if old_contract.get("contract_sha256") != fingerprint(unsigned):
+                raise ValueError("previous QA contract hash changed")
+            if any(old_contract.get(k) != contract.get(k) for k in contract):
+                raise ValueError("QA resume model/config/environment/requests changed")
+            old_manifest = verify_bundle(previous.parent / "adapter", "adapter_manifest.json")
+            for key in ("dataset_identity", "dataset_hashes", "review_view_sha256", "settings_sha256", "purpose", "split"):
+                if old_manifest.get(key) != manifest.get(key):
+                    raise ValueError("QA resume review/data contract changed: " + key)
         for arch in arches:
+            reuse = False
+            if (previous and (previous / (arch + ".completed.json")).is_file()
+                    and (previous / (arch + ".raw.jsonl")).is_file()
+                    and not (previous / (arch + ".failed.json")).exists()):
+                done = read_json(previous / (arch + ".completed.json"))
+                old_raw = previous / (arch + ".raw.jsonl")
+                rows = read_rows(old_raw)
+                reuse = (done.get("status") == "completed" and done.get("source_verification") == "passed"
+                         and done.get("raw_sha256") == sha(old_raw) and done.get("count") == len(cases)
+                         and len(rows) == len(cases) and all(r.get("status") == "success" for r in rows)
+                         and [r["question_id"] for r in rows] == [r["question_id"] for r in cases])
+                if reuse:
+                    shutil.copyfile(old_raw, run / old_raw.name)
+                    shutil.copyfile(previous / (arch + ".completed.json"), run / (arch + ".completed.json"))
+                    write_json(run / (arch + ".reused.json"), {"source": str(previous), "raw_sha256": sha(old_raw),
+                               "completion_sha256": sha(previous / (arch + ".completed.json"))})
             with (run / (arch + ".log")).open("x", encoding="utf-8", newline="\n") as log:
                 env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
-                process = subprocess.run([sys.executable, "-u", "-m", "experiments.research_tools.qa_worker",
+                if reuse:
+                    log.write("Reused verified committed architecture from " + str(previous) + "\n")
+                    process = SimpleNamespace(returncode=0)
+                else:
+                    process = subprocess.run([sys.executable, "-u", "-m", "experiments.research_tools.qa_worker",
                                           "--run-dir", str(run), "--architecture", arch], cwd=root,
                                          env=env, stdout=log, stderr=subprocess.STDOUT, check=False)
             completion = run / (arch + ".completed.json")

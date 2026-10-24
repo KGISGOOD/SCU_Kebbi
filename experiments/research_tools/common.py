@@ -80,7 +80,8 @@ def new_output(root, value):
     path = locate(root, value)
     # No writes into datasets, code, model/index resources or input review bundles.
     allowed = (root / "experiments/results/research_tools",
-               root / "experiments/results/algorithms/research")
+               root / "experiments/results/algorithms/research",
+               root / "experiments/results/algorithms/research_full")
     if not any(path != base and path.is_relative_to(base) for base in allowed):
         raise ValueError("output must be NEW below research_tools or algorithms/research results")
     path.mkdir(parents=True, exist_ok=False)

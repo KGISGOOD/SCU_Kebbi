@@ -1,0 +1,11 @@
+{
+  "configs": {
+    "qa": "experiments/evaluation/config.gpu.local.json",
+    "sc": "experiments/algorithms/semantic_cache/config.gpu.local.json",
+    "sd": "experiments/algorithms/speculative_decoding/config.gpu.local.json",
+    "ti": "experiments/algorithms/topic_identification/config.gpu.local.json",
+    "int": "experiments/algorithms/integrated_efficiency/config.gpu.local.json"
+  },
+  "view": null,
+  "gold_certification": null
+}
