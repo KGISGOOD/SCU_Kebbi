@@ -1,0 +1,7 @@
+{
+  "schema": "sc1_3_selection_v1",
+  "threshold": null,
+  "calibration_run": "REPLACE_WITH_COMPLETED_CALIBRATION_RUN",
+  "rationale": "請在檢視 Calibration 與人工安全標註後填寫選擇理由；此範本不是實驗結果。",
+  "review_status": "needs_review"
+}
