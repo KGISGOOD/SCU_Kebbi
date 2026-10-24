@@ -61,7 +61,7 @@ A3原始v1快照維持needs_review及逐欄來源驗證，用於歷史provisiona
 - A3：`python -m experiments.a3_faq_sft.prepare_data --project-root . --data-dir <新目錄> --answer-revisions experiments/datasets/faq_finetuning/a3_answer_revisions.candidate.jsonl`。v2只改42個Train的assistant答案，保留原問題、原答案、修訂理由、來源定位/Hash、適用期間與不確定性；Validation/Test維持原始快照。現有v1快照與Smoke入口保留。
 - 42筆A3修訂均為needs_review：20筆含部分本機來源、9筆為不保證結果的一般建議、13筆事實證據不足；不表示20筆完整答案已由官方認證。若人審要改候選，另存修訂JSONL，再建新資料目錄，不能編輯已釘選的資料或填造Hash。
 - A2與A3正式批准收據都須由人類實際審核後填寫：模板中的`approved_faq_ids`完整列出42個Train ID；`decisions`每筆須含`decision: approved`及適用該ID的`evidence`，另填`reviewer`、帶時區`reviewed_at`及總體`evidence`。保留模板，將簽認檔另存為`training_review.signed.json`；模板沒有預填身分、簽認時間或批准。來源不足不能只簽名當成事實已證實。
-- A2正式訓練同時指定`--training <衍生/train.jsonl> --training-manifest <衍生/dataset_manifest.json> --training-review <簽認收據>`；A3正式訓練使用v2的`--data-dir`與`--training-review`。A3修訂答案即使使用allow-unreviewed也必須有有效批准；原v1的provisional Smoke維持可用。
+- A2正式訓練同時指定`--training <衍生/train.jsonl> --training-manifest <衍生/dataset_manifest.json> --training-review <簽認收據>`；A3正式訓練使用v2的`--data-dir`與`--training-review`。A3修訂答案可用明確的`--allow-unreviewed`進行完整預備訓練，不需要也不產生批准收據；此旗標必定使模型provisional，不能通過正式模型Gate。原v1的provisional Smoke維持可用。
 - 啟動及checkpoint儲存前均檢查來源、實際資料與收據；正式參數不得加allow-unreviewed/max-steps。A2兩組沿用同一原始BGE-M3、資料與正配對排程；A2-2困難候選覆蓋不均，原始42筆中P13/P14兩筆被排除，並非各意圖等量增加負例。
 - FAQ60包含42個已見Train意圖及18個保留意圖；A3已學習Train原問題對應的修訂答案。QA整體分數是混合曝光條件，不能稱全部未見泛化或未曝光答案測試。
 
@@ -340,3 +340,18 @@ python -m experiments.research_tools.run_all --mode provisional --resume <原res
 Resume核對模型/設定/題庫/人審/程式/套件環境與已提交證據，成功階段不重跑；QA中斷時，只沿用同條件下具完整60題收據的架構，保留原答案及時間，未提交架構重跑。其他演算法以整個失敗階段為重跑單位，不接續不完整Cache或KV狀態。每次嘗試獨立目錄，不覆蓋歷史證據。
 
 Excel包含研究總覽、QA架構比較、QA逐題比較、SC、SD、TI、INT、跨實驗同題比較、研究設定與限制。表頭凍結/篩選/配色及欄寬由既有OOXML Writer輸出，不新增Excel套件。QA另分42個已見與18個保留意圖；Warmup與Initial Fill不混入Measured平均，P95少於20筆不估計。跨實驗只對齊相同ID/版本/文字，不合併不同計時意義。Provisional品質未評定；正式資料Gold也不等於生成答案已正確，缺乏指標以unavailable呈現。
+
+## 完整Provisional模型訓練（GPU執行）
+
+```powershell
+Set-Location 'C:\Users\rsy\Desktop\SCU_Kebbi'
+& .\experiments\research_tools\train_provisional.ps1 -ProjectRoot . -RunAll
+```
+
+腳本沿用`a2_review_20261024_235354`及`a3_spoken_20261025_001847`；僅在目錄缺失時從既有A2候選／最新spoken A3候選重建，已有但驗證失敗的資料不覆寫。模型路徑取SC本機設定，可用`-BgeModel <本機路徑> -LlamaModel <本機路徑>`覆寫。總控本機設定內既有五類config對應也會保留。
+
+依序驗證資料、A3 Tokenization、A2-1、A2-2、A3完整3 epochs；不設max-steps、不簽署人審。A2預設batch 8、FP32、gradient checkpointing、最終CPU回載比較；A3沿用LoRA r=8/alpha=16、q_proj/v_proj、batch 1、gradient accumulation 4，使用FP16及原有gradient checkpointing。24GB能否完成仍需實機確認；A2若OOM，可另開新訓練加`-A2BatchSize 4`，兩組一起改，不能只改其中一組。
+
+輸出集中於`experiments/models/provisional_full_<時間_GUID>/`：三個模型的必要設定/來源/provenance/訓練紀錄/final輸出、A3回載紀錄，以及獨立QA和run_all設定。`--final-only`不儲存中間epoch模型，不表示具備中斷續訓功能；既有Smoke模型不刪除。A3回載在獨立process檢查base+adapter+tokenizer，輸入exit結束，不冒充已做生成或品質驗證。
+
+新QA設定指向兩個final_model及final_adapter；base_model綁定實際原始Llama本機路徑，A2最大長度設512以符合新訓練設定，allow_unreviewed=true。舊設定不覆寫。`-RunAll`在三模型完成與回載後接續完整預備實驗；省略時只訓練並印出後續run_all命令。任何訓練失敗立即停止，不寫總訓練成功收據。所有輸出仍provisional，Formal Gate維持不接受。開發端未執行此腳本或模型。

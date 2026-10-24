@@ -66,6 +66,7 @@ def load_arguments():
                         help="enable underlying Transformer checkpointing or fail explicitly")
     parser.add_argument("--verify-save-load", action="store_true",
                         help="reload final export on CPU and compare two Train embeddings; extra host RAM required")
+    parser.add_argument("--final-only", action="store_true", help="save only final_model, not intermediate epoch checkpoints")
     args = parser.parse_args()
     import math
     for key in ("batch_size", "epochs", "seed", "max_length", "save_every_epochs"):
@@ -345,7 +346,7 @@ def main() -> int:
                 log.write(json.dumps(record, ensure_ascii=False, allow_nan=False) + "\n")
                 log.flush()
                 epoch_finished = index + 1 == len(schedule) or schedule[index + 1]["epoch"] != batch["epoch"]
-                if (epoch_finished and batch["epoch"] < args.epochs
+                if (not args.final_only and epoch_finished and batch["epoch"] < args.epochs
                         and batch["epoch"] % args.save_every_epochs == 0):
                     save_model(output / "checkpoints" / ("epoch_%03d" % batch["epoch"]), batch["epoch"])
                     model.train()

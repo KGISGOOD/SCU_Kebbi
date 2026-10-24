@@ -46,6 +46,7 @@ def arguments():
     parser.add_argument("--allow-unreviewed", action="store_true")
     parser.add_argument("--training-review", help="external human approval JSON bound to the exact Train and dataset manifest hashes")
     parser.add_argument("--check-only", action="store_true", help="check data and tokenizer labels; no model weights")
+    parser.add_argument("--final-only", action="store_true", help="save only final_adapter, not intermediate epoch checkpoints")
     args = parser.parse_args()
     for name in ("lora_r", "lora_alpha", "epochs", "batch_size", "gradient_accumulation", "max_length"):
         if getattr(args, name) < 1:
@@ -100,8 +101,8 @@ def main():
                 raise DataError("Train approval needs a timezone and must remain unchanged")
             pending = []  # Explicit external human approval; immutable dataset stays needs_review.
         if (dataset_manifest["schema_version"] == "a3_sft_data_v2"
-                and not args.training_review and not args.check_only):
-            raise DataError("revised supervised answers require human --training-review, even for provisional runs")
+                and not args.training_review and not args.check_only and not args.allow_unreviewed):
+            raise DataError("revised supervised answers need human --training-review for formal training; --allow-unreviewed explicitly permits provisional training")
         if (not args.check_only and not args.allow_unreviewed
                 and dataset_manifest["schema_version"] != "a3_sft_data_v2"):
             raise DataError("formal A3 training requires a revised v2 dataset; original v1 remains available for provisional Smoke")
@@ -303,7 +304,7 @@ def main():
                     completed_epochs += 1
                 if stop:
                     break
-                if epoch < args.epochs:
+                if epoch < args.epochs and not args.final_only:
                     save_adapter(output / "checkpoints" / ("epoch_%03d" % epoch), epoch)
         save_adapter(output / "final_adapter", epoch)
         write_json(output / "completed.json", {
