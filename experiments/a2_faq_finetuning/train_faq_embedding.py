@@ -60,6 +60,8 @@ def load_arguments():
     parser.add_argument("--allow-unreviewed", action="store_true",
                         help="explicit provisional research/debug run, never a formal experiment")
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--training-review", help="explicit human approval of derived Train bytes and manifest")
+    parser.add_argument("--training-manifest", help="derived dataset_manifest.json; required with --training-review")
     parser.add_argument("--gradient-checkpointing", action="store_true",
                         help="enable underlying Transformer checkpointing or fail explicitly")
     parser.add_argument("--verify-save-load", action="store_true",
@@ -104,10 +106,28 @@ def main() -> int:
             raise DataError(json.dumps(read_issues, ensure_ascii=False))
         assert_input_hashes(validation["input_sha256"])
         pending = [row["faq_id"] for row in rows if row["review_status"] != "approved"]
+        training_review, review_inputs = None, {}
+        if bool(args.training_review) != bool(args.training_manifest):
+            raise DataError("--training-review and --training-manifest must be supplied together")
+        if args.training_review:
+            from .prepare_review import validate_manifest
+            from experiments.research_tools.training_approval import verify
+            manifest_path = resolve_path(root, args.training_manifest)
+            review_path = resolve_path(root, args.training_review)
+            derived = validate_manifest(root, manifest_path, paths["training"])
+            training_review, review_digest = verify(review_path, "a2_training_review_v1", paths["training"],
+                                                    manifest_path, [r["faq_id"] for r in rows])
+            if derived["faq_ids"] != [r["faq_id"] for r in rows]:
+                raise DataError("derived Train ID order differs from manifest")
+            review_inputs = {str(review_path): review_digest, str(manifest_path): sha256_file(manifest_path)}
+            review_inputs.update({str(resolve_path(root, p)): d for p, d in derived["source_sha256"].items()})
+            pending = []
         if pending and not args.allow_unreviewed:
             raise DataError("formal training is blocked: review_status is not approved for %s. "
                             "Do not auto-approve. --allow-unreviewed is provisional research only."
                             % ", ".join(pending))
+        if not args.allow_unreviewed and not args.training_review:
+            raise DataError("formal A2 training requires --training-manifest AND --training-review; status alone is not approval")
         by_id, hard, diagnostic_ids, excluded, excluded_hard = prepare_training(rows, diagnostics, config)
         schedule = make_schedule(by_id, args.batch_size, args.epochs, args.seed,
                                  diagnostic_ids, excluded)
@@ -118,6 +138,10 @@ def main() -> int:
         versions = package_versions()
         api_profile = select_training_profile(versions)
         input_hashes = dict(validation["input_sha256"])
+        for name, digest in review_inputs.items():
+            if name in input_hashes and input_hashes[name] != digest:
+                raise DataError("conflicting derived input identity: " + name)
+            input_hashes[name] = digest
         input_hashes[args.config] = config_digest
         for path, digest in input_hashes.items():
             if sha256_file(Path(path)) != digest:
@@ -206,6 +230,8 @@ def main() -> int:
                       Path(__file__).with_name("validate_a2_data.py"),
                       Path(__file__).with_name("evaluate_faq_retrieval.py"),
                       Path(__file__).with_name("training_compat.py")]
+        code_paths += [Path(__file__).with_name("prepare_review.py"),
+                       Path(__file__).resolve().parents[1] / "research_tools/training_approval.py"]
         run_config = {
             **provenance, "arguments": {key: str(value) if isinstance(value, Path) else value
                                        for key, value in vars(args).items()},
@@ -225,6 +251,8 @@ def main() -> int:
             "utc_started": timestamp, "evaluation_during_training": False,
         }
         write_json_exclusive(output / "run_config.json", run_config)
+        if training_review is not None:
+            write_json_exclusive(output / "training_review.snapshot.json", training_review)
         write_json_exclusive(output / "data_validation.json", validation)
         write_jsonl_exclusive(output / "positive_pair_schedule.jsonl", schedule)
 

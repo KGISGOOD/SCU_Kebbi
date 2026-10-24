@@ -80,6 +80,11 @@ def main():
             review_path = resolve(root, args.training_review)
             review_hash = sha(review_path)
             training_review = read_json(review_path)
+            if dataset_manifest["schema_version"] == "a3_sft_data_v2":
+                from experiments.research_tools.training_approval import verify
+                training_review, review_hash = verify(review_path, "a3_training_review_v1", training_path,
+                                                     directory / "dataset_manifest.json",
+                                                     [r["faq_id"] for r in data["train"]])
             ids = [row["faq_id"] for row in data["train"]]
             approved = training_review.get("approved_faq_ids")
             if (training_review.get("schema_version") != "a3_training_review_v1"
@@ -94,6 +99,12 @@ def main():
             if reviewed_at.tzinfo is None or sha(review_path) != review_hash:
                 raise DataError("Train approval needs a timezone and must remain unchanged")
             pending = []  # Explicit external human approval; immutable dataset stays needs_review.
+        if (dataset_manifest["schema_version"] == "a3_sft_data_v2"
+                and not args.training_review and not args.check_only):
+            raise DataError("revised supervised answers require human --training-review, even for provisional runs")
+        if (not args.check_only and not args.allow_unreviewed
+                and dataset_manifest["schema_version"] != "a3_sft_data_v2"):
+            raise DataError("formal A3 training requires a revised v2 dataset; original v1 remains available for provisional Smoke")
         if pending and not args.allow_unreviewed and not args.check_only:
             raise DataError("Train rows need human review: %s; --allow-unreviewed permits provisional smoke only"
                             % ",".join(pending))
@@ -137,6 +148,7 @@ def main():
             "arguments": {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
             "defaults": config, "versions": runtime_versions, "python": platform.python_version(),
             "code_sha256": {p.name: sha(p) for p in sorted(Path(__file__).parent.glob("*.py"))},
+            "approval_code_sha256": sha(Path(__file__).resolve().parents[1] / "research_tools/training_approval.py"),
             "config_sha256": sha(resolve(root, args.config)),
             "optimizer": "AdamW; constant LR; token-weighted gradient accumulation",
         })
@@ -146,6 +158,11 @@ def main():
                 raise DataError("human Train approval changed before training")
             write_json(output / "training_review.snapshot.json", training_review)
         random.seed(args.seed)
+        if file_hashes(directory) != dataset_hashes:
+            raise DataError("prepared inputs changed before model loading")
+        validate_data(root, directory)
+        if review_path is not None and sha(review_path) != review_hash:
+            raise DataError("Train approval changed before model loading")
         torch.manual_seed(args.seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(args.seed)

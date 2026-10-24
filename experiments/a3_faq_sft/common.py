@@ -134,12 +134,18 @@ def snapshot(root, manifest):
 
 def validate_data(root, directory):
     manifest = read_json(directory / "dataset_manifest.json")
-    if manifest.get("schema_version") != "a3_sft_data_v1":
+    if manifest.get("schema_version") not in {"a3_sft_data_v1", "a3_sft_data_v2"}:
         raise DataError("unknown A3 dataset schema")
     source_manifest = resolve(root, manifest["intent_manifest"])
     expected_rows, hashes = snapshot(root, source_manifest)
     if hashes != manifest.get("source_sha256") or manifest.get("system_prompt") != SYSTEM:
         raise DataError("source hashes or system prompt differ from dataset manifest")
+    if manifest["schema_version"] == "a3_sft_data_v2":
+        from .revised_data import revisions
+        revised, revision_hashes = revisions(root, resolve(root, manifest["answer_revisions"]), expected_rows)
+        if revision_hashes != manifest.get("revision_inputs_sha256"):
+            raise DataError("revised answers or evidence changed; prepare a NEW derived dataset")
+        expected_rows = [revised.get(row["faq_id"], row) for row in expected_rows]
     actual = {}
     for split in ("train", "validation", "test"):
         path = directory / (split + ".jsonl")
@@ -147,9 +153,9 @@ def validate_data(root, directory):
             raise DataError("prepared file changed: %s" % path)
         rows = read_rows(path)
         expected = [row for row in expected_rows if row["split"] == split]
-        # No added questions/answers/paraphrases or cross-split substitutions.
+        # Exact original snapshot (v1), or exact source-linked Train revision (v2).
         if rows != expected:
-            raise DataError("%s must exactly match original FAQ rows and fixed intent split" % path)
+            raise DataError("%s must exactly match its source/revision contract and fixed intent split" % path)
         actual[split] = rows
     if manifest.get("counts") != {name: len(rows) for name, rows in actual.items()}:
         raise DataError("dataset manifest counts differ from actual splits")

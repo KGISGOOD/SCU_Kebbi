@@ -53,7 +53,17 @@ QA設定指向`experiments/models/a2_1_smoke_task8/final_model`與`a2_2_smoke_ta
 
 A2操作與相容性見 [TRAINING.md](experiments/a2_faq_finetuning/TRAINING.md)、[TRAINING_COMPATIBILITY.md](experiments/a2_faq_finetuning/TRAINING_COMPATIBILITY.md)。A2／A3的needs_review預設阻擋正式訓練，allow-unreviewed只作provisional。A3使用原生Chat Template及assistant標籤邊界檢查；A5沿用模型載入器並保留完整Top-5 Prompt，不以截斷文件規避輸入限制。訓練參數與來源以實際設定／Checkpoint為準。
 
-A3準備資料的狀態固定為needs_review，來源驗證不允許改寫資料列。正式訓練可另提供`--training-review <人工收據.json>`：`schema_version`須為`a3_training_review_v1`，`train_sha256`與`dataset_manifest_sha256`須對應該data-dir的原始檔案位元組，`approved_faq_ids`須完整且唯一涵蓋42個Train ID，並含非空`reviewer`、具時區的`reviewed_at`及`evidence`。收據由人類實際審核後簽認，程式不自動生成批准；原資料不變，訓練輸出保留收據快照與來源Hash。`--allow-unreviewed`或`--max-steps`仍使模型provisional；題庫Gold簽認不能代替訓練資料批准。
+A3原始v1快照維持needs_review及逐欄來源驗證，用於歷史provisional Smoke。正式訓練改用以下v2衍生資料與`--training-review <人工收據.json>`；原始資料不變，程式不自動批准。`--allow-unreviewed`或`--max-steps`仍使模型provisional；題庫Gold簽認不能代替訓練資料批准。
+
+正式衍生訓練資料流程（程式尚待GPU驗證）：
+
+- A2：`python -m experiments.a2_faq_finetuning.prepare_review --project-root . --output-dir <新目錄>`，原樣複製42筆候選，保留126個Positive與12個空Hard Negative，不自動批准。輸出`train.jsonl`、`dataset_manifest.json`、`training_review.template.json`。使用同入口加`--check-only`驗證；加`--training-review <人審收據>`可一併驗證批准。
+- A3：`python -m experiments.a3_faq_sft.prepare_data --project-root . --data-dir <新目錄> --answer-revisions experiments/datasets/faq_finetuning/a3_answer_revisions.candidate.jsonl`。v2只改42個Train的assistant答案，保留原問題、原答案、修訂理由、來源定位/Hash、適用期間與不確定性；Validation/Test維持原始快照。現有v1快照與Smoke入口保留。
+- 42筆A3修訂均為needs_review：20筆含部分本機來源、9筆為不保證結果的一般建議、13筆事實證據不足；不表示20筆完整答案已由官方認證。若人審要改候選，另存修訂JSONL，再建新資料目錄，不能編輯已釘選的資料或填造Hash。
+- A2與A3正式批准收據都須由人類實際審核後填寫：模板中的`approved_faq_ids`完整列出42個Train ID；`decisions`每筆須含`decision: approved`及適用該ID的`evidence`，另填`reviewer`、帶時區`reviewed_at`及總體`evidence`。保留模板，將簽認檔另存為`training_review.signed.json`；模板沒有預填身分、簽認時間或批准。來源不足不能只簽名當成事實已證實。
+- A2正式訓練同時指定`--training <衍生/train.jsonl> --training-manifest <衍生/dataset_manifest.json> --training-review <簽認收據>`；A3正式訓練使用v2的`--data-dir`與`--training-review`。A3修訂答案即使使用allow-unreviewed也必須有有效批准；原v1的provisional Smoke維持可用。
+- 啟動及checkpoint儲存前均檢查來源、實際資料與收據；正式參數不得加allow-unreviewed/max-steps。A2兩組沿用同一原始BGE-M3、資料與正配對排程；A2-2困難候選覆蓋不均，原始42筆中P13/P14兩筆被排除，並非各意圖等量增加負例。
+- FAQ60包含42個已見Train意圖及18個保留意圖；A3已學習Train原問題對應的修訂答案。QA整體分數是混合曝光條件，不能稱全部未見泛化或未曝光答案測試。
 
 ## 推論效率演算法
 
