@@ -124,7 +124,8 @@ def sequence(data, questions, pairs, workload_id, split, limit, purpose):
 
 def build(args, root, data, output):
     purpose, split, target = args.purpose, args.split, args.target
-    if purpose == "calibration" and split != "calibration" or purpose == "evaluation" and split != "evaluation":
+    qa_fixed = target == "qa" and data.get("dataset_name") in {"experiment_suites_v1", "experiment_suites_v1_r4"} and split == "historical"
+    if purpose == "calibration" and split != "calibration" or purpose == "evaluation" and split != "evaluation" and not qa_fixed:
         raise ValueError("calibration/evaluation purpose must use its own split")
     if args.limit is not None and (args.limit < 1 or purpose != "functional"):
         raise ValueError("--limit is positive and functional-only; formally freeze explicit IDs instead")
@@ -136,7 +137,7 @@ def build(args, root, data, output):
     calibration_run_receipt = None
     if purpose != "functional" and settings_hash is None:
         raise ValueError("formal export requires --settings to pin model/prompt/decoder parameters")
-    if purpose == "evaluation":
+    if purpose == "evaluation" and not qa_fixed:
         if not args.calibration_export:
             raise ValueError("evaluation requires --calibration-export; no evaluation-driven parameter selection")
         prior_dir = locate(root, args.calibration_export)
@@ -234,7 +235,7 @@ def build(args, root, data, output):
     elif target == "ti":
         selected_ids = {q["question_id"] for q in selected}
         eligible = [t for t in turns.values() if t["split"] == split
-                    and (data.get("dataset_name") == "experiment_suites_v1"
+                    and (data.get("dataset_name") in {"experiment_suites_v1", "experiment_suites_v1_r4"}
                          or set(t["source_question_ids"]) & selected_ids)]
         conversation_ids = list(dict.fromkeys(t["conversation_id"] for t in eligible))
         if args.limit is not None:
@@ -297,7 +298,7 @@ def build(args, root, data, output):
                                "quality_and_speed": "score separately; no quality-preserving speedup claim without review"},
             "generation_comparison_contract": "same Target/tokenizer/input IDs/Top5/prompt/precision/generation settings; use SD0 paired token checks",
             "files_sha256": {p.name: sha(p) for p in output.glob("*.jsonl")}}
-    if purpose == "evaluation":
+    if purpose == "evaluation" and not qa_fixed:
         prior = read_json(locate(root, args.calibration_export) / "adapter_manifest.json")
         if set(prior["family_ids"]) & set(plan["family_ids"]) or set(prior["query_ids"]) & set(plan["query_ids"]):
             raise ValueError("calibration/evaluation family or query overlap")
@@ -310,7 +311,7 @@ def main():
     parser.add_argument("--project-root", type=Path, default=ROOT)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--target", choices=("qa", "sc", "sc_threshold", "sd", "prompt_lookup", "ti", "int"), required=True)
-    parser.add_argument("--dataset", choices=("unified_research_v1", "experiment_suites_v1"), default="unified_research_v1")
+    parser.add_argument("--dataset", choices=("unified_research_v1", "experiment_suites_v1", "experiment_suites_v1_r4"), default="unified_research_v1")
     parser.add_argument("--groups", type=int, help="suite functional-only complete SC/INT groups or TI conversations")
     parser.add_argument("--suite-cache-state", choices=("cold", "prefilled"), default="cold", help="prefilled is suite INT-only; fill remains separate")
     parser.add_argument("--split", choices=("historical", "calibration", "evaluation"), required=True)
@@ -327,7 +328,7 @@ def main():
     args = parser.parse_args()
     root = args.project_root.resolve()
     data = load_dataset(root, args.dataset)
-    if args.dataset == "experiment_suites_v1":
+    if args.dataset in {"experiment_suites_v1", "experiment_suites_v1_r4"}:
         from .suites import prepare
         data = prepare(args, data)
     elif args.groups is not None or args.suite_cache_state != "cold":

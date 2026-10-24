@@ -217,3 +217,78 @@ python -m experiments.research_tools.int_benchmark --project-root . --adapter-di
 INT預設cold；`--suite-cache-state prefilled`可先以每個所選組的Q1填充，再量完整四問。Initial Fill在獨立檔與獨立報表，不改20／40次measured題數。SC舊Benchmark不接受warm-fill，因此該旗標只開放給phase-aware INT，不能靜默把fill混進SC量測。
 
 正式執行仍需完成問題／答案行為、配對與TI標籤審核，透過既有人審View及Calibration收據閘門。`review export/merge`新增同名`--dataset`選項供機器審核流程相容；本輪不另外產生技術CSV。所有新輸出目前是needs_review候選，沒有宣稱GPU成功、語意無洩漏或正式Gold已凍結。
+
+## 共用研究執行與Excel報告
+
+新增入口`python -m experiments.research_tools.run`，呼叫原Adapter與Benchmark，不改模型、題目、計時或解碼核心。支援`--target qa|sc|sd|ti|int --stage calibration|evaluation --config <本機設定>`。每次自動建立`experiments/results/algorithms/research/<項目_UTC_GUID>/`：
+
+```text
+summary.xlsx                 # Overview / Comparison / Per Question / Configuration / Validation / Groups
+report.md                    # 證據支持的比較、樣本數與限制
+raw/
+  context.json / config.snapshot.json / commands.json
+  adapter/                   # 原Adapter契約、逐題來源與scorer_only
+  benchmark/                 # 原CLI完整輸出與完成收據；不搬動已建立的檔案
+  prompt_lookup/             # SD另跑sd2_4，保留其獨立成對SD0
+  worker_1.log               # stdout、stderr、Traceback；第二子實驗另有worker_2.log
+  calibration.receipts.json  # Evaluation所依據的Calibration收據Hash（若適用）
+  evidence.json / completed.json
+```
+
+不需額外Excel套件：使用Python標準函式庫寫OOXML。Excel儲存格以明確文字型態防止公式注入；超長內容截短顯示，完整回答留raw。原CLI必要JSON/CSV繼續留raw，不刪除重現證據。只有子Benchmark成功、來源驗證通過且Excel/Markdown都寫出後，才寫`raw/completed.json`；失敗保留`raw/failed.json`及階段，不能只看某個子Benchmark完成就判整體成功。
+
+舊SD `--mode all`只含SD0/SD2-1/SD2-2，新入口自動再跑SD2-4的k=2/4/6/8。兩個子實驗各有SD0，並核對問題序列及Prompt/檢索身分；模型駐留可能不同，跨子實驗不合併SD0或直接計算加速比。Warmup不進Comparison平均；INT的Initial Fill獨立統計，不進Measured。SC是固定模式順序的單次受控序列，不將其延遲視為多次隨機實驗結論；intent proxy不當成錯誤重用Gold。
+
+TI使用原Calibration凍結的thresholds；Evaluation必須指定本入口完成的`--calibration <整個Calibration輸出目錄>`。新報告補出Calibration逐題候選分類，該分數是擬合結果，不是獨立測試。新入口目前跑TI Detection；既有Context Reduction仍可用原CLI，不在這個Detection報告中冒充已量測生成效率。
+
+正式執行不得加`--functional`，必須提供新版人審`--view`及人工簽認`--gold-certification`。人工簽認是獨立JSON，由審核者確認後保存，欄位如下；範例維持false，工具不會代填true：
+
+```json
+{
+  "schema": "research_gold_certification_v1",
+  "human_gold_certified": false,
+  "dataset_identity": "從新版人審view_manifest.json取得dataset_identity",
+  "review_view_sha256": "該view_manifest.json原始位元組SHA-256",
+  "reviewer": "人工審核者",
+  "reviewed_at": "人工簽認時間"
+}
+```
+
+這份簽認不取代逐題/答案/Cache配對/TI標籤人審View。正式Guard仍逐項檢查；未認證只能用明確的`--functional`。SC正式配對需涵蓋所有可能的先前來源，包括同ID重訪。正式QA只有一份已曝光60題評估、沒有Calibration；特例僅限明確指定Suite的QA，仍需人審View與凍結設定，不把Historical曝光改成盲測。
+
+GPU功能Smoke（先驗證新輸出流程，不是正式研究）：
+
+```powershell
+python -m experiments.research_tools.suites check --project-root .
+if ($LASTEXITCODE -ne 0) { throw 'Suite check failed' }
+python -m experiments.research_tools.run --project-root . --target sc --stage calibration --config experiments/algorithms/semantic_cache/config.gpu.local.json --functional --groups 1
+```
+
+正式執行（人工View及簽認完成後才可用；設定路徑請確認GPU本機）：
+
+```powershell
+$view = '<新版完成的人審View目錄>'
+$gold = '<人工Gold簽認JSON>'
+$review = @('--view', $view, '--gold-certification', $gold)
+python -m experiments.research_tools.run --project-root . --target qa --stage evaluation --config experiments/evaluation/config.json @review
+python -m experiments.research_tools.run --project-root . --target sc --stage calibration --config experiments/algorithms/semantic_cache/config.gpu.local.json @review
+python -m experiments.research_tools.run --project-root . --target sd --stage calibration --config experiments/algorithms/speculative_decoding/config.gpu.local.json @review
+python -m experiments.research_tools.run --project-root . --target ti --stage calibration --config experiments/algorithms/topic_identification/config.gpu.local.json @review
+python -m experiments.research_tools.run --project-root . --target int --stage calibration --config experiments/algorithms/integrated_efficiency/config.gpu.local.json --cache-state prefilled @review
+
+# 每個項目分別指定自己的完整Calibration輸出目錄；INT也須維持相同cache-state。
+python -m experiments.research_tools.run --project-root . --target sc --stage evaluation --config experiments/algorithms/semantic_cache/config.gpu.local.json --calibration '<SC Calibration輸出目錄>' @review
+python -m experiments.research_tools.run --project-root . --target sd --stage evaluation --config experiments/algorithms/speculative_decoding/config.gpu.local.json --calibration '<SD Calibration輸出目錄>' @review
+python -m experiments.research_tools.run --project-root . --target ti --stage evaluation --config experiments/algorithms/topic_identification/config.gpu.local.json --calibration '<TI Calibration輸出目錄>' @review
+python -m experiments.research_tools.run --project-root . --target int --stage evaluation --config experiments/algorithms/integrated_efficiency/config.gpu.local.json --cache-state prefilled --calibration '<INT Calibration輸出目錄>' @review
+```
+
+Evaluation嚴格要求同題庫、同人審View、同設定、同程式與Cache政策的成功Calibration收據，拒絕Provisional/Smoke收據。若要依探索結果改設定，先凍結選定設定並完成相符的正式Calibration，不能拿舊設定的收據直接跑Evaluation。本入口不修改任何GPU套件或模型；所有新程式僅經靜態審查，仍需GPU驗證CLI、Excel開啟與Guard失敗情境。
+
+### r4三表整合候選（保留r3）
+
+`experiments/datasets/experiment_suites_v1/revisions/spoken_candidate_r4/`保存新的questions.jsonl、suites.json及review.json。讀取/執行時明確加`--dataset experiment_suites_v1_r4`；未指定時維持舊入口，不自動切換。r4釘選r3原檔及三份審核輸入的原始位元組Hash，修改輸入需另行版本更新。r3的View、Adapter、Calibration收據不得混用。
+
+本機整合閱讀檔為`experiments/datasets/研究題庫整合審核_r4.csv`（單一分區UTF-8 BOM）；摘要與完整GPU命令見`研究題庫整合審核_r4_摘要.md`。開發端沒有執行Python產生XLSX。GPU可執行`python -m experiments.research_tools.suites export-integrated --project-root . --revision spoken_candidate_r4`，重用既有XLSX Writer產生6工作表的`研究題庫整合審核_r4.xlsx`，已存在時拒絕覆寫。
+
+版本檢查為`python -m experiments.research_tools.suites check --project-root . --revision spoken_candidate_r4`。r4仍needs_review、human_gold_certified=false；部分本機來源支持不能當完整官方答案認證，可能的範圍/時點差異不自動定為直接矛盾。正式結果仍沿用summary.xlsx、report.md與raw/證據，不建立第二套Benchmark或移除Guard。

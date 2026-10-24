@@ -1,0 +1,3457 @@
+{
+  "schema_version": "experiment_suites_v1_candidate",
+  "status": "needs_review",
+  "frozen": false,
+  "source_dataset": "unified_research_v1",
+  "source_manifest_sha256": "5e0a13f91ec26adbbf6b530e665faa5ca3a1ea17a2c373ce1c41f8675dd7773b",
+  "files_sha256": {
+    "questions.jsonl": "e114fbc05be5b3d792a71eeb9082b637c6f61e151ab471314e0a7ecef4674df3",
+    "review.json": "d658644575b63d3106f92ae6b7b2f3d44ad2d86ad0223a2526f338166603399f"
+  },
+  "counts": {
+    "qa": 60,
+    "sc_calibration_groups": 10,
+    "sc_evaluation_groups": 20,
+    "sd_calibration": 20,
+    "sd_evaluation": 40,
+    "ti_calibration_conversations": 8,
+    "ti_evaluation_conversations": 12,
+    "int_calibration_groups": 5,
+    "int_evaluation_groups": 10
+  },
+  "qa": {
+    "split": "historical",
+    "question_ids": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "P09",
+      "P10",
+      "P11",
+      "P12",
+      "P13",
+      "P14",
+      "P15",
+      "P16",
+      "P17",
+      "P18",
+      "P19",
+      "P20",
+      "P21",
+      "P22",
+      "P23",
+      "P24",
+      "P25",
+      "P26",
+      "P27",
+      "P28",
+      "P29",
+      "P30",
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S09",
+      "S10",
+      "S11",
+      "S12",
+      "S13",
+      "S14",
+      "S15",
+      "S16",
+      "S17",
+      "S18",
+      "S19",
+      "S20",
+      "S21",
+      "S22",
+      "S23",
+      "S24",
+      "S25",
+      "S26",
+      "S27",
+      "S28",
+      "S29",
+      "S30"
+    ],
+    "basis": "spoken candidate view of original CSV60; original IDs retained only inside explicit experiment_suites_v1 dataset entry",
+    "exposure": "previously_used_not_blind_test",
+    "research_role": "evaluation_only_no_calibration_previously_exposed",
+    "revision": "spoken_candidate_r2"
+  },
+  "sc": [
+    {
+      "group_id": "SC-C01",
+      "split": "calibration",
+      "family_id": "linked_degree_vs_admission",
+      "question_ids": [
+        "SC-C01-A",
+        "SC-C01-A",
+        "SC-C01-P",
+        "SC-C01-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P05",
+        "P07"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-C02",
+      "split": "calibration",
+      "family_id": "employers_vs_roles",
+      "question_ids": [
+        "SC-C02-A",
+        "SC-C02-A",
+        "SC-C02-P",
+        "SC-C02-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P01",
+        "S25"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認；r3只加強問句的任務脈絡，未經模型排名確認困難度；Q4仍需檢查實際儲存答案後才可判定重用安全。"
+    },
+    {
+      "group_id": "SC-C03",
+      "split": "calibration",
+      "family_id": "experienced_vs_starting_salary",
+      "question_ids": [
+        "SC-C03-A",
+        "SC-C03-A",
+        "SC-C03-P",
+        "SC-C03-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P04",
+        "S26"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "Q1/Q3只問畢業後工作三到五年的薪資金額；Q4問應屆起薪。P04原題另含成長潛力，不能拿Q3的改寫差異當成增長率要求。"
+    },
+    {
+      "group_id": "SC-C04",
+      "split": "calibration",
+      "family_id": "calculus_vs_statistics",
+      "question_ids": [
+        "SC-C04-A",
+        "SC-C04-A",
+        "SC-C04-P",
+        "SC-C04-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S07",
+        "S08"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-C05",
+      "split": "calibration",
+      "family_id": "tuition_vs_entry_scholarship",
+      "question_ids": [
+        "SC-C05-A",
+        "SC-C05-A",
+        "SC-C05-P",
+        "SC-C05-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P18",
+        "P19"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "P18含一般獎助管道，P19問優秀入學獎學金資格與免學雜費；完整P18答案可能涵蓋P19，Q4不可自動標為禁止重用，需逐答案人工判定。"
+    },
+    {
+      "group_id": "SC-C06",
+      "split": "calibration",
+      "family_id": "exchange_options_vs_delay",
+      "question_ids": [
+        "SC-C06-A",
+        "SC-C06-A",
+        "SC-C06-P",
+        "SC-C06-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P22",
+        "P23"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "Q1/Q3均保留交換機會多寡與姊妹校；Q4問延畢風險。完整交換規劃答案可能同時涵蓋，待人審。"
+    },
+    {
+      "group_id": "SC-C07",
+      "split": "calibration",
+      "family_id": "project_start_vs_grouping",
+      "question_ids": [
+        "SC-C07-A",
+        "SC-C07-A",
+        "SC-C07-P",
+        "SC-C07-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S19",
+        "S20"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "Q1/Q3均問開始年級與找指導教授；Q4問個人或分組及選題。屬同一專題流程的不同資訊需求，不保證答案完全不重疊。"
+    },
+    {
+      "group_id": "SC-C08",
+      "split": "calibration",
+      "family_id": "faculty_research_vs_practice",
+      "question_ids": [
+        "SC-C08-A",
+        "SC-C08-A",
+        "SC-C08-P",
+        "SC-C08-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P11",
+        "P12"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-C09",
+      "split": "calibration",
+      "family_id": "cloud_vs_campus_compute",
+      "question_ids": [
+        "SC-C09-A",
+        "SC-C09-A",
+        "SC-C09-P",
+        "SC-C09-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P21",
+        "S13"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-C10",
+      "split": "calibration",
+      "family_id": "internship_pay_vs_credits",
+      "question_ids": [
+        "SC-C10-A",
+        "SC-C10-A",
+        "SC-C10-P",
+        "SC-C10-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P08",
+        "P09"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E01",
+      "split": "evaluation",
+      "family_id": "current_vs_long_term_demand",
+      "question_ids": [
+        "SC-E01-A",
+        "SC-E01-A",
+        "SC-E01-P",
+        "SC-E01-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P02",
+        "P15"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E02",
+      "split": "evaluation",
+      "family_id": "public_jobs_vs_career_services",
+      "question_ids": [
+        "SC-E02-A",
+        "SC-E02-A",
+        "SC-E02-P",
+        "SC-E02-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P03",
+        "P30"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認；r3只加強問句的任務脈絡，未經模型排名確認困難度；Q4仍需檢查實際儲存答案後才可判定重用安全。"
+    },
+    {
+      "group_id": "SC-E03",
+      "split": "evaluation",
+      "family_id": "masters_necessity_vs_prevalence",
+      "question_ids": [
+        "SC-E03-A",
+        "SC-E03-A",
+        "SC-E03-P",
+        "SC-E03-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P06",
+        "S22"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E04",
+      "split": "evaluation",
+      "family_id": "industry_sectors_vs_internship_requirement",
+      "question_ids": [
+        "SC-E04-A",
+        "SC-E04-A",
+        "SC-E04-P",
+        "SC-E04-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P10",
+        "S27"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認；r3只加強問句的任務脈絡，未經模型排名確認困難度；Q4仍需檢查實際儲存答案後才可判定重用安全。"
+    },
+    {
+      "group_id": "SC-E05",
+      "split": "evaluation",
+      "family_id": "academic_warning_vs_advisor",
+      "question_ids": [
+        "SC-E05-A",
+        "SC-E05-A",
+        "SC-E05-P",
+        "SC-E05-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P13",
+        "P14"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E06",
+      "split": "evaluation",
+      "family_id": "hiring_preference_vs_cs_curriculum",
+      "question_ids": [
+        "SC-E06-A",
+        "SC-E06-A",
+        "SC-E06-P",
+        "SC-E06-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P16",
+        "S28"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E07",
+      "split": "evaluation",
+      "family_id": "national_comparison_vs_mis_depth",
+      "question_ids": [
+        "SC-E07-A",
+        "SC-E07-A",
+        "SC-E07-P",
+        "SC-E07-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P17",
+        "S29"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E08",
+      "split": "evaluation",
+      "family_id": "software_cost_vs_laptop",
+      "question_ids": [
+        "SC-E08-A",
+        "SC-E08-A",
+        "SC-E08-P",
+        "SC-E08-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P20",
+        "S12"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E09",
+      "split": "evaluation",
+      "family_id": "cross_enrollment_vs_credit_counting",
+      "question_ids": [
+        "SC-E09-A",
+        "SC-E09-A",
+        "SC-E09-P",
+        "SC-E09-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P24",
+        "S11"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "P24只問跨修財金/資工的門檻；S11問一般外系選課及畢業學分認抵。共通選課政策可能同時回答，不可用不同來源ID證明不可重用。"
+    },
+    {
+      "group_id": "SC-E10",
+      "split": "evaluation",
+      "family_id": "portfolio_vs_interview",
+      "question_ids": [
+        "SC-E10-A",
+        "SC-E10-A",
+        "SC-E10-P",
+        "SC-E10-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P25",
+        "P26"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E11",
+      "split": "evaluation",
+      "family_id": "campus_life_vs_housing",
+      "question_ids": [
+        "SC-E11-A",
+        "SC-E11-A",
+        "SC-E11-P",
+        "SC-E11-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P27",
+        "S16"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E12",
+      "split": "evaluation",
+      "family_id": "graduation_requirements_vs_completion",
+      "question_ids": [
+        "SC-E12-A",
+        "SC-E12-A",
+        "SC-E12-P",
+        "SC-E12-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "P28",
+        "P29"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E13",
+      "split": "evaluation",
+      "family_id": "beginner_vs_exam_support",
+      "question_ids": [
+        "SC-E13-A",
+        "SC-E13-A",
+        "SC-E13-P",
+        "SC-E13-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S01",
+        "S04"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E14",
+      "split": "evaluation",
+      "family_id": "first_language_vs_other_languages",
+      "question_ids": [
+        "SC-E14-A",
+        "SC-E14-A",
+        "SC-E14-P",
+        "SC-E14-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S02",
+        "S03"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E15",
+      "split": "evaluation",
+      "family_id": "math_readiness_vs_heavy_courses",
+      "question_ids": [
+        "SC-E15-A",
+        "SC-E15-A",
+        "SC-E15-P",
+        "SC-E15-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S05",
+        "S06"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E16",
+      "split": "evaluation",
+      "family_id": "timetable_vs_prerequisites",
+      "question_ids": [
+        "SC-E16-A",
+        "SC-E16-A",
+        "SC-E16-P",
+        "SC-E16-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S09",
+        "S10"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認；r3只加強問句的任務脈絡，未經模型排名確認困難度；Q4仍需檢查實際儲存答案後才可判定重用安全。"
+    },
+    {
+      "group_id": "SC-E17",
+      "split": "evaluation",
+      "family_id": "workload_vs_study_spaces",
+      "question_ids": [
+        "SC-E17-A",
+        "SC-E17-A",
+        "SC-E17-P",
+        "SC-E17-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S14",
+        "S15"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認；r3只加強問句的任務脈絡，未經模型排名確認困難度；Q4仍需檢查實際儲存答案後才可判定重用安全。"
+    },
+    {
+      "group_id": "SC-E18",
+      "split": "evaluation",
+      "family_id": "clubs_vs_department_activities",
+      "question_ids": [
+        "SC-E18-A",
+        "SC-E18-A",
+        "SC-E18-P",
+        "SC-E18-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S17",
+        "S18"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    },
+    {
+      "group_id": "SC-E19",
+      "split": "evaluation",
+      "family_id": "ai_examples_vs_major_choice",
+      "question_ids": [
+        "SC-E19-A",
+        "SC-E19-A",
+        "SC-E19-P",
+        "SC-E19-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S21",
+        "S30"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認；r3只加強問句的任務脈絡，未經模型排名確認困難度；Q4仍需檢查實際儲存答案後才可判定重用安全。"
+    },
+    {
+      "group_id": "SC-E20",
+      "split": "evaluation",
+      "family_id": "graduate_destinations_vs_cross_field",
+      "question_ids": [
+        "SC-E20-A",
+        "SC-E20-A",
+        "SC-E20-P",
+        "SC-E20-N"
+      ],
+      "relations": [
+        "original",
+        "exact_repeat",
+        "paraphrase_reuse_candidate",
+        "different_intent_no_reuse_candidate"
+      ],
+      "source_intent_ids": [
+        "S23",
+        "S24"
+      ],
+      "review_status": "needs_review",
+      "semantic_boundary_review": "資訊需求不同的候選家族；跨組與跨切分語意獨立性仍須人工確認"
+    }
+  ],
+  "sd": {
+    "calibration": [
+      "SC-C01-A",
+      "SC-C01-N",
+      "SC-C02-A",
+      "SC-C02-N",
+      "SC-C03-A",
+      "SC-C03-N",
+      "SC-C04-A",
+      "SC-C04-N",
+      "SC-C05-A",
+      "SC-C05-N",
+      "SC-C06-A",
+      "SC-C06-N",
+      "SC-C07-A",
+      "SC-C07-N",
+      "SC-C08-A",
+      "SC-C08-N",
+      "SC-C09-A",
+      "SC-C09-N",
+      "SC-C10-A",
+      "SC-C10-N"
+    ],
+    "evaluation": [
+      "SC-E01-A",
+      "SC-E01-N",
+      "SC-E02-A",
+      "SC-E02-N",
+      "SC-E03-A",
+      "SC-E03-N",
+      "SC-E04-A",
+      "SC-E04-N",
+      "SC-E05-A",
+      "SC-E05-N",
+      "SC-E06-A",
+      "SC-E06-N",
+      "SC-E07-A",
+      "SC-E07-N",
+      "SC-E08-A",
+      "SC-E08-N",
+      "SC-E09-A",
+      "SC-E09-N",
+      "SC-E10-A",
+      "SC-E10-N",
+      "SC-E11-A",
+      "SC-E11-N",
+      "SC-E12-A",
+      "SC-E12-N",
+      "SC-E13-A",
+      "SC-E13-N",
+      "SC-E14-A",
+      "SC-E14-N",
+      "SC-E15-A",
+      "SC-E15-N",
+      "SC-E16-A",
+      "SC-E16-N",
+      "SC-E17-A",
+      "SC-E17-N",
+      "SC-E18-A",
+      "SC-E18-N",
+      "SC-E19-A",
+      "SC-E19-N",
+      "SC-E20-A",
+      "SC-E20-N"
+    ]
+  },
+  "ti": [
+    {
+      "conversation_id": "TI-01",
+      "source_conversation_id": "UR1_CV01",
+      "split": "calibration",
+      "queries": [
+        "系上有學士接碩士的五年一貫嗎？名額多不多？",
+        "那個管道大概收多少人？",
+        "如果是一般研究所招生，系上同學推甄和筆試哪一種錄取率比較高？",
+        "五年一貫的名額大概多不多？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "系上有學士接碩士的五年一貫嗎？名額多不多？",
+        "那個管道大概收多少人？",
+        "如果走一般研究所招生，推甄和筆試哪種錄取的比較多？",
+        "那回到一開始的五年一貫，它也有名額限制嗎？"
+      ],
+      "topic_ids": [
+        "degree",
+        "degree",
+        "degree_application",
+        "degree"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P05"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P05"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P07"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P05"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "系上有學士接碩士的五年一貫嗎？名額多不多？",
+            "那個管道大概收多少人？",
+            "如果是一般研究所招生，系上同學推甄和筆試哪一種錄取率比較高？",
+            "那回到一開始的五年一貫，它也有名額限制嗎？"
+          ],
+          "topic_ids": [
+            "degree",
+            "degree",
+            "degree_application",
+            "degree"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-02",
+      "source_conversation_id": "UR1_CV02",
+      "split": "calibration",
+      "queries": [
+        "大學微積分跟高中數學差在哪裡？",
+        "那進大學後，這一科主要多了什麼？",
+        "統計學呢？跟高中數學差很多嗎，要背很多公式嗎？",
+        "那微積分跟高中數學的差別，可以再說一次嗎？"
+      ],
+      "modification_reason": "口語修訂2：依目前問句重標候選主題與前輪依賴；移除不必要計算/指令式提問，維持原家族與Split。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "大學微積分跟高中數學差在哪裡？",
+        "那進大學後，這一科主要多了什麼？",
+        "統計學呢？跟高中數學差很多嗎，要背很多公式嗎？",
+        "再回來說微積分，它跟統計的學習方式差在哪？"
+      ],
+      "topic_ids": [
+        "calculus",
+        "calculus",
+        "statistics",
+        "calculus"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S07"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S07"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S08"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S07"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。"
+    },
+    {
+      "conversation_id": "TI-03",
+      "source_conversation_id": "UR1_CV03",
+      "split": "calibration",
+      "queries": [
+        "優秀新生獎學金要符合什麼資格？",
+        "拿到那個獎學金就能免學雜費嗎？",
+        "如果先不看獎學金，每學期學雜費大概多少？",
+        "那個新生獎學金要符合哪些條件才能申請？"
+      ],
+      "modification_reason": "r4三表整合：保留語意、候選主題與歷史依賴的口語微調；仍待人工標籤審核。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "優秀新生獎學金要符合什麼資格？",
+        "拿到那個獎學金就能免學雜費嗎？",
+        "如果先不看獎學金，每學期學雜費大概多少？",
+        "那回到獎學金，沒符合資格是不是就不能保證減免？"
+      ],
+      "topic_ids": [
+        "scholarship",
+        "scholarship",
+        "tuition",
+        "scholarship"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        [
+          1
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P19"
+        ],
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P19"
+        ],
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P18"
+        ],
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P19"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r3",
+          "queries": [
+            "優秀新生獎學金要符合什麼資格？",
+            "拿到那個獎學金就能免學雜費嗎？",
+            "如果先不看獎學金，每學期學雜費大概多少？",
+            "那剛剛說的新生獎學金，要符合哪些申請條件？"
+          ],
+          "topic_ids": [
+            "scholarship",
+            "scholarship",
+            "tuition",
+            "scholarship"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-04",
+      "source_conversation_id": "UR1_CV04",
+      "split": "evaluation",
+      "queries": [
+        "我們系畢業可以考哪些公務員或國營類科？",
+        "剛剛那個公職方向，也包含國營事業嗎？",
+        "如果不考公職，學長姐常去哪幾家企業？",
+        "那我還是想走公職，適合準備哪些類科？"
+      ],
+      "modification_reason": "口語修訂2：依目前問句重標候選主題與前輪依賴；移除不必要計算/指令式提問，維持原家族與Split。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "我們系畢業可以考哪些公務員或國營類科？",
+        "剛剛那個公職方向，也包含國營事業嗎？",
+        "如果不考公職，學長姐常去哪幾家企業？",
+        "那我還是想走公職，適合準備哪些類科？"
+      ],
+      "topic_ids": [
+        "public_jobs",
+        "public_jobs",
+        "private_jobs",
+        "public_jobs"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P03"
+        ],
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P03"
+        ],
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P01"
+        ],
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P03"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": true
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。"
+    },
+    {
+      "conversation_id": "TI-05",
+      "source_conversation_id": "UR1_CV05",
+      "split": "calibration",
+      "queries": [
+        "系上有五年一貫嗎？大概有多少名額？",
+        "如果我不走那個管道，大學畢業就去工作可以嗎？",
+        "所以只念到學士，不一定就找不到好工作吧？",
+        "五年一貫這個管道，系上有嗎？名額多不多？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "系上有五年一貫嗎？大概有多少名額？",
+        "如果我不走那個管道，大學畢業就去工作可以嗎？",
+        "所以只念到學士，不一定就找不到好工作吧？",
+        "那如果之後又想走五年一貫，系上有這個制度嗎？"
+      ],
+      "topic_ids": [
+        "linked_degree",
+        "work_without_masters",
+        "work_without_masters",
+        "linked_degree"
+      ],
+      "shift_labels": [
+        "initial",
+        "shift",
+        "same_topic",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P05"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P06"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P06"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P05"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "系上有五年一貫嗎？大概有多少名額？",
+            "如果我不走那個管道，大學畢業就去工作可以嗎？",
+            "所以只念到學士，不一定就找不到好工作吧？",
+            "那回到剛剛的五年一貫，系上有這個管道嗎？名額多不多？"
+          ],
+          "topic_ids": [
+            "linked_degree",
+            "work_without_masters",
+            "work_without_masters",
+            "linked_degree"
+          ],
+          "shift_labels": [
+            "initial",
+            "shift",
+            "same_topic",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-06",
+      "source_conversation_id": "UR1_CV06",
+      "split": "calibration",
+      "queries": [
+        "微積分如果沒過，會擋到後面的課嗎？",
+        "那是所有課都不能選，還是只有部分課？",
+        "我也想問統計學，是不是得背很多公式？",
+        "對了，微積分沒過的話，會影響大二修課嗎？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "微積分如果沒過，會擋到後面的課嗎？",
+        "那是所有課都不能選，還是只有部分課？",
+        "我也想問統計學，是不是得背很多公式？",
+        "再問回微積分，如果沒過，會影響大二修課嗎？"
+      ],
+      "topic_ids": [
+        "prerequisite",
+        "prerequisite",
+        "statistics",
+        "prerequisite"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S10"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S10"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S08"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S10"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "微積分如果沒過，會擋到後面的課嗎？",
+            "那是所有課都不能選，還是只有部分課？",
+            "我也想問統計學，是不是得背很多公式？",
+            "再問回微積分，如果沒過，會影響大二修課嗎？"
+          ],
+          "topic_ids": [
+            "prerequisite",
+            "prerequisite",
+            "statistics",
+            "prerequisite"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            []
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-07",
+      "source_conversation_id": "UR1_CV07",
+      "split": "calibration",
+      "queries": [
+        "讀四年期間，每學期學雜費大概多少，有哪些獎助管道？",
+        "那個費用是要看哪個入學年度的資料？",
+        "那優秀入學獎學金要符合什麼條件？",
+        "如果符合剛剛那些資格，就能免學雜費嗎？"
+      ],
+      "modification_reason": "口語修訂2：依目前問句重標候選主題與前輪依賴；移除不必要計算/指令式提問，維持原家族與Split。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "讀四年期間，每學期學雜費大概多少，有哪些獎助管道？",
+        "那個費用是要看哪個入學年度的資料？",
+        "如果我還沒提供成績，可以先知道自己一定拿得到新生獎學金嗎？",
+        "那我得先準備哪些資料，才能確認剛剛那個獎學金資格？"
+      ],
+      "topic_ids": [
+        "tuition",
+        "tuition",
+        "scholarship_personal",
+        "scholarship_personal"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        [
+          3
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P18"
+        ],
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P18"
+        ],
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P19"
+        ],
+        [
+          "UR1_A004",
+          "UR1_B004",
+          "UR1_C004",
+          "UR1_D004",
+          "UR1_U003",
+          "UR1_T002",
+          "UR1_E003",
+          "UR1_F001",
+          "UR1_J001",
+          "P19"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。"
+    },
+    {
+      "conversation_id": "TI-08",
+      "source_conversation_id": "UR1_CV08",
+      "split": "evaluation",
+      "queries": [
+        "資料科學系畢業後，工作三到五年的薪水大概多少？",
+        "你說的那個待遇範圍，每個人都一樣嗎？",
+        "還不知道公司和職務，也能先知道確切月薪嗎？",
+        "所以剛剛說的薪水，只能作參考，不能保證每個人都拿得到，對嗎？"
+      ],
+      "modification_reason": "口語修訂2：依目前問句重標候選主題與前輪依賴；移除不必要計算/指令式提問，維持原家族與Split。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "畢業後通常去哪幾家企業？工作三到五年的薪水大概多少？",
+        "那個薪水範圍，能當成每年一定加多少薪水嗎？",
+        "如果還不知道公司和職務，也能先知道確切月薪嗎？",
+        "所以剛剛三到五年的待遇，只能當參考，不能保證對嗎？"
+      ],
+      "topic_ids": [
+        "career_salary",
+        "career_salary",
+        "career_salary",
+        "career_salary"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "same_topic",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P04"
+        ],
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P04"
+        ],
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P04"
+        ],
+        [
+          "UR1_A002",
+          "UR1_B001",
+          "UR1_D002",
+          "UR1_U001",
+          "UR1_T003",
+          "UR1_E004",
+          "UR1_F002",
+          "P04"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": true
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。"
+    },
+    {
+      "conversation_id": "TI-09",
+      "source_conversation_id": "UR1_CV09",
+      "split": "calibration",
+      "queries": [
+        "我想申請研究所，系上能保證我錄取某一間嗎？",
+        "要討論剛剛那個申請，我需要先說明自己的哪些條件？",
+        "如果改走五年一貫，今年名額要去哪裡確認？",
+        "一般研究所申請，不能因為系上有五年一貫就保證錄取，對嗎？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "我想申請研究所，系上能保證我錄取某一間嗎？",
+        "那要先了解我的哪些條件，才比較能討論？",
+        "如果改走五年一貫，今年名額要去哪裡確認？",
+        "那一般研究所申請，還是不能因為有五年一貫就保證錄取吧？"
+      ],
+      "topic_ids": [
+        "admission_guarantee",
+        "admission_guarantee",
+        "linked_degree",
+        "admission_guarantee"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P07"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P07"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P05"
+        ],
+        [
+          "UR1_A001",
+          "UR1_B002",
+          "UR1_C001",
+          "UR1_C002",
+          "UR1_D001",
+          "UR1_U002",
+          "UR1_T001",
+          "UR1_R001",
+          "UR1_E002",
+          "UR1_G001",
+          "UR1_H001",
+          "UR1_J002",
+          "P07",
+          "P05"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "我想申請研究所，系上能保證我錄取某一間嗎？",
+            "要討論剛剛那個申請，我需要先說明自己的哪些條件？",
+            "如果改走五年一貫，今年名額要去哪裡確認？",
+            "那回到一般研究所申請，就算系上有五年一貫，也不代表我一定能錄取，對嗎？"
+          ],
+          "topic_ids": [
+            "admission_guarantee",
+            "admission_guarantee",
+            "linked_degree",
+            "admission_guarantee"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1,
+              3
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-10",
+      "source_conversation_id": "UR1_CV10",
+      "split": "calibration",
+      "queries": [
+        "微積分跟統計，和高中數學各有什麼不同？",
+        "剛剛說的統計學，需要背很多公式嗎？",
+        "如果其中一科沒過，會擋到後面的課嗎？",
+        "微積分跟高中數學，最大的差別是什麼？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "微積分跟統計，和高中數學各有什麼不同？",
+        "剛剛兩科裡，哪一科比較涉及背公式的問題？",
+        "如果我說有一科沒過會不會擋修，你是不是得先知道是哪一科？",
+        "那我先不問擋修，回來了解微積分跟統計各在學什麼。"
+      ],
+      "topic_ids": [
+        "math_comparison",
+        "math_comparison",
+        "prerequisite_ambiguous",
+        "math_comparison"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S07",
+          "S08"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S08"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S10"
+        ],
+        [
+          "UR1_A003",
+          "UR1_B003",
+          "UR1_C003",
+          "UR1_D003",
+          "UR1_R002",
+          "UR1_E001",
+          "UR1_G002",
+          "UR1_H002",
+          "UR1_J003",
+          "S07"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "calibration",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "微積分跟統計，和高中數學各有什麼不同？",
+            "剛剛說的統計學，需要背很多公式嗎？",
+            "如果其中一科沒過，會擋到後面的課嗎？",
+            "那先回來問微積分，它跟高中數學最大的差別是什麼？"
+          ],
+          "topic_ids": [
+            "math_comparison",
+            "math_comparison",
+            "prerequisite_ambiguous",
+            "math_comparison"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-11",
+      "source_conversation_id": "UR1_CV11",
+      "split": "evaluation",
+      "queries": [
+        "系上的公有雲補助，跟校內AI伺服器有什麼不同？",
+        "剛剛說的公有雲，是指校內的電腦嗎？",
+        "那我買自己的筆電，一定要有高階顯卡嗎？",
+        "那校內的AI伺服器，跟剛剛說的公有雲又有什麼不同？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "系上的公有雲補助，跟校內AI伺服器有什麼不同？",
+        "剛剛說的公有雲，是指校內的電腦嗎？",
+        "那我買自己的筆電，一定要有高階顯卡嗎？",
+        "如果回來說校內AI伺服器，那又是另一種運算資源嗎？"
+      ],
+      "topic_ids": [
+        "compute_resources",
+        "compute_resources",
+        "laptop",
+        "compute_resources"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        [
+          1
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "P21",
+          "S13"
+        ],
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "P21",
+          "S13"
+        ],
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "S12"
+        ],
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "S13",
+          "P21"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "系上的公有雲補助，跟校內AI伺服器有什麼不同？",
+            "剛剛說的公有雲，是指校內的電腦嗎？",
+            "那我買自己的筆電，一定要有高階顯卡嗎？",
+            "如果回來說校內AI伺服器，那又是另一種運算資源嗎？"
+          ],
+          "topic_ids": [
+            "compute_resources",
+            "compute_resources",
+            "laptop",
+            "compute_resources"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-12",
+      "source_conversation_id": "UR1_CV12",
+      "split": "evaluation",
+      "queries": [
+        "畢專大幾開始做？指導老師是自己找嗎？",
+        "你說的那個時間點是大幾？",
+        "那組員跟題目通常怎麼決定？",
+        "指導教授要自己找的話，是我們自己去聯絡老師嗎？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "畢專大幾開始做？指導老師是自己找嗎？",
+        "你說的那個時間點是大幾？",
+        "那組員跟題目通常怎麼決定？",
+        "回來問找老師，是我們自己去聯絡教授嗎？"
+      ],
+      "topic_ids": [
+        "project_planning",
+        "project_planning",
+        "project_planning",
+        "project_planning"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "same_topic",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S19"
+        ],
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S19"
+        ],
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S20"
+        ],
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S19"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "畢專大幾開始做？指導老師是自己找嗎？",
+            "你說的那個時間點是大幾？",
+            "那組員跟題目通常怎麼決定？",
+            "回來問找老師，是我們自己去聯絡教授嗎？"
+          ],
+          "topic_ids": [
+            "project_planning",
+            "project_planning",
+            "project_planning",
+            "project_planning"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "same_topic",
+            "same_topic"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-13",
+      "source_conversation_id": "UR1_CV13",
+      "split": "evaluation",
+      "queries": [
+        "系上有跟哪些知名企業合作實習？會給薪水嗎？",
+        "那剛剛說的實習機會，全部都有薪水嗎？",
+        "如果大四整年都在企業全職實習，可以算學分嗎？",
+        "系上合作企業的實習，通常會給薪水嗎？"
+      ],
+      "modification_reason": "r4三表整合：保留語意、候選主題與歷史依賴的口語微調；仍待人工標籤審核。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "系上有跟哪些知名企業合作實習？會給薪水嗎？",
+        "那剛剛說的實習機會，全部都有薪水嗎？",
+        "如果大四整年都在企業全職實習，可以算學分嗎？",
+        "那拿不拿得到薪水，和能不能算學分是兩件事吧？"
+      ],
+      "topic_ids": [
+        "internship_planning",
+        "internship_planning",
+        "internship_planning",
+        "internship_planning"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "same_topic",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A005",
+          "UR1_B005",
+          "UR1_C009",
+          "UR1_D006",
+          "UR1_U005",
+          "UR1_T005",
+          "UR1_R003",
+          "UR1_E005",
+          "UR1_G004",
+          "UR1_H004",
+          "UR1_J005",
+          "P08"
+        ],
+        [
+          "UR1_A005",
+          "UR1_B005",
+          "UR1_C009",
+          "UR1_D006",
+          "UR1_U005",
+          "UR1_T005",
+          "UR1_R003",
+          "UR1_E005",
+          "UR1_G004",
+          "UR1_H004",
+          "UR1_J005",
+          "P08"
+        ],
+        [
+          "UR1_A005",
+          "UR1_B005",
+          "UR1_C009",
+          "UR1_D006",
+          "UR1_U005",
+          "UR1_T005",
+          "UR1_R003",
+          "UR1_E005",
+          "UR1_G004",
+          "UR1_H004",
+          "UR1_J005",
+          "P09"
+        ],
+        [
+          "UR1_A005",
+          "UR1_B005",
+          "UR1_C009",
+          "UR1_D006",
+          "UR1_U005",
+          "UR1_T005",
+          "UR1_R003",
+          "UR1_E005",
+          "UR1_G004",
+          "UR1_H004",
+          "UR1_J005",
+          "P08"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "系上有跟哪些知名企業合作實習？會給薪水嗎？",
+            "那剛剛說的實習機會，全部都有薪水嗎？",
+            "如果大四整年都在企業全職實習，可以算學分嗎？",
+            "那回到實習薪水，系上合作的實習機會有給薪嗎？"
+          ],
+          "topic_ids": [
+            "internship_planning",
+            "internship_planning",
+            "internship_planning",
+            "internship_planning"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "same_topic",
+            "same_topic"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1
+            ]
+          ]
+        },
+        {
+          "revision": "spoken_candidate_r3",
+          "queries": [
+            "系上有跟哪些知名企業合作實習？會給薪水嗎？",
+            "那剛剛說的實習機會，全部都有薪水嗎？",
+            "如果大四整年都在企業全職實習，可以算學分嗎？",
+            "找系上合作企業實習，通常有薪水嗎？"
+          ],
+          "topic_ids": [
+            "internship_planning",
+            "internship_planning",
+            "internship_planning",
+            "internship_planning"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "same_topic",
+            "same_topic"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            []
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-14",
+      "source_conversation_id": "UR1_CV14",
+      "split": "evaluation",
+      "queries": [
+        "如果課業跟不上，系上有預警輔導嗎？",
+        "還沒被當，也能先找剛剛那種協助嗎？",
+        "另外，每個學生都有固定導師嗎？",
+        "課業跟不上時，剛剛說的預警輔導會怎麼幫忙？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "如果課業跟不上，系上有預警輔導嗎？",
+        "還沒被當，也能先找剛剛那種協助嗎？",
+        "另外，每個學生都有固定導師嗎？",
+        "那預警輔導跟固定導師，是不同的協助方式嗎？"
+      ],
+      "topic_ids": [
+        "academic_warning",
+        "academic_warning",
+        "advisor",
+        "academic_warning"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        [
+          1
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A007",
+          "UR1_B007",
+          "UR1_C011",
+          "UR1_D008",
+          "UR1_U009",
+          "UR1_E010",
+          "UR1_H007",
+          "P13"
+        ],
+        [
+          "UR1_A007",
+          "UR1_B007",
+          "UR1_C011",
+          "UR1_D008",
+          "UR1_U009",
+          "UR1_E010",
+          "UR1_H007",
+          "P13"
+        ],
+        [
+          "UR1_A007",
+          "UR1_B007",
+          "UR1_C011",
+          "UR1_D008",
+          "UR1_U009",
+          "UR1_E010",
+          "UR1_H007",
+          "P14"
+        ],
+        [
+          "UR1_A007",
+          "UR1_B007",
+          "UR1_C011",
+          "UR1_D008",
+          "UR1_U009",
+          "UR1_E010",
+          "UR1_H007",
+          "P13"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "如果課業跟不上，系上有預警輔導嗎？",
+            "還沒被當，也能先找剛剛那種協助嗎？",
+            "另外，每個學生都有固定導師嗎？",
+            "那回到剛剛的預警輔導，課業跟不上時會怎麼協助？"
+          ],
+          "topic_ids": [
+            "academic_warning",
+            "academic_warning",
+            "advisor",
+            "academic_warning"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-15",
+      "source_conversation_id": "UR1_CV15",
+      "split": "evaluation",
+      "queries": [
+        "系上專任老師多嗎？主要研究哪些領域？",
+        "那能看到每一位老師的研究方向嗎？",
+        "老師本身有沒有在業界工作的經驗？",
+        "那系上的專任老師主要做哪些領域的研究？"
+      ],
+      "modification_reason": "口語修訂2：依目前問句重標候選主題與前輪依賴；移除不必要計算/指令式提問，維持原家族與Split。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "系上專任老師多嗎？主要研究哪些領域？",
+        "那能看到每一位老師的研究方向嗎？",
+        "老師本身有沒有在業界工作的經驗？",
+        "所以研究方向和業界經驗，要分開了解對嗎？"
+      ],
+      "topic_ids": [
+        "faculty_profile",
+        "faculty_profile",
+        "faculty_profile",
+        "faculty_profile"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "same_topic",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A006",
+          "UR1_B006",
+          "UR1_C010",
+          "UR1_D007",
+          "UR1_U006",
+          "UR1_T006",
+          "P11"
+        ],
+        [
+          "UR1_A006",
+          "UR1_B006",
+          "UR1_C010",
+          "UR1_D007",
+          "UR1_U006",
+          "UR1_T006",
+          "P11"
+        ],
+        [
+          "UR1_A006",
+          "UR1_B006",
+          "UR1_C010",
+          "UR1_D007",
+          "UR1_U006",
+          "UR1_T006",
+          "P12"
+        ],
+        [
+          "UR1_A006",
+          "UR1_B006",
+          "UR1_C010",
+          "UR1_D007",
+          "UR1_U006",
+          "UR1_T006",
+          "P11"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。"
+    },
+    {
+      "conversation_id": "TI-16",
+      "source_conversation_id": "UR1_CV16",
+      "split": "evaluation",
+      "queries": [
+        "在學期間有哪些姊妹校可以去交換？出去交換會不會延畢？",
+        "剛剛那個交換安排，學分要先確認能不能認抵嗎？",
+        "如果我現在想申請交換，要看哪一學年度的公告？",
+        "那我最在意的還是畢業時間，去交換之前要先確認哪些事？"
+      ],
+      "modification_reason": "r4三表整合：保留語意、候選主題與歷史依賴的口語微調；仍待人工標籤審核。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "系上有哪些交換學校？出去交換會不會延畢？",
+        "剛剛那個交換安排，學分要先確認能不能認抵嗎？",
+        "如果我想申請現在開放的交換學校，要看哪個年度的公告？",
+        "那回到畢業時間，我出國前要先確認哪些學分？"
+      ],
+      "topic_ids": [
+        "exchange_planning",
+        "exchange_planning",
+        "exchange_planning",
+        "exchange_planning"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "same_topic",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A010",
+          "UR1_D010",
+          "UR1_T009",
+          "UR1_R006",
+          "UR1_E009",
+          "UR1_G007",
+          "P22",
+          "P23"
+        ],
+        [
+          "UR1_A010",
+          "UR1_D010",
+          "UR1_T009",
+          "UR1_R006",
+          "UR1_E009",
+          "UR1_G007",
+          "P23"
+        ],
+        [
+          "UR1_A010",
+          "UR1_D010",
+          "UR1_T009",
+          "UR1_R006",
+          "UR1_E009",
+          "UR1_G007",
+          "P22"
+        ],
+        [
+          "UR1_A010",
+          "UR1_D010",
+          "UR1_T009",
+          "UR1_R006",
+          "UR1_E009",
+          "UR1_G007",
+          "P23"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r3",
+          "queries": [
+            "在學期間有哪些姊妹校可以去交換？出去交換會不會延畢？",
+            "剛剛那個交換安排，學分要先確認能不能認抵嗎？",
+            "如果我想申請現在開放的交換學校，要看哪個年度的公告？",
+            "那我最在意的還是畢業時間，去交換之前要先確認哪些事？"
+          ],
+          "topic_ids": [
+            "exchange_planning",
+            "exchange_planning",
+            "exchange_planning",
+            "exchange_planning"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "same_topic",
+            "same_topic"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-17",
+      "source_conversation_id": "UR1_CV17",
+      "split": "evaluation",
+      "queries": [
+        "大一保證有宿舍嗎？沒抽到的話附近好租房子嗎？",
+        "如果我沒抽到，剛剛說的租屋選擇方便嗎？",
+        "系學會有沒有辦新生迎新？",
+        "住宿的事我還想問一下，沒抽中宿舍時，附近找房子方便嗎？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "大一保證有宿舍嗎？沒抽到的話附近好租房子嗎？",
+        "如果我沒抽到，剛剛說的租屋選擇方便嗎？",
+        "系學會有沒有辦新生迎新？",
+        "那住宿我還是想再問，沒抽中時附近找房子方便嗎？"
+      ],
+      "topic_ids": [
+        "housing",
+        "housing",
+        "student_activities",
+        "housing"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        [
+          1
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_B010",
+          "UR1_C012",
+          "UR1_U007",
+          "UR1_T007",
+          "UR1_E012",
+          "UR1_G006",
+          "UR1_H008",
+          "UR1_J007",
+          "S16"
+        ],
+        [
+          "UR1_B010",
+          "UR1_C012",
+          "UR1_U007",
+          "UR1_T007",
+          "UR1_E012",
+          "UR1_G006",
+          "UR1_H008",
+          "UR1_J007",
+          "S16"
+        ],
+        [
+          "UR1_B010",
+          "UR1_C012",
+          "UR1_U007",
+          "UR1_T007",
+          "UR1_E012",
+          "UR1_G006",
+          "UR1_H008",
+          "UR1_J007",
+          "S18"
+        ],
+        [
+          "UR1_B010",
+          "UR1_C012",
+          "UR1_U007",
+          "UR1_T007",
+          "UR1_E012",
+          "UR1_G006",
+          "UR1_H008",
+          "UR1_J007",
+          "S16"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "大一保證有宿舍嗎？沒抽到的話附近好租房子嗎？",
+            "如果我沒抽到，剛剛說的租屋選擇方便嗎？",
+            "系學會有沒有辦新生迎新？",
+            "那住宿我還是想再問，沒抽中時附近找房子方便嗎？"
+          ],
+          "topic_ids": [
+            "housing",
+            "housing",
+            "student_activities",
+            "housing"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-18",
+      "source_conversation_id": "UR1_CV18",
+      "split": "evaluation",
+      "queries": [
+        "系上對筆電有規格要求嗎？需要高階顯卡嗎？",
+        "如果我不買那麼好的顯卡，會不會不夠用？",
+        "系上有提供公有雲的額度補助嗎？",
+        "買筆電時，系上對顯卡到底有沒有規格要求？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "系上對筆電有規格要求嗎？需要高階顯卡嗎？",
+        "如果我不買那麼好的顯卡，會不會不夠用？",
+        "系上有提供公有雲的額度補助嗎？",
+        "那買筆電的規格，還是不能只看有沒有雲端補助對嗎？"
+      ],
+      "topic_ids": [
+        "laptop",
+        "laptop",
+        "cloud_credit",
+        "laptop"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "shift",
+        "shift"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "S12"
+        ],
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "S12"
+        ],
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "P21"
+        ],
+        [
+          "UR1_A008",
+          "UR1_B008",
+          "UR1_C005",
+          "UR1_C006",
+          "UR1_D005",
+          "UR1_U004",
+          "UR1_T004",
+          "UR1_R004",
+          "UR1_E006",
+          "UR1_E007",
+          "UR1_G003",
+          "UR1_H003",
+          "UR1_J004",
+          "S12"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "系上對筆電有規格要求嗎？需要高階顯卡嗎？",
+            "如果我不買那麼好的顯卡，會不會不夠用？",
+            "系上有提供公有雲的額度補助嗎？",
+            "那回到買筆電，系上對顯卡到底有沒有規格要求？"
+          ],
+          "topic_ids": [
+            "laptop",
+            "laptop",
+            "cloud_credit",
+            "laptop"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "shift",
+            "shift"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-19",
+      "source_conversation_id": "UR1_CV19",
+      "split": "evaluation",
+      "queries": [
+        "我看到112學年度入學的畢業學分資料，這份是適用哪些學生的？",
+        "那我也是那個學年度入學，查畢業要求可以先看這份嗎？",
+        "如果是今年才入學的同學，也能直接看同一份嗎？",
+        "那我要查自己適用的畢業規定，應該看哪一個入學年度？"
+      ],
+      "modification_reason": "r4三表整合：保留語意、候選主題與歷史依賴的口語微調；仍待人工標籤審核。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "我看到112學年度入學的畢業學分資料，必修和選修各要多少？",
+        "它上面寫的必修加選修，合起來是多少學分？",
+        "如果是今年入學的新生，也能直接照那一份算嗎？",
+        "那我先照112入學的那份來看，總學分是多少？"
+      ],
+      "topic_ids": [
+        "graduation_requirements",
+        "graduation_requirements",
+        "graduation_requirements",
+        "graduation_requirements"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "same_topic",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "source_question_ids": [
+        [
+          "UR1_F003",
+          "UR1_F004",
+          "UR1_F005",
+          "UR1_F006",
+          "UR1_F007",
+          "UR1_J008"
+        ],
+        [
+          "UR1_F003",
+          "UR1_F004",
+          "UR1_F005",
+          "UR1_F006",
+          "UR1_F007",
+          "UR1_J008"
+        ],
+        [
+          "UR1_F003",
+          "UR1_F004",
+          "UR1_F005",
+          "UR1_F006",
+          "UR1_F007",
+          "UR1_J008"
+        ],
+        [
+          "UR1_F003",
+          "UR1_F004",
+          "UR1_F005",
+          "UR1_F006",
+          "UR1_F007",
+          "UR1_J008"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "我看到112學年度入學的畢業學分資料，這份是適用哪些學生的？",
+            "那我也是那個學年度入學，查畢業要求可以先看這份嗎？",
+            "如果是今年才入學的同學，也能直接看同一份嗎？",
+            "那回到我這一屆，要確認畢業要求，應該找哪個入學年度的資料？"
+          ],
+          "topic_ids": [
+            "graduation_requirements",
+            "graduation_requirements",
+            "graduation_requirements",
+            "graduation_requirements"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "same_topic",
+            "same_topic"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        },
+        {
+          "revision": "spoken_candidate_r3",
+          "queries": [
+            "我看到112學年度入學的畢業學分資料，這份是適用哪些學生的？",
+            "那我也是那個學年度入學，查畢業要求可以先看這份嗎？",
+            "如果是今年才入學的同學，也能直接看同一份嗎？",
+            "以我入學的那一屆來看，要找哪個年度的畢業要求？"
+          ],
+          "topic_ids": [
+            "graduation_requirements",
+            "graduation_requirements",
+            "graduation_requirements",
+            "graduation_requirements"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "same_topic",
+            "same_topic"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "TI-20",
+      "source_conversation_id": "UR1_CV20",
+      "split": "evaluation",
+      "queries": [
+        "畢業專題什麼時候開始？老師要自己找嗎？",
+        "那我可以自己去問想合作的教授嗎？",
+        "那專題是分組還是一個人做？題目怎麼決定？",
+        "畢業專題通常大幾開始做？"
+      ],
+      "modification_reason": "口語修訂3：減少刻意回題句型；候選主題粒度不變，明說主題的自足問句取消不必要歷史依賴，指代追問保留歷史。",
+      "review_status": "needs_review",
+      "previous_queries": [
+        "畢業專題什麼時候開始？老師要自己找嗎？",
+        "那我可以自己去問想合作的教授嗎？",
+        "我看到115年6月的專題截止日期，這個日期每年都一樣嗎？",
+        "先不看那個截止日，畢專通常是大幾開始做？"
+      ],
+      "topic_ids": [
+        "project_planning",
+        "project_planning",
+        "project_planning",
+        "project_planning"
+      ],
+      "shift_labels": [
+        "initial",
+        "same_topic",
+        "same_topic",
+        "same_topic"
+      ],
+      "required_history_turn_indices": [
+        [],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        []
+      ],
+      "source_question_ids": [
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S19"
+        ],
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S19"
+        ],
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S20"
+        ],
+        [
+          "UR1_A009",
+          "UR1_B009",
+          "UR1_C007",
+          "UR1_C008",
+          "UR1_D009",
+          "UR1_U008",
+          "UR1_T008",
+          "UR1_R005",
+          "UR1_E008",
+          "UR1_F008",
+          "UR1_G005",
+          "UR1_H005",
+          "UR1_H006",
+          "UR1_J006",
+          "S19"
+        ]
+      ],
+      "prior_exposure": {
+        "source_split": "evaluation",
+        "previous_benchmark_exposure": "possible_previously_available_not_blind",
+        "moved_from_calibration": false
+      },
+      "topic_annotation_basis": "以目前對話任務/討論對象標記：專題規劃、交換規劃、實習規劃、師資資訊及畢業要求內的細節或適用年度變化不自動算切換；所有標籤及必要歷史仍待人審。",
+      "revision_history": [
+        {
+          "revision": "spoken_candidate_r2",
+          "queries": [
+            "畢業專題什麼時候開始？老師要自己找嗎？",
+            "那我可以自己去問想合作的教授嗎？",
+            "那專題是分組還是一個人做？題目怎麼決定？",
+            "回來問一開始做專題的時間，通常是大幾開始？"
+          ],
+          "topic_ids": [
+            "project_planning",
+            "project_planning",
+            "project_planning",
+            "project_planning"
+          ],
+          "shift_labels": [
+            "initial",
+            "same_topic",
+            "same_topic",
+            "same_topic"
+          ],
+          "required_history_turn_indices": [
+            [],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "int": {
+    "calibration": [
+      "SC-C01",
+      "SC-C02",
+      "SC-C03",
+      "SC-C04",
+      "SC-C05"
+    ],
+    "evaluation": [
+      "SC-E01",
+      "SC-E02",
+      "SC-E03",
+      "SC-E04",
+      "SC-E05",
+      "SC-E06",
+      "SC-E07",
+      "SC-E08",
+      "SC-E09",
+      "SC-E10"
+    ],
+    "policy": "references SC groups verbatim; no separate questions; decoder fixed after Calibration"
+  },
+  "policies": {
+    "cache_workload": "controlled_diagnostic_not_real_traffic; four measured requests per group; default cold",
+    "prefilled": "optional INT initial_fill of each selected group's first question; separate cost; measured counts unchanged",
+    "family_basis": "distinct original FAQ information intents, not just new IDs; each original FAQ belongs to one SC/SD split",
+    "semantic_risks": [
+      "P18 contains both tuition and general aid; P19 entry-scholarship eligibility overlaps in topic: review boundaries",
+      "P24 vs S11 cross-enrollment vs credit recognition may admit overlapping answers",
+      "career, mathematics and graduate-study parent topics appear in both SC/SD splits with different intent facets: manual semantic independence audit required",
+      "TI CV04/CV08 previously Calibration are Evaluation here by complete career family: prior exposure must be disclosed; not a new blind test",
+      "QA exposes all FAQ intents; do not use QA/Evaluation outputs to select SC/SD/TI/INT settings. Cross-algorithm source overlap requires disclosure, not independent-test claims.",
+      "E02 public-job eligibility vs job-search services, E17 workload vs facilities and E19 AI examples vs major choice remain broader task contrasts even after r3 contextualization; no claim of validated hard negatives. Public project-display location not substituted because existing FAQ evidence does not establish that information need."
+    ],
+    "answer_policy": "no new answer facts; source answers remain candidates; no automatic verified/reusable labels",
+    "topic_annotation": "Task-level candidate topic taxonomy; scope/year/facet changes within the same ongoing planning task are not automatically topic shifts. Attention is not a causal explanation; review all labels."
+  },
+  "revision": "spoken_candidate_r4",
+  "previous_suite_sha256": "6fdfd3e61b6136627d24c31a32664306a9f43785e643d105ae0254073374b150",
+  "parent_files_sha256": {
+    "suites.json": "6fdfd3e61b6136627d24c31a32664306a9f43785e643d105ae0254073374b150",
+    "questions.jsonl": "fb1f0c084a15cda46c622b802667dc2754b5fde1c3e6c1dd5c1ec6586e5b1e66"
+  }
+}

@@ -40,9 +40,9 @@ def write_rows(path, rows):
 
 
 def load_dataset(root, name="unified_research_v1"):
-    if name == "experiment_suites_v1":
+    if name in {"experiment_suites_v1", "experiment_suites_v1_r4"}:
         from .suites import load
-        return load(root)
+        return load(root, "spoken_candidate_r4" if name.endswith("_r4") else "spoken_candidate_r3")
     if name != "unified_research_v1":
         raise ValueError("unknown research dataset")
     directory = root / DATA
@@ -79,8 +79,10 @@ def load_dataset(root, name="unified_research_v1"):
 def new_output(root, value):
     path = locate(root, value)
     # No writes into datasets, code, model/index resources or input review bundles.
-    if not path.is_relative_to(root / "experiments/results/research_tools"):
-        raise ValueError("output must be a NEW directory below experiments/results/research_tools")
+    allowed = (root / "experiments/results/research_tools",
+               root / "experiments/results/algorithms/research")
+    if not any(path != base and path.is_relative_to(base) for base in allowed):
+        raise ValueError("output must be NEW below research_tools or algorithms/research results")
     path.mkdir(parents=True, exist_ok=False)
     return path
 

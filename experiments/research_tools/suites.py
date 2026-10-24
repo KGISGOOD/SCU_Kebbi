@@ -13,10 +13,15 @@ FIELDS = ["研究項目", "階段", "題組或對話編號", "題號", "使用�
 STAGES = {"historical": "Historical", "calibration": "Calibration", "evaluation": "Evaluation"}
 
 
-def load(root):
+def load(root, revision="spoken_candidate_r3"):
+    if revision not in {"spoken_candidate_r3", "spoken_candidate_r4"}:
+        raise ValueError("unsupported suite revision")
     from .common import load_dataset
     base = load_dataset(root)  # original immutable dataset, all artifact/source hashes checked
     directory = root / "experiments/datasets" / NAME
+    parent_directory = directory
+    if revision == "spoken_candidate_r4":
+        directory = directory / "revisions" / revision
     plan = read_json(directory / "suites.json")
     if (plan["schema_version"] != NAME + "_candidate" or plan["status"] != "needs_review"
             or plan["frozen"] is not False):
@@ -26,17 +31,34 @@ def load(root):
         raise ValueError("original dataset manifest changed; review suite source version")
     hashes = {"original/" + k: v for k, v in base["hashes"].items()}
     hashes["suites.json"] = sha(directory / "suites.json")
-    if set(plan["files_sha256"]) != {"questions.jsonl"}:
+    expected_files = {"questions.jsonl", "review.json"} if revision == "spoken_candidate_r4" else {"questions.jsonl"}
+    if set(plan["files_sha256"]) != expected_files:
         raise ValueError("unexpected suite payload inventory")
     for name, expected in plan["files_sha256"].items():
         if sha(directory / name) != expected:
             raise ValueError(f"suite payload changed: {name}")
         hashes[name] = expected
+    audit = None
+    if revision == "spoken_candidate_r4":
+        if set(plan.get("parent_files_sha256", {})) != {"suites.json", "questions.jsonl"}:
+            raise ValueError("r4 must pin the complete r3 parent payload")
+        for name, expected in plan["parent_files_sha256"].items():
+            if sha(parent_directory / name) != expected:
+                raise ValueError("r3 parent changed; do not silently rebase r4")
+            hashes["parent/" + name] = expected
+        audit = read_json(directory / "review.json")
+        if audit.get("human_gold_certified") is not False or audit.get("revision") != revision:
+            raise ValueError("machine-assisted review cannot certify human Gold")
+        for item in audit["inputs"]:
+            path = locate(root, item["path"])
+            if not path.is_relative_to(root) or sha(path) != item["sha256"]:
+                raise ValueError("r4 review input changed: " + item["path"])
+            hashes["review_input/" + item["path"]] = item["sha256"]
     original = {q["question_id"]: q for q in base["questions"]}
     expected_qa = [p + f"{n:02d}" for p in ("P", "S") for n in range(1, 31)]
     if (plan["qa"]["question_ids"] != expected_qa or plan["qa"]["split"] != "historical"
-            or plan.get("revision") != "spoken_candidate_r3"):
-        raise ValueError("QA must retain 60 original source IDs in the explicit spoken r3 suite")
+            or plan.get("revision") != revision):
+        raise ValueError("QA must retain 60 original source IDs in the explicit named spoken suite")
     from experiments.evaluation.common import dataset
     csv_rows, _ = dataset(root, "experiments/datasets/faq_finetuning/faq_split_manifest.json")
     for row in csv_rows:
@@ -84,6 +106,10 @@ def load(root):
             questions = [q if row["question_id"] == q["question_id"] else row for row in questions]
         else:
             questions.append(q)
+    if audit is not None:
+        for q in questions:
+            if q["question_id"] in audit["questions"]:
+                q["source_audit"] = audit["questions"][q["question_id"]]
     index = {q["question_id"]: q for q in questions}
     groups = plan["sc"]
     if len(groups) != 30 or len({g["group_id"] for g in groups}) != 30 or len({g["family_id"] for g in groups}) != 30:
@@ -186,19 +212,31 @@ def load(root):
                 if history["role"] == "user":
                     j = next(j for j, r in enumerate(source) if r["turn_id"] == history["turn_id"])
                     history["content"] = c["queries"][j]
+            if audit is not None:
+                t["source_audit"] = audit["questions"][c["conversation_id"] + f"-T{i + 1}"]
             turns.append(t)
     if families["calibration"] & families["evaluation"]:
         raise ValueError("TI conversation family crosses Calibration/Evaluation")
     queries_by_split = {s: {t["question"].strip() for t in turns if t["split"] == s} for s in families}
     if queries_by_split["calibration"] & queries_by_split["evaluation"]:
         raise ValueError("same TI utterance crosses splits")
+    if audit is not None:
+        expected_audits = {q["question_id"] for q in additions} | {
+            c["conversation_id"] + f"-T{i}" for c in conversations for i in range(1, 5)}
+        if (set(audit["questions"]) != expected_audits
+                or len(audit["decisions"]) != 380
+                or len(audit["answer_sources"]) != 225
+                or any(r.get("review_status") != "needs_review" for r in audit["questions"].values())
+                or any(r.get("human_gold_certified") is not False for r in audit["answer_sources"])):
+            raise ValueError("r4 integrated review coverage/status differs from candidate contract")
     counts = {"qa": 60, "sc_calibration_groups": 10, "sc_evaluation_groups": 20,
               "sd_calibration": 20, "sd_evaluation": 40, "ti_calibration_conversations": 8,
               "ti_evaluation_conversations": 12, "int_calibration_groups": 5, "int_evaluation_groups": 10}
     if plan["counts"] != counts:
         raise ValueError("suite declared counts changed")
     result = {**base, "identity": fingerprint(hashes), "hashes": hashes, "questions": questions,
-              "turns": turns, "suite": plan, "dataset_name": NAME}
+              "turns": turns, "suite": plan, "integrated_review": audit,
+              "dataset_name": NAME if revision == "spoken_candidate_r3" else NAME + "_r4"}
     return execution(result, "cold")
 
 
@@ -303,25 +341,36 @@ def review_rows(data):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("check", "export-review"))
+    parser.add_argument("action", choices=("check", "export-review", "export-integrated"))
     parser.add_argument("--project-root", type=Path, default=ROOT)
+    parser.add_argument("--revision", choices=("spoken_candidate_r3", "spoken_candidate_r4"), default="spoken_candidate_r3")
     parser.add_argument("--output", default="experiments/datasets/研究題目審核表.csv")
     args = parser.parse_args()
     root = args.project_root.resolve()
-    data = load(root)
+    data = load(root, args.revision)
     rows = review_rows(data)
+    if args.action == "export-integrated":
+        if args.revision != "spoken_candidate_r4":
+            raise ValueError("integrated workbook is available only for explicit r4")
+        path = root / "experiments/datasets/研究題庫整合審核_r4.xlsx"
+        from .suite_review import export
+        digest = export(data, path)
+        if load(root, args.revision)["identity"] != data["identity"]:
+            raise ValueError("r4 changed during integrated export; do not certify the workbook")
+        print({"path": str(path), "sha256": digest, "human_gold_certified": False})
+        return
     if args.action == "export-review":
         path = locate(root, args.output)
         if path.parent != root / "experiments/datasets" or path.suffix.lower() != ".csv" or path.exists():
             raise ValueError("review export must be a NEW CSV directly in experiments/datasets")
         from .review import write_csv
-        if load(root)["identity"] != data["identity"]:
+        if load(root, args.revision)["identity"] != data["identity"]:
             raise ValueError("suite changed before export")
         write_csv(path, rows)
         with path.open(encoding="utf-8-sig", newline="") as stream:
             if list(csv.DictReader(stream)) != rows:
                 raise ValueError("review CSV round-trip mismatch")
-        if load(root)["identity"] != data["identity"]:
+        if load(root, args.revision)["identity"] != data["identity"]:
             raise ValueError("suite changed during export")
         print(f"{path}: 380 rows, 6 columns, UTF-8 BOM; candidates only")
     else:

@@ -9,7 +9,7 @@ from .adapters import get_views, metadata, pair_label, question_eligible
 def load_input(root, directory, target, config_path, allow_unreviewed, view=None):
     manifest = verify_bundle(directory, "adapter_manifest.json")
     data = load_dataset(root, manifest.get("dataset_name", "unified_research_v1"))
-    if data.get("dataset_name") == "experiment_suites_v1":
+    if data.get("dataset_name") in {"experiment_suites_v1", "experiment_suites_v1_r4"}:
         from .suites import execution
         data = execution(data, manifest.get("suite_cache_state", "cold"), manifest.get("suite_groups"))
     if (manifest["target"] != target or manifest["dataset_identity"] != data["identity"]
@@ -20,9 +20,10 @@ def load_input(root, directory, target, config_path, allow_unreviewed, view=None
             "historical", "calibration", "evaluation"}:
         raise ValueError("invalid purpose/split")
     formal = purpose != "functional"
+    qa_fixed = target == "qa" and data.get("dataset_name") in {"experiment_suites_v1", "experiment_suites_v1_r4"} and split == "historical" and purpose == "evaluation"
     if manifest.get("settings_sha256") is not None and manifest["settings_sha256"] != sha(config_path):
         raise ValueError("settings file differs from the exported experiment settings")
-    if manifest["provisional"] != (not formal) or (formal and purpose != split):
+    if manifest["provisional"] != (not formal) or (formal and purpose != split and not qa_fixed):
         raise ValueError("Calibration/Evaluation purpose and split must agree")
     if not formal and not allow_unreviewed:
         raise ValueError("functional data requires --allow-unreviewed; never a formal result")

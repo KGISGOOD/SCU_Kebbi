@@ -281,7 +281,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("export", "merge", "overview"))
     parser.add_argument("--project-root", type=Path, default=ROOT)
-    parser.add_argument("--dataset", choices=("unified_research_v1", "experiment_suites_v1"), default="unified_research_v1")
+    parser.add_argument("--dataset", choices=("unified_research_v1", "experiment_suites_v1", "experiment_suites_v1_r4"), default="unified_research_v1")
     parser.add_argument("--output-dir", help="required for export/merge; NEW result directory")
     parser.add_argument("--output", default="experiments/datasets/題庫總覽.csv", help="overview-only NEW CSV")
     parser.add_argument("--view", help="overview-only completed human-merged view")
