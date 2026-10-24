@@ -35,8 +35,8 @@ def load(root):
     original = {q["question_id"]: q for q in base["questions"]}
     expected_qa = [p + f"{n:02d}" for p in ("P", "S") for n in range(1, 31)]
     if (plan["qa"]["question_ids"] != expected_qa or plan["qa"]["split"] != "historical"
-            or plan.get("revision") != "spoken_candidate_r2"):
-        raise ValueError("QA must retain 60 original source IDs in the explicit spoken r2 suite")
+            or plan.get("revision") != "spoken_candidate_r3"):
+        raise ValueError("QA must retain 60 original source IDs in the explicit spoken r3 suite")
     from experiments.evaluation.common import dataset
     csv_rows, _ = dataset(root, "experiments/datasets/faq_finetuning/faq_split_manifest.json")
     for row in csv_rows:
@@ -273,7 +273,7 @@ def review_rows(data):
     def add(target, split, group, key, query, note):
         rows.append(dict(zip(FIELDS, [target, STAGES[split], group, key, query, note + "；待人工審核"])))
     for key in plan["qa"]["question_ids"]:
-        add("QA", "historical", "QA60", key, index[key]["question"], "新版口語候選r2；來源" + key + "原題保留；研究用途為QA評估，Historical表示先前曝光，非新盲測")
+        add("QA", "historical", "QA60", key, index[key]["question"], "口語候選；Suite " + plan["revision"] + "；來源" + key + "原題保留；研究用途為QA評估，Historical表示先前曝光，非新盲測")
     for g in plan["sc"]:
         for i, key in enumerate(g["question_ids"], 1):
             note = ["原始資訊需求的口語候選", "完全重複，答案品質及重用仍需確認",
