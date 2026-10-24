@@ -55,6 +55,20 @@ def catalogue(data):
             for earlier in sorted(earlier_ids):
                 pair(earlier, event["question_id"], workload_id + ":possible_actual_origin")
             earlier_ids.add(event["question_id"])
+    # r4 INT can prefill all selected Q1s before measured requests. Those entries
+    # include later groups, so cold-order pairs alone cannot satisfy its Guard.
+    if data.get("dataset_name") == "experiment_suites_v1_r4":
+        from .suites import execution
+        filled = execution(data, "prefilled")
+        for workload_id in dict.fromkeys(r["workload_id"] for r in filled["workloads"]
+                                        if r["workload_id"].startswith("INT-")):
+            earlier_ids = set()
+            events = [r for r in filled["fills"] if r["workload_id"] == workload_id]
+            events += [r for r in filled["workloads"] if r["workload_id"] == workload_id]
+            for event in events:
+                for earlier in sorted(earlier_ids):
+                    pair(earlier, event["question_id"], workload_id + ":prefilled_possible_actual_origin")
+                earlier_ids.add(event["question_id"])
     return by_id, pairs
 
 
