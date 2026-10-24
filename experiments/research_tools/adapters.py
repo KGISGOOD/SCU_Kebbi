@@ -164,6 +164,8 @@ def build(args, root, data, output):
                                 set(filter(None, (args.types or "").split(","))),
                                 None if target == "ti" or args.workload_id else args.limit)
     capability = {"direct_current_cli": True, "limitation": None}
+    if args.initial_fill_ids and (target != "int" or purpose != "functional" or args.workload_id or not args.ids):
+        raise ValueError("--initial-fill-ids is INT functional-only with explicit --ids; source workloads retain their own fill plan")
     native, scorer, initial = [], [], []
     if target in {"sc", "sc_threshold", "int"}:
         if not args.workload_id:
@@ -183,7 +185,23 @@ def build(args, root, data, output):
                                "cache_state_policy": "empty_at_workload_start", "review_status": "needs_review",
                                "sequence_kind": "explicit_user_order_not_formal_workload"})
                 seen.add(key)
-            sequence_data = {**data, "workloads": events, "fills": []}
+            fills = []
+            fill_ids = args.initial_fill_ids.split(",") if args.initial_fill_ids else []
+            if fill_ids and any(not key.strip() for key in fill_ids):
+                raise ValueError("initial-fill IDs must not contain empty items")
+            for index, key in enumerate(fill_ids, 1):
+                if key not in questions or questions[key]["split"] != split:
+                    raise ValueError("initial-fill ID missing or belongs to another split")
+                fills.append({"workload_id": "explicit_smoke_sequence", "question_id": key,
+                              "question_text": questions[key]["question"], "query_order": index,
+                              "source_split": split, "reference_question_id": None,
+                              "cache_state_policy": "empty_then_explicit_initial_fill",
+                              "review_status": "needs_review",
+                              "sequence_kind": "explicit_user_order_not_formal_workload"})
+            if fills:
+                for event in events:
+                    event["cache_state_policy"] = "empty_then_explicit_initial_fill"
+            sequence_data = {**data, "workloads": events, "fills": fills}
             workload_id = "explicit_smoke_sequence"
         else:
             if args.ids or args.types:
@@ -193,7 +211,9 @@ def build(args, root, data, output):
         if initial:
             capability = {"direct_current_cli": False, "limitation": "requires phase-aware runner: initial fill separate from measured denominator"}
         if target == "int":
-            capability = {"direct_current_cli": False, "limitation": "INT loader hardcodes functional split; research split must not be relabeled"}
+            capability = {"direct_current_cli": False, "limitation": "legacy INT CLI remains functional-only",
+                          "research_runner_supported": True,
+                          "research_runner": "experiments.research_tools.int_benchmark"}
         if target == "sc_threshold" and split == "historical":
             capability = {"direct_current_cli": False, "limitation": "threshold CLI does not accept historical split"}
         write_rows(output / "initial_fill.jsonl", initial)
@@ -246,7 +266,9 @@ def build(args, root, data, output):
             scorer.append(q)
         write_rows(output / "scenarios.jsonl", native)
         if target == "qa":
-            capability = {"direct_current_cli": False, "limitation": "eight-architecture dataset/worker/scorer use fixed FAQ60; separate evaluation ID from optional gold FAQ ID"}
+            capability = {"direct_current_cli": False, "limitation": "legacy evaluation.run retains fixed FAQ60",
+                          "research_runner_supported": True,
+                          "research_runner": "experiments.research_tools.qa_benchmark"}
     if not native:
         raise ValueError("empty adapter output")
     write_rows(output / "scorer_only.jsonl", scorer)
@@ -285,6 +307,7 @@ def main():
     parser.add_argument("--types", help="comma-separated primary type codes")
     parser.add_argument("--limit", type=int, help="functional prefix; TI uses full conversation count")
     parser.add_argument("--workload-id")
+    parser.add_argument("--initial-fill-ids", help="INT functional-only ordered fill IDs, separate from measured --ids")
     parser.add_argument("--settings", help="chosen local config file, hashed only; no model loading")
     parser.add_argument("--calibration-export", help="completed matching Calibration adapter export")
     parser.add_argument("--calibration-run", help="non-provisional, source-verified measured Calibration run")

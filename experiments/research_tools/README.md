@@ -188,18 +188,18 @@ $intData = 'experiments/results/research_tools/int_smoke_' + [guid]::NewGuid().T
 python -m experiments.research_tools.adapters --project-root . --target int --split calibration --purpose functional --ids UR1_A001,UR1_H001,UR1_R001 --output-dir $intData
 ```
 
-兩份adapter_manifest應明確標示原生CLI尚不支援；不要把舊固定60題Smoke的成功當新題庫已接通。
+舊原生CLI仍維持原本資料契約。新的QA／INT入口與完整Calibration Smoke指令見 [QA_INT.md](QA_INT.md)。adapter_manifest的`research_runner`指出獨立入口；`direct_current_cli=false`仍表示不能把匯出檔直接交給舊CLI。
 
 ## 正式Benchmark順序
 
 1. 保留已通過的結構驗證紀錄，匯出審核表；核對來源、年代、Train曝光、多Gold及跨family交集。
 2. 完成人工問題／答案／pair／對話標註、仲裁，合併為獨立view；核准不是工具自動決定。
 3. 固定題庫與view身分、明確選定每個target的ID／family與指標，記錄排除及not_applicable。
-4. 完成QA/INT/phase runner少量入口改動後，各先用Calibration 3～5題做Smoke，核對標籤未進入Prompt。
+4. 使用獨立QA/INT research runner，各先用Calibration 3～5題做Smoke，核對標籤未進入Prompt；initial_fill與measured分別檢查。
 5. 只在Calibration選門檻／解碼設定；保存非provisional實測Run、來源Hash與參數選擇理由。
 6. 用一致settings及該Calibration export/run身分匯出獨立Evaluation，不再挑參數。
 7. 各variant用獨立Cache及相同題序；SD配對同Prompt，INT用獨立真實online E2E；暖填／warmup另計。
 8. 先評估答案與重用安全性，再分析延遲／速度；一次模型成功執行不等於研究假設通過。
 
-限制：未建立自動模型答案品質評分、審核人身分驗證、實驗自動啟動器或QA/INT新runner。
+限制：未建立自動模型答案品質評分、審核人身分驗證或自動單一Gold FAQ標註。新QA/INT runner只完成靜態實作，尚待GPU Smoke驗證。
 本輪不會重新建FAISS、不訓練模型，也不啟動230題GPU實驗。
