@@ -57,6 +57,7 @@ def report(run, rows, identity, provisional):
               "retrieval_seconds", "shared_preparation_seconds", "generation_seconds", "end_to_end_seconds",
               "tokens_per_second", "generation_speedup_sd0", "end_to_end_speedup_sd0",
               "cuda_peak_allocated_bytes", "cuda_peak_reserved_bytes", "assistant_candidate_limit",
+              "prompt_lookup_candidate_limit", "max_matching_ngram_size",
               "prompt_identity", "retrieval_identity", "target_identity", "draft_identity", "output_text",
               "output_token_sha256", "residency", "fallback", "error"]
     with (run / "comparison.csv").open("x", encoding="utf-8-sig", newline="") as stream:

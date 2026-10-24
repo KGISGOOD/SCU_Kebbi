@@ -165,9 +165,26 @@ class SDEngine:
         common = deepcopy(self.generation)
         if any(key in inputs for key in ("past_key_values", "cache_params", "mems", "past_buckets_states", "state", "cache_implementation")):
             raise ValueError("fresh benchmark requests must not supply a previous request's KV cache/selector")
-        assistant = self.draft if version != "SD0" else None
-        if version != "SD0" and assistant is None:
+        lookup = version.startswith("SD2-4-k")
+        if version != "SD0" and not lookup and not (version == "SD2-1" or version.startswith("SD2-2-k")):
+            raise ValueError(f"unknown decoding version {version}")
+        assistant = self.draft if version != "SD0" and not lookup else None
+        if version != "SD0" and not lookup and assistant is None:
             raise ValueError("assisted mode requested without local Draft; no fallback")
+        lookup_stats = None
+        ngram = self.config.get("max_matching_ngram_size", 2)
+        if lookup:
+            from .prompt_lookup import check_lookup_api
+            if self.draft is not None:
+                raise ValueError("Prompt Lookup runs must not load a Draft model")
+            if type(length) is not int or length < 1 or type(ngram) is not int or ngram < 1:
+                raise ValueError("positive integer lookup length and ngram required")
+            if "prompt_lookup_api" not in self.identity:
+                self.identity["prompt_lookup_api"] = check_lookup_api()
+            common.prompt_lookup_num_tokens = length
+            common.max_matching_ngram_size = ngram
+            common.cache_implementation = None
+            common.cache_config = None
         settings = None
         if assistant is not None:
             # CandidateGenerator copies this TARGET call config for Draft
@@ -185,7 +202,7 @@ class SDEngine:
                         ("num_assistant_tokens", "num_assistant_tokens_schedule", "assistant_confidence_threshold",
                          "use_cache", "cache_implementation", "cache_config")}
         selected = common.get_generation_mode(assistant_model=assistant).value
-        if selected != ("assisted_generation" if assistant is not None else "greedy_search"):
+        if selected != ("assisted_generation" if assistant is not None or lookup else "greedy_search"):
             raise ValueError(f"unexpected generation mode {selected}; no fallback")
         local_inputs = {k: v.clone() for k, v in inputs.items()}
         calls = {"target": 0, "draft": 0}
@@ -203,8 +220,11 @@ class SDEngine:
         before = torch.cuda.memory_allocated() if cuda else None
         free_before = list(torch.cuda.mem_get_info()) if cuda else None
         policy = assisted_cache_policy(self.target, assistant) if assistant is not None else nullcontext()
+        if lookup:
+            from .prompt_lookup import lookup_request
+            policy = lookup_request(self.target, length, ngram)
         try:
-            with policy:
+            with policy as lookup_stats:
                 sync()
                 start = time.perf_counter()
                 with torch.inference_mode():
@@ -212,6 +232,8 @@ class SDEngine:
                                                   **({"assistant_model": assistant} if assistant is not None else {}))
                 sync()
                 generation_seconds = time.perf_counter() - start
+                if lookup and (not lookup_stats["generator_created"] or not lookup_stats["candidate_calls"]):
+                    raise RuntimeError("Prompt Lookup generator was not executed; no fallback")
             if generation_seconds <= 0:
                 raise RuntimeError("nonpositive generation timer; cannot calculate throughput")
             peak = torch.cuda.max_memory_allocated() if cuda else None
@@ -245,7 +267,11 @@ class SDEngine:
                 "mode_execution_seconds": execution,
                 "end_to_end_seconds": snapshot["shared_preparation_seconds"] + execution,
                 "end_to_end_kind": "controlled sum: shared preparation measured once + this mode execution",
-                "assistant_candidate_limit": length, "assistant_settings_before": settings,
+                "assistant_candidate_limit": length if assistant is not None else None,
+                "prompt_lookup_candidate_limit": length if lookup else None,
+                "max_matching_ngram_size": ngram if lookup else None,
+                "prompt_lookup_statistics": lookup_stats if lookup else None,
+                "assistant_settings_before": settings,
                 "assistant_settings_after": after, "generation_mode": selected, "forward_calls": calls,
                 "effective_use_cache": common.use_cache,
                 "effective_cache_implementation": common.cache_implementation,

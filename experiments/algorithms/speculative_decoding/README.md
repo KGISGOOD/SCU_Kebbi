@@ -28,6 +28,7 @@ GPU 通過紀錄。既有八架構、Semantic Cache、索引與結果均不修�
 | `--mode sd2_2` | SD0 ＋ SD2-2-k2/k4/k6/k8 |
 | `--mode all` | 上述六個版本；SD2-1 與 sweep k4 刻意保留為不同量測 |
 | `--mode sd2_3` | 預留介面，明確報未實作；不會暗中使用固定策略 |
+| `--mode sd2_4` | SD0 ＋ Prompt Lookup k2/k4/k6/k8；不載入 Draft，詳見 [SD2-4](SD2_4_README.md) |
 
 SD0 的輸出只來自 Target。為了交錯比較，all／sd2_1／sd2_2 中 Draft 會持續留在顯存，
 包括 SD0 量測時；SD0 不會呼叫 Draft。記錄 residency，不能把這些數字稱為真正僅載入
@@ -186,6 +187,6 @@ failed.json 結束，raw 仍保留，不產生成功摘要；是否完成以 com
 
 ## 後續邊界
 
-SD2-3 只預留明確拒絕執行的介面；未加入 Adaptive 邏輯。未定義 SD2-4 的研究方法，
-不自行把 Medusa／EAGLE 等技術冠上該版本。接受統計、Adaptive、其他 Draft 或資源配置
+SD2-3 只預留明確拒絕執行的介面；未加入 Adaptive 邏輯。SD2-4 已新增官方 Prompt Lookup
+獨立模式，詳見 SD2_4_README.md；沒有加入 Medusa／EAGLE。接受統計、Adaptive、其他 Draft 或資源配置
 比較都需要另訂研究問題、版本 API 審查與題庫；本階段不開發 Attention Topic。

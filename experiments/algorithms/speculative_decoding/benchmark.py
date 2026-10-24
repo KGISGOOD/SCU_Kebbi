@@ -18,7 +18,8 @@ def main():
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[3])
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--run-dir", type=Path, required=True)
-    parser.add_argument("--mode", choices=("all", "sd0", "sd2_1", "sd2_2", "sd2_3"), default="all")
+    parser.add_argument("--mode", choices=("all", "sd0", "sd2_1", "sd2_2", "sd2_3", "sd2_4"), default="all")
+    parser.add_argument("--max-matching-ngram-size", type=int)
     parser.add_argument("--scenarios", type=Path, default=Path("experiments/algorithms/speculative_decoding/scenarios.jsonl"))
     parser.add_argument("--repeats", type=int)
     parser.add_argument("--warmups", type=int)
@@ -35,8 +36,14 @@ def main():
     config = json.loads(config_path.read_text(encoding="utf-8-sig"))
     required = {"model", "draft_model", "bge", "knowledge_index", "device", "precision", "seed",
                 "max_new_tokens", "max_input_tokens", "standard_draft_tokens", "repeats", "warmups"}
-    if not isinstance(config, dict) or set(config) != required:
-        raise ValueError(f"config must contain exactly {sorted(required)}")
+    if not isinstance(config, dict) or not required <= set(config) or set(config) - required - {"max_matching_ngram_size"}:
+        raise ValueError(f"config requires {sorted(required)}; optional max_matching_ngram_size")
+    if args.max_matching_ngram_size is not None:
+        config["max_matching_ngram_size"] = args.max_matching_ngram_size
+    if args.mode == "sd2_4":
+        config.setdefault("max_matching_ngram_size", 2)
+    if "max_matching_ngram_size" in config and (type(config["max_matching_ngram_size"]) is not int or config["max_matching_ngram_size"] < 1):
+        raise ValueError("max_matching_ngram_size must be a positive integer")
     for key, override in (("repeats", args.repeats), ("warmups", args.warmups)):
         if override is not None:
             config[key] = override
@@ -51,7 +58,7 @@ def main():
     for key in ("model", "draft_model", "bge", "knowledge_index"):
         if not isinstance(config[key], str) or not config[key].strip():
             raise ValueError(f"invalid {key} path")
-        if key != "draft_model" or args.mode != "sd0":
+        if key != "draft_model" or args.mode not in {"sd0", "sd2_4"}:
             if not locate(config[key]).is_dir():
                 raise ValueError(f"{key}: LOCAL directory missing: {locate(config[key])}; no download")
     cases = []
@@ -87,6 +94,8 @@ def main():
         variants.append(("SD2-1", config["standard_draft_tokens"]))
     if args.mode in {"all", "sd2_2"}:
         variants.extend((f"SD2-2-k{k}", k) for k in (2, 4, 6, 8))
+    if args.mode == "sd2_4":
+        variants.extend((f"SD2-4-k{k}", k) for k in (2, 4, 6, 8))
     write_json(run / "run.json", {"status": "running", "config": config, "source_hashes": hashes,
                                   "mode": args.mode, "variants": variants, "provisional": provisional,
                                   "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -100,7 +109,10 @@ def main():
     try:
         from .engine import SDEngine
         import torch
-        engine = SDEngine(root, config, with_draft=len(variants) > 1)
+        engine = SDEngine(root, config, with_draft=args.mode in {"all", "sd2_1", "sd2_2"})
+        if args.mode == "sd2_4":
+            from .prompt_lookup import check_lookup_api
+            engine.identity["prompt_lookup_api"] = check_lookup_api()
         engine.identity["hardware"] = {"cuda_available": torch.cuda.is_available(), "torch_cuda": torch.version.cuda,
                                       "gpu": torch.cuda.get_device_name(0) if config["device"] == "cuda" else None,
                                       "gpu_total_bytes": torch.cuda.get_device_properties(0).total_memory
