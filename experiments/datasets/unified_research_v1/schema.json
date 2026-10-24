@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:scu:unified-research:v1",
+  "description": "Each JSONL row uses the matching $defs schema. validation.py evaluates only type/enum/minLength/required/properties/items, supplemented by explicit cross-file checks.",
+  "$defs": {
+    "question": {
+      "type": "object",
+      "required": [
+        "question_id",
+        "question",
+        "primary_type",
+        "secondary_tags",
+        "intent_id",
+        "family_id",
+        "related_question_ids",
+        "difficulty",
+        "expected_answer_length",
+        "source_document_ids",
+        "source_version",
+        "source_hash",
+        "knowledge_date",
+        "answerability",
+        "reference_answer",
+        "reference_answer_status",
+        "expected_behavior",
+        "expected_reuse",
+        "split",
+        "review_status",
+        "training_overlap_status"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_type": {
+          "type": "string",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "U",
+            "O",
+            "T",
+            "R",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J"
+          ]
+        },
+        "secondary_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "intent_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supporting_intent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "family_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "related_question_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "difficulty": {
+          "enum": [
+            "easy",
+            "medium",
+            "hard"
+          ]
+        },
+        "expected_answer_length": {
+          "enum": [
+            "short",
+            "medium",
+            "long"
+          ]
+        },
+        "source_document_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_hash": {
+          "type": "object"
+        },
+        "knowledge_date": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "answerability": {
+          "enum": [
+            "source_supported",
+            "needs_evidence_review",
+            "requires_clarification",
+            "out_of_scope",
+            "requires_current_source"
+          ]
+        },
+        "reference_answer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reference_answer_status": {
+          "enum": [
+            "verified",
+            "needs_review",
+            "unavailable"
+          ]
+        },
+        "expected_behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_reuse": {
+          "enum": [
+            "reusable",
+            "not_reusable",
+            "unknown"
+          ]
+        },
+        "split": {
+          "enum": [
+            "historical",
+            "calibration",
+            "evaluation"
+          ]
+        },
+        "review_status": {
+          "enum": [
+            "needs_review",
+            "reviewed"
+          ]
+        },
+        "training_overlap_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "training_overlap_details": {
+          "type": "object"
+        },
+        "attributes": {
+          "type": "object"
+        }
+      }
+    },
+    "conversation_turn": {
+      "type": "object",
+      "required": [
+        "conversation_id",
+        "turn_id",
+        "turn_index",
+        "question",
+        "history",
+        "topic_id",
+        "same_topic_or_shift",
+        "required_history_turn_ids",
+        "removable_history_turn_ids",
+        "expected_behavior",
+        "source_question_ids",
+        "review_status",
+        "split",
+        "family_id"
+      ],
+      "properties": {
+        "conversation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "turn_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "turn_index": {
+          "type": "integer"
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "turn_id",
+              "role",
+              "content"
+            ],
+            "properties": {
+              "turn_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "enum": [
+                  "user",
+                  "assistant"
+                ]
+              },
+              "content": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "topic_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "same_topic_or_shift": {
+          "enum": [
+            "initial",
+            "same_topic",
+            "shift"
+          ]
+        },
+        "required_history_turn_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "removable_history_turn_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "expected_behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_question_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "review_status": {
+          "enum": [
+            "needs_review",
+            "reviewed"
+          ]
+        },
+        "split": {
+          "enum": [
+            "calibration",
+            "evaluation"
+          ]
+        },
+        "family_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cache_event": {
+      "type": "object",
+      "required": [
+        "workload_id",
+        "query_event_id",
+        "query_order",
+        "question_id",
+        "question_text",
+        "reference_question_id",
+        "intended_repeat_type",
+        "intended_revisit",
+        "expected_reuse",
+        "expected_reuse_review_status",
+        "cache_state_policy",
+        "source_split"
+      ],
+      "properties": {
+        "workload_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "query_event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "query_order": {
+          "type": "integer"
+        },
+        "question_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference_question_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "intended_repeat_type": {
+          "enum": [
+            "new_query",
+            "exact",
+            "paraphrase"
+          ]
+        },
+        "intended_revisit": {
+          "type": "boolean"
+        },
+        "expected_reuse": {
+          "enum": [
+            "reusable",
+            "not_reusable",
+            "unknown"
+          ]
+        },
+        "expected_reuse_review_status": {
+          "enum": [
+            "needs_review",
+            "reviewed"
+          ]
+        },
+        "cache_state_policy": {
+          "enum": [
+            "empty_at_workload_start",
+            "empty_then_explicit_initial_fill"
+          ]
+        },
+        "source_split": {
+          "enum": [
+            "calibration",
+            "evaluation"
+          ]
+        }
+      }
+    }
+  }
+}

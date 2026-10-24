@@ -1,0 +1,109 @@
+{
+  "schema_version": "unified_research_coverage_v1",
+  "status": "authored_counts_not_validator_results",
+  "validation_executed": false,
+  "target_main_total": 240,
+  "actual_main_total": 230,
+  "target_new": 180,
+  "actual_new": 170,
+  "new_shortfall": 10,
+  "historical": 60,
+  "calibration": 60,
+  "evaluation": 110,
+  "supplemental_fixed60_excluded_from_main": 60,
+  "types": {
+    "A": {
+      "historical": 60,
+      "new": 15,
+      "total": 75
+    },
+    "B": {
+      "historical": 0,
+      "new": 15,
+      "total": 15
+    },
+    "C": {
+      "historical": 0,
+      "new": 20,
+      "total": 20
+    },
+    "D": {
+      "historical": 0,
+      "new": 14,
+      "total": 14
+    },
+    "U": {
+      "historical": 0,
+      "new": 12,
+      "total": 12
+    },
+    "O": {
+      "historical": 0,
+      "new": 9,
+      "total": 9
+    },
+    "T": {
+      "historical": 0,
+      "new": 14,
+      "total": 14
+    },
+    "R": {
+      "historical": 0,
+      "new": 6,
+      "total": 6
+    },
+    "E": {
+      "historical": 0,
+      "new": 20,
+      "total": 20
+    },
+    "F": {
+      "historical": 0,
+      "new": 15,
+      "total": 15
+    },
+    "G": {
+      "historical": 0,
+      "new": 10,
+      "total": 10
+    },
+    "H": {
+      "historical": 0,
+      "new": 10,
+      "total": 10
+    },
+    "I": {
+      "historical": 0,
+      "new": 0,
+      "total": 0
+    },
+    "J": {
+      "historical": 0,
+      "new": 10,
+      "total": 10
+    }
+  },
+  "gaps": [
+    {
+      "type": "I",
+      "target": 10,
+      "actual": 0,
+      "reason": "No pair of independently verified, genuinely conflicting or superseding rules has been established; do not invent regulations."
+    }
+  ],
+  "conversation_groups": 20,
+  "conversation_turns": 80,
+  "topic_decisions_excluding_initial": 60,
+  "cache_workloads": 10,
+  "cache_measured_queries": 200,
+  "cache_initial_fill_queries": 4,
+  "known_answer_source_counts": {
+    "main_with_candidate_reference": 116,
+    "verified_gold": 0
+  },
+  "notes": [
+    "Historical60 are verbatim CSV P/S IDs, all primary A; requested original type allocation describes a different legacy fixed60 bank.",
+    "expected_answer_length/difficulty are author proposals, not model observations.",
+    "Evaluation is a candidate split, not frozen or unseen-intent certified."
+  ]
+}
