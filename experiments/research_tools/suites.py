@@ -51,8 +51,23 @@ def load(root, revision="spoken_candidate_r3"):
             raise ValueError("machine-assisted review cannot certify human Gold")
         for item in audit["inputs"]:
             path = locate(root, item["path"])
-            if not path.is_relative_to(root) or sha(path) != item["sha256"]:
-                raise ValueError("r4 review input changed: " + item["path"])
+            if not path.is_relative_to(root) or not path.is_file():
+                raise ValueError("r4 review input missing/outside project: " + item["path"])
+            actual = sha(path)
+            if actual != item["sha256"]:
+                import hashlib
+                raw = path.read_bytes()
+                # Diagnostic only: normalized bytes NEVER replace the strict comparison above.
+                lf_hash = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()
+                crlf = raw.count(b"\r\n")
+                bare_lf = raw.count(b"\n") - crlf
+                raise ValueError(
+                    f"r4 review input changed: {item['path']}; expected={item['sha256']}; "
+                    f"actual={actual}; bytes={len(raw)}; utf8_bom={raw.startswith(bytes.fromhex('efbbbf'))}; "
+                    f"CRLF={crlf}; bare_LF={bare_lf}; "
+                    f"LF_only_normalization_matches_expected={lf_hash == item['sha256']}. "
+                    "Restore the pinned byte-exact source after preserving the GPU copy; "
+                    "do not update review/manifest hashes to accept an unexplained difference.")
             hashes["review_input/" + item["path"]] = item["sha256"]
     original = {q["question_id"]: q for q in base["questions"]}
     expected_qa = [p + f"{n:02d}" for p in ("P", "S") for n in range(1, 31)]
