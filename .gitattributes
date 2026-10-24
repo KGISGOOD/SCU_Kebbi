@@ -1,1 +1,2 @@
 experiments/datasets/faq/*.jsonl text eol=lf
+experiments/datasets/scu_fixed_questions_v1_1.jsonl text eol=lf

@@ -23,6 +23,29 @@ def sha(path):
     return digest.hexdigest()
 
 
+def source_hash_diagnostic(path, expected, actual):
+    """Explain byte differences; diagnostic normalization NEVER accepts input."""
+    raw = path.read_bytes()
+    detail = {"path": str(path), "expected_sha256": expected, "actual_sha256": actual,
+              "bytes": len(raw), "utf8_bom": raw.startswith(b"\xef\xbb\xbf"),
+              "crlf_pairs": raw.count(b"\r\n"), "lf_bytes": raw.count(b"\n"),
+              "bare_cr_bytes": raw.count(b"\r") - raw.count(b"\r\n")}
+    try:
+        raw.decode("utf-8", errors="strict")
+        detail["strict_utf8"] = True
+        # Preserve BOM, trailing newline, whitespace and JSON serialization.
+        # Only replace CRLF in memory, then compare with the ORIGINAL receipt.
+        detail["crlf_to_lf_sha256_diagnostic_only"] = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()
+        detail["crlf_only_difference_supported"] = (
+            detail["crlf_pairs"] > 0 and detail["bare_cr_bytes"] == 0
+            and detail["crlf_to_lf_sha256_diagnostic_only"] == expected)
+    except UnicodeDecodeError:
+        detail["strict_utf8"] = False
+        detail["crlf_only_difference_supported"] = False
+    detail["accepted"] = False
+    return detail
+
+
 def object_pairs(pairs):
     result = {}
     for key, value in pairs:
@@ -138,7 +161,8 @@ def validate(root, directory, require_reviewed=False):
         if path not in source_cache:
             source_cache[path] = sha(path)
         if source_cache[path] != source["sha256"]:
-            errors.append(f"source SHA256 mismatch: {source_id}")
+            detail = source_hash_diagnostic(path, source["sha256"], source_cache[path])
+            errors.append(f"source SHA256 mismatch: {source_id}; " + json.dumps(detail, ensure_ascii=False, sort_keys=True))
     for row in all_questions:
         qid = row["question_id"]
         for ref in row["related_question_ids"]:

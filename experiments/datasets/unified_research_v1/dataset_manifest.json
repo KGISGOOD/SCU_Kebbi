@@ -46,7 +46,8 @@
     "schema.json": "d8bf57d98c5b1813f234ef43fb53f9c869cad45bd1caf4245d9568d8393c62ad",
     "SOURCE_AUDIT.md": "d9c2f0c93c639263fd73ec25b12c9662b33574f94815539123f5f0ecc929aa12",
     "source_registry.json": "0abd6d5822c2357e8407e16e8ff314fd1adf6a5c60bc1a1145b5d43c261638e8",
-    "validation.py": "b8cfb17945df73d17c4523bce397826844dca710a1bcfa966529f66cae4d8a8d"
+    "validation.py": "f3339ac610f465499383392ef196313150ffaf4d23eaab8bb6e2906a292cb650",
+    "SOURCE_HASH_DIAGNOSIS.md": "7cf59e57cfcafc0a5769a24e6cf96a7adaf940bfdb09cb46a50825042043d9e1"
   },
   "protection": "Existing datasets/benchmarks/models/index/results unchanged"
 }
