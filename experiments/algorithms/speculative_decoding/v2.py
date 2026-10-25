@@ -29,8 +29,19 @@ def check_plain(config):
                 "constraints": None, "stop_strings": None, "watermarking_config": None,
                 "exponential_decay_length_penalty": None, "penalty_alpha": None,
                 "max_time": None, "guidance_scale": None, "token_healing": False}
-    errors = {k: {"expected": v, "actual": getattr(config, k, v)} for k, v in required.items()
-              if getattr(config, k, v) != v}
+    # Reviewed against HF v5.16.1 generation/configuration_utils.py global
+    # defaults and generation/utils.py _get_logits_processor / token_healing.
+    # None -> 0 for these two constraints (active only if >0); None healing
+    # is false in its `if` branch. This is validation-only: never mutate the
+    # GenerationConfig or broadly treat arbitrary None/0/False as equivalent.
+    # SDEngine.check_api enforces the reviewed 5.16.1 version before decode.
+    none_disabled = {"no_repeat_ngram_size": 0, "min_length": 0, "token_healing": False}
+    errors = {}
+    for key, expected in required.items():
+        actual = getattr(config, key, expected)
+        checked = none_disabled[key] if actual is None and key in none_disabled else actual
+        if checked != expected:
+            errors[key] = {"expected": expected, "actual": actual}
     if errors:
         raise ValueError(f"V2 supports plain greedy only; no silent processor removal: {errors}")
 

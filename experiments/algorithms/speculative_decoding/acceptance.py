@@ -137,6 +137,8 @@ def audit(source):
                            and not failures and all(c["完整Lossless通過"] for c in comparisons), validation)
         except Exception as exc:
             record(job["id"], False, str(exc))
+    record("SD v2 獨立單題（不屬原Run）", None,
+           "本表僅驗收原Run；未讀取獨立v2結果，狀態未驗證。單題通過也不能取代完整SD Evaluation。")
     record("正式研究資格", None, {"mode": identity.get("mode"),
            "gold_sha256": identity.get("gold_sha256"), "policy": "技術完成不等於Gold或訓練批准；本工具不簽認"})
     return checks
@@ -192,7 +194,7 @@ def main():
         lines.append(f"|{row['檢查']}|{row['技術狀態']}|{detail}|")
     (output / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"技術驗收：{output}")
-    technical = [r for r in checks if r["檢查"] != "正式研究資格"]
+    technical = [r for r in checks if r["檢查"] not in {"正式研究資格", "SD v2 獨立單題（不屬原Run）"}]
     return (0 if ready else 2) if args.check_resume else (2 if any(r["技術狀態"] != "通過" for r in technical) else 0)
 
 

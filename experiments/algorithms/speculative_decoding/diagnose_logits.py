@@ -195,6 +195,7 @@ def main():
     supplied_config = read(locate(args.config))
     config = read(source / "run.json")["config"]
     input_config_diff = config_differences(config, supplied_config)
+    source_identity = read(source / "identity.json") if (source / "identity.json").is_file() else {}
     destination.mkdir(parents=True, exist_ok=False)
     try:
         write_json(destination / "input_config_diff.json", {
@@ -235,7 +236,17 @@ def main():
             "logits_dtype": str(reference.logits.dtype),
             "raw_logits": describe(reference.logits[0, -1], engine.tokenizer)})
         del reference, full
-        records, all_config_diff = [], []
+        source_template = source_identity.get("effective_generation_config")
+        template_diff = (config_differences(source_template, engine.identity["effective_generation_config"])
+                         if isinstance(source_template, dict) and source_template else [])
+        template_verified = isinstance(source_template, dict) and bool(source_template) and not template_diff
+        write_json(destination / "template_config_comparison.json", {
+            "source_location": "identity.json:effective_generation_config",
+            "current_location": "engine.identity.effective_generation_config",
+            "status": "verified_match" if template_verified else "different" if template_diff else "unverified",
+            "differences": template_diff,
+            "scope": "shared pre-call template only; NOT per-mode effective call config"})
+        records, all_config_diff, config_checks = [], [], []
         for version, length in variants:
             observer = Observer(fixed, engine.tokenizer)
             handles = [engine.target.register_forward_pre_hook(observer.before, with_kwargs=True),
@@ -248,13 +259,27 @@ def main():
                 for handle in handles:
                     handle.remove()
             captures = [r for r in observer.records if r["causal_prefix_matches_fixed_prefix"]]
-            diffs = config_differences(paired[version].get("effective_generation_config"), row["effective_generation_config"])
+            source_effective = paired[version].get("effective_generation_config")
+            source_saved = isinstance(source_effective, dict) and bool(source_effective)
+            diffs = config_differences(source_effective, row["effective_generation_config"]) if source_saved else []
+            # Missing evidence is one unverified configuration, not hundreds of
+            # fabricated parameter mismatches. Never substitute the template.
+            critical = ("eos_token_id", "pad_token_id", "max_new_tokens", "do_sample", "num_beams",
+                        "use_cache", "cache_implementation", "cache_config")
+            missing_critical = [k for k in critical if not source_saved or k not in source_effective]
+            check = {"version": version, "source_location": "results.jsonl:effective_generation_config",
+                     "current_location": "generation.effective_generation_config",
+                     "status": "unverified" if not source_saved or missing_critical else "different" if diffs else "verified_match",
+                     "reason": "per-call effective config was not saved" if not source_saved else None,
+                     "missing_critical_fields": missing_critical, "differences": diffs}
+            config_checks.append(check)
             all_config_diff.extend({"version": version, **d} for d in diffs)
             old_ids, new_ids = generated, row["output_token_ids"]
             first_diff = next((i for i in range(min(len(old_ids), len(new_ids))) if old_ids[i] != new_ids[i]),
                               min(len(old_ids), len(new_ids)) if len(old_ids) != len(new_ids) else None)
             record = {"version": version, "generation": row, "target_forward_observations": observer.records,
                       "generation_config_differences": diffs,
+                      "generation_config_check": check,
                       "first_different_new_token_index": first_diff,
                       "mapping_errors": observer.mapping_errors,
                       "reproduces_source_tokens": row["output_token_ids"] == paired[version]["output_token_ids"],
@@ -264,14 +289,19 @@ def main():
             write_json(destination / f"{version}.json", record)
             for difference in diffs:
                 print("CONFIG_DIFF " + json.dumps({"version": version, **difference}, ensure_ascii=False), flush=True)
+            if check["status"] == "unverified":
+                print("CONFIG_UNVERIFIED " + json.dumps(check, ensure_ascii=False), flush=True)
             records.append(record)
         engine.verify_sources()
         complete = all(r["capture_complete"] for r in records)
         replay_sd0 = records[0]["generation"]["output_token_ids"]
         replay_equal = all(r["generation"]["output_token_ids"] == replay_sd0 for r in records)
-        configs_equal = not all_config_diff and not input_config_diff
+        configs_equal = (all(c["status"] == "verified_match" for c in config_checks)
+                         and template_verified and not input_config_diff)
         write_json(destination / "generation_config_diff.json", {
-            "differences": all_config_diff, "comparison_layer": "effective_generation_config vs effective_generation_config",
+            "differences": all_config_diff, "per_mode_checks": config_checks,
+            "source_template_status": "verified_match" if template_verified else "different" if template_diff else "unverified",
+            "comparison_layer": "saved per-call effective config vs current per-call effective config; template compared separately",
             "normalization": "none; no field difference proven behavior-neutral"})
         for difference in input_config_diff:
             print("CONFIG_DIFF " + json.dumps(difference, ensure_ascii=False), flush=True)

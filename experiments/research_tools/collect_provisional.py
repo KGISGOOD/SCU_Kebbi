@@ -161,6 +161,8 @@ def main():
         sheets = {name: [] for name in ("Overview", "QA Comparison", "SC Comparison", "SD Comparison",
                   "TI Comparison", "INT Comparison", "Per Question", "Groups", "Failures", "Configuration", "Validation")}
         validation = sheets["Validation"]
+        validation.append({"檢查": "SD版本範圍", "狀態": "原Run的SD v1；獨立v2未驗證",
+            "限制": "不讀取或合併其他目錄的v2單題成果；不得以v2成功覆蓋v1失敗或宣稱完整SD通過。"})
         validation.append({"檢查": "階段數", "實際": len(state["jobs"]), "預期": 11,
                            "狀態": "符合" if len(state["jobs"]) == 11 else "未驗證"})
         sheets["Configuration"].append({"來源Run": str(source), "原始身分": identity,
@@ -245,6 +247,7 @@ def main():
                 lines.append("- " + text(row))
         lines += ["", "## 研究限制與正式實驗缺口", "",
             "- SD時間可作實際執行描述；Token不等價的輸出不納入Lossless Speedup。合格子集加速比不是全體成功或無損保證。",
+            "- 本報告的SD為原Run的v1；獨立v2不在本次證據範圍，標為未驗證。v2單題成功不能替代完整SD Evaluation。",
             "- SD Warmup與正式Repeat分開計數，平均延遲與加速比排除Warmup；SD與Prompt Lookup各自配對本子實驗SD0。",
             "- 缺少子實驗（例如SD失敗後未啟動的Prompt Lookup）明確標為未驗證，不補造數據。",
             "- SC答案重用安全、TI候選標籤與生成答案品質仍須真實人工審核；Token一致不代表答案正確。",
