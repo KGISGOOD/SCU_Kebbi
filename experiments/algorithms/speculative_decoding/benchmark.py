@@ -25,6 +25,8 @@ def main():
     parser.add_argument("--warmups", type=int)
     parser.add_argument("--allow-unreviewed", action="store_true")
     parser.add_argument("--scenario-id", help="explicit single-scenario diagnostic; never a complete Evaluation")
+    parser.add_argument("--fp32-control", action="store_true",
+                        help="independent CUDA FP32/SDPA control, TF32 off; requires precision=fp32")
     args = parser.parse_args()
     if args.mode == "sd2_3":
         from .compatibility import adaptive_policy
@@ -119,7 +121,13 @@ def main():
     try:
         from .engine import SDEngine
         import torch
+        if args.fp32_control:
+            from .fp32_control import configure, bind, ensure_memory, memory_state
+            write_json(run / "fp32_memory_before_loading.json", configure(config))
         engine = SDEngine(root, config, with_draft=args.mode in {"all", "sd2_1", "sd2_2"})
+        if args.fp32_control:
+            bind(engine)
+            engine.identity["fp32_memory_after_loading"] = ensure_memory(engine, config["max_input_tokens"])
         if args.mode == "sd2_4":
             from .prompt_lookup import check_lookup_api
             engine.identity["prompt_lookup_api"] = check_lookup_api()
@@ -158,6 +166,8 @@ def main():
                         current = {"scenario_id": scenario["scenario_id"], "experiment_version": version,
                                    "repeat_index": repeat, "warmup": warmup, "candidate_limit": length}
                         stage = "generation"
+                        if args.fp32_control:
+                            ensure_memory(engine, snapshot["input_token_count"])
                         result = engine.generate(snapshot, inputs, version, length, repeat, warmup,
                                                  config["seed"] + repeat)
                         result.update(measurement_id=f"M{len(rows) + 1:06d}", order_position=position,
@@ -186,6 +196,12 @@ def main():
         failure = {"status": "failed", "stage": stage, "measurement": current,
                    "error": str(error), "exception_type": type(error).__name__,
                    "traceback": traceback.format_exc(), "saved_raw_measurements": len(rows), "fallback": False}
+        if args.fp32_control:
+            failure["precision_fallback"] = False
+            try:
+                failure["cuda_memory"] = memory_state()
+            except Exception:
+                failure["cuda_memory"] = "unavailable"
         write_json(run / "failed.json", failure)
         print(f"SD FAILED stage={stage}: {error}", flush=True)
         raise
