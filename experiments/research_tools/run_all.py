@@ -25,7 +25,7 @@ def defaults(root):
         **{target: f"experiments/algorithms/{directory}/config.gpu.local.json" for target, directory in
            (("sc", "semantic_cache"), ("sd", "speculative_decoding"),
             ("ti", "topic_identification"), ("int", "integrated_efficiency"))}},
-        "view": None, "gold_certification": None}
+        "view": None, "gold_certification": None, "sd_fp32": False, "require_full_training": False}
 
 
 def atomic(path, value):
@@ -96,6 +96,15 @@ def inventory(root, settings, mode, data, view, gold):
     qa = qa_identity(root, qa_config)
     readiness = architecture_preflight(qa["resources"], ARCHITECTURES)
     errors = [f"{arch}: {r['errors']}" for arch, r in readiness.items() if r["status"] == "failed"]
+    if settings.get("require_full_training"):
+        for key, expected_steps in (("a2_1_model", 54), ("a2_2_model", 54), ("a3_adapter", 33)):
+            value = qa["resources"].get(key, {}).get("value", {})
+            provenance = value.get("provenance", {})
+            epoch = provenance.get("completed_epoch")
+            if key == "a3_adapter" and value.get("path"):
+                epoch = read_json(Path(value["path"]).parent / "completed.json").get("completed_epochs")
+            if epoch != 3 or provenance.get("optimizer_steps") != expected_steps or provenance.get("smoke_step_limit") is not None:
+                errors.append(f"{key}: require the completed 3-Epoch/{expected_steps}-step model, not Smoke; got epoch={epoch}, steps={provenance.get('optimizer_steps')}")
     resources, signatures = {}, {}
     for target in ("sc", "sd", "ti", "int"):
         config = read_json(configs[target])
@@ -114,7 +123,11 @@ def inventory(root, settings, mode, data, view, gold):
         for field in ("model", "bge", "knowledge_index"):
             if resources[target].get(field) != resources["sc"].get(field):
                 errors.append(f"{target}.{field}: differs from SC; fix local paths/settings, no automatic substitution")
-        if signatures[target] != signatures["sc"]:
+        if target == "sd" and settings.get("sd_fp32"):
+            if signatures[target]["precision"] != "fp32" or any(signatures[target][k] != signatures["sc"][k]
+                    for k in ("device", "seed", "max_new_tokens")):
+                errors.append("SD FP32 control requires fp32 and identical device/seed/max_new_tokens to SC")
+        elif signatures[target] != signatures["sc"]:
             errors.append(f"{target}: device/precision/seed/max_new_tokens differs from SC")
     approval_resources = {}
     if mode == "formal":
@@ -179,7 +192,10 @@ def inventory(root, settings, mode, data, view, gold):
             "view": str(view) if view else None, "view_sha256": get_views(data, view)[3],
             "gold": str(gold) if gold else None, "gold_sha256": sha(gold) if gold else None,
             "qa": qa, "algorithm_resources": resources, "settings": signatures, "code": tool_identity(),
-            "readiness": readiness, "plan": plan(), "training_approvals": approval_resources, "hardware": hardware}
+            "readiness": readiness, "plan": plan(), "training_approvals": approval_resources, "hardware": hardware,
+            "execution_policy": {"sd_fp32": bool(settings.get("sd_fp32")),
+                "require_full_training": bool(settings.get("require_full_training")),
+                "comparison_limit": "SD FP32 is an independent numerical control; do not pool cross-algorithm precision timings"}}
 
 
 def validate_child(path, job=None):
@@ -202,7 +218,12 @@ def main():
     parser.add_argument("--view")
     parser.add_argument("--gold-certification")
     parser.add_argument("--resume", help="existing full Run directory; retries failed/interrupted stages, preserves all attempts")
+    parser.add_argument("--sd-fp32", action="store_true")
+    parser.add_argument("--require-full-training", action="store_true")
+    parser.add_argument("--run-dir", help="NEW independent full Run; cannot combine with --resume")
     args = parser.parse_args()
+    if args.resume and args.run_dir:
+        parser.error("--run-dir cannot be combined with --resume")
     root = args.project_root.resolve()
     if root != ROOT:
         parser.error("cd to the intended checkout; imported project-root differs")
@@ -211,9 +232,14 @@ def main():
     if args.config or local.is_file():
         supplied = read_json(local)
         settings["configs"].update(supplied.get("configs", {}))
-        for key in ("view", "gold_certification"):
+        for key in ("view", "gold_certification", "sd_fp32", "require_full_training"):
             if key in supplied:
                 settings[key] = supplied[key]
+    for key in ("sd_fp32", "require_full_training"):
+        if getattr(args, key):
+            settings[key] = True
+        if type(settings[key]) is not bool:
+            raise ValueError(key + " must be a JSON boolean")
     view = locate(root, args.view or settings["view"]) if args.view or settings["view"] else None
     gold = locate(root, args.gold_certification or settings["gold_certification"]) if args.gold_certification or settings["gold_certification"] else None
     base = root / "experiments/results/algorithms/research_full"
@@ -222,7 +248,7 @@ def main():
         if not run.is_relative_to(base) or not (run / "raw/state.json").is_file():
             parser.error("resume must name an existing managed research_full Run")
     else:
-        run = new_output(root, base / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ_") + uuid.uuid4().hex))
+        run = new_output(root, args.run_dir or base / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ_") + uuid.uuid4().hex))
         (run / "raw").mkdir()
     raw = run / "raw"
     if args.resume and not args.config and not local.is_file():
@@ -275,6 +301,8 @@ def main():
                     command += ["--view", str(view), "--gold-certification", str(gold)]
                 if view and args.mode == "provisional":
                     command += ["--view", str(view)]
+                if job["target"] == "sd" and settings.get("sd_fp32"):
+                    command.append("--sd-fp32")
                 if job["depends"]:
                     command += ["--calibration", str(run / by_id[job["depends"]]["result"])]
                 if prior_qa:
@@ -297,20 +325,24 @@ def main():
             # Rehash after execution. Never commit a mixed-resource full experiment.
             if inventory(root, settings, args.mode, data, view, gold) != identity or load_dataset(root, "experiment_suites_v1_r4")["identity"] != data["identity"]:
                 raise ValueError("research inputs changed during execution; full Run not committed")
-            for name in ("summary.xlsx", "report.md"):
+            for name in ("summary.xlsx", "report.md", "raw/technical_acceptance.json"):
                 if (run / name).exists():
                     archive = raw / "prior_reports" / session
                     archive.mkdir(parents=True, exist_ok=True)
-                    (run / name).replace(archive / name)
+                    destination = archive / name
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    (run / name).replace(destination)
             from .full_reporting import report
-            report(run, state, identity)
-            state["status"] = "completed" if all(j["status"] == "completed" for j in state["jobs"]) else "incomplete"
+            state["technical_acceptance_passed"] = report(run, state, identity)
+            state["status"] = "completed" if all(j["status"] == "completed" for j in state["jobs"]) and state["technical_acceptance_passed"] else "incomplete"
             atomic(raw / "state.json", state)
             write_json(raw / ("receipt_" + session + ".json"), {"status": state["status"],
+                "technical_acceptance_passed": state["technical_acceptance_passed"],
+                "technical_acceptance_sha256": sha(raw / "technical_acceptance.json"),
                 "identity_sha256": sha(raw / "identity.json"), "state_sha256": sha(raw / "state.json"),
                 "reports": {n: sha(run / n) for n in ("summary.xlsx", "report.md")}})
             print(f"{state['status']}：{run / 'summary.xlsx'}\n{run / 'report.md'}", flush=True)
-            return 0 if state["status"] == "completed" else 2
+            return 0 if state["status"] == "completed" and state["technical_acceptance_passed"] else 2
         except BaseException as exc:
             state["status"] = "failed"
             atomic(raw / "state.json", state)

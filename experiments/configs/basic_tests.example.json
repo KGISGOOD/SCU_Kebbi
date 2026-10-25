@@ -1,0 +1,13 @@
+{
+  "configs": {
+    "qa": "experiments/models/provisional_full_20261025_021058_666b6611/qa.provisional.config.json",
+    "sc": "experiments/algorithms/semantic_cache/config.gpu.local.json",
+    "sd": "experiments/configs/sd_fp32.local.json",
+    "ti": "experiments/algorithms/topic_identification/config.gpu.local.json",
+    "int": "experiments/algorithms/integrated_efficiency/config.gpu.local.json"
+  },
+  "sd_fp32": true,
+  "require_full_training": true,
+  "view": null,
+  "gold_certification": null
+}

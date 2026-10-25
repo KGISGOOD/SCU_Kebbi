@@ -122,7 +122,7 @@ def main():
         from .engine import SDEngine
         import torch
         if args.fp32_control:
-            from .fp32_control import configure, bind, ensure_memory, memory_state
+            from .numerics import configure, bind, ensure_memory, memory_state
             write_json(run / "fp32_memory_before_loading.json", configure(config))
         engine = SDEngine(root, config, with_draft=args.mode in {"all", "sd2_1", "sd2_2"})
         if args.fp32_control:

@@ -219,8 +219,28 @@ def main():
             raise ValueError("source evidence changed while collecting; report aborted")
         save(raw / "source_evidence.json", {"source_run": str(source), "files_sha256": before,
               "meaning": "collection-time snapshot, not retrospective completion certification"})
+        from .acceptance import audit
+        try:
+            checks = audit(source)
+        except Exception as exc:
+            checks = [{"檢查": "來源Run技術驗收", "技術狀態": "未驗證", "證據": str(exc)}]
+        technical = [r for r in checks if r["檢查"] not in
+                     {"正式研究資格", "SD v2 獨立單題（不屬原Run）"}]
+        save(raw / "technical_acceptance.json", {
+            "technical_passed": bool(technical) and all(r["技術狀態"] == "通過" for r in technical),
+            "checks": checks, "meaning": "Read-only retrospective check; never certifies the source Run"})
+        sheets["Technical Acceptance"] = checks
+        sheets["Failures"].extend(r for r in checks if r["技術狀態"] != "通過")
         save(raw / "projection.json", sheets)
-        workbook(output / "summary.xlsx", {k: [flatten(r) for r in v] for k, v in sheets.items()}, presentation=True)
+        titles = {"QA Comparison": "Architecture Comparison", "SC Comparison": "SC Results",
+                  "SD Comparison": "SD Results", "TI Comparison": "TI Results", "INT Comparison": "INT Results",
+                  "Failures": "Failures & Limitations", "Configuration": "Provenance"}
+        presentation = {titles.get(k, k): [flatten(r) for r in v] for k, v in sheets.items()}
+        # Move QA detail into its own sheet instead of duplicating every answer.
+        rows = presentation.pop("Per Question")
+        presentation["Architecture Per-Question"] = [r for r in rows if "architecture" in r]
+        presentation["Algorithm Per-Question"] = [r for r in rows if "architecture" not in r]
+        workbook(output / "summary.xlsx", presentation, presentation=True)
         lines = ["# 資科萬事通完整預備研究結果整理", "", "身分：Provisional；本報告不是正式研究認證，也不變更原Run狀態。",
                  "來源：`" + str(source) + "`", "", "## 階段成果", "", "|階段|原始狀態|證據檢查|", "|---|---|---|"]
         def clean(v):
@@ -238,6 +258,10 @@ def main():
                 for key, value in flatten(row).items():
                     if key not in {"實驗", "子實驗", "模式", "mode", "phase"}:
                         lines.append(f"|{clean(label)}|{clean(key)}|{clean(value)}|")
+        lines += ["", "## 技術驗收（不等於正式研究資格）", "",
+                  "|檢查|狀態|證據|", "|---|---|---|"]
+        for check in checks:
+            lines.append("|" + "|".join(clean(check.get(k)) for k in ("檢查", "技術狀態", "證據")) + "|")
         lines += ["", "## 失敗及未驗證項目", ""]
         for row in sheets["Failures"]:
             lines.append("- " + text({k: row[k] for k in

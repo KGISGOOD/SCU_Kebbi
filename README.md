@@ -20,6 +20,9 @@ SCU_Kebbi/
 │   ├── algorithms/{shared,semantic_cache,speculative_decoding,topic_identification,integrated_efficiency}/
 │   ├── evaluation/
 │   ├── research_tools/
+│   ├── configs/                 # 穩定Benchmark範本；*.local.json為GPU本機設定
+│   ├── cleanup/                 # 逐檔清理與封存SHA-256清單
+│   ├── archive/                 # 歷史除錯程式；非正式執行入口
 │   ├── datasets/{faq,faq_finetuning,unified_research_v1,experiment_suites_v1}/
 │   ├── models/
 │   ├── vector_stores/
@@ -49,7 +52,33 @@ SCU_Kebbi/
 
 A0／A4／A5文件庫是`experiments/vector_stores/type1_type2_bge_m3_v1/`，保留`index.faiss`與`index.pkl`；既有文件庫無version.json時不補造，保留檔案Hash與結構驗證，不與FAQ索引混用。A2的`faq_finetuning/faq_training_candidates.jsonl`是42個Train意圖的訓練資料，`faq_retrieval_candidates.jsonl`是60題檢索候選，答案仍核對原CSV。
 
-QA設定指向`experiments/models/a2_1_smoke_task8/final_model`與`a2_2_smoke_task8/final_model`。完整Tokenizer、Pooling、Normalize、權重、來源、完成及回載驗證紀錄都要保留。A3／A5使用GPU既有Base＋Adapter；預設`experiments/models/a3_smoke_v1/final_adapter`需在GPU確認存在，不自動替換模型。
+舊`evaluation/config.json`的Smoke模型路徑僅供舊入口相容。新完整基礎測試使用`configs/basic_tests.local.json`明確選擇已完成的A2-1、A2-2及A3模型，並在載入前核對3 Epoch與54／54／33 optimizer steps，不回退Smoke。完整Tokenizer、Pooling、Normalize、權重、來源、完成及回載驗證紀錄都要保留；A5沿用同一A3 Adapter。開發電腦缺少GPU完整模型時，不代表可以清除GPU上的模型。
+
+## 乾淨的完整基礎測試
+
+GPU專案根目錄執行：
+
+```powershell
+& .\experiments\research_tools\run_basic_tests.ps1 -ProjectRoot . -Mode provisional
+```
+
+首次執行只在不存在時，從`experiments/configs/basic_tests.example.json`建立`basic_tests.local.json`，並從GPU既有SD本機設定建立獨立的`sd_fp32.local.json`（只將precision改為fp32）。不覆寫既有本機設定，不下載或訓練模型。範本中的QA設定指向已知完整訓練目錄的`qa.provisional.config.json`；若GPU位置不同，先修改本機profile。SC／TI／INT沿用各自的`config.gpu.local.json`。所有設定不得依賴舊`results/`目錄。
+
+入口執行11階段：QA八架構；SC Calibration/Evaluation；SD Calibration/Evaluation（每階段含獨立Prompt Lookup配對子研究）；TI Calibration/Evaluation；INT Cold及Prefilled各自Calibration/Evaluation。新Run自動建立於`experiments/results/algorithms/research_full/basic_*`，不Resume舊Run。SD採FP32、SDPA、停用TF32，對比自己的FP32 SD0；不將其時間與其他FP16演算法混算。FP16 CLI仍保留。
+
+正式SD入口為`python -m experiments.algorithms.speculative_decoding.benchmark`，`--fp32-control`配合明確`precision=fp32`設定；數值與顯存檢查位於`numerics.py`，不再依賴單題診斷或舊Run。單題12/12通過不等於完整SD Evaluation通過。Token不等價仍導致失敗，原始答案、Token與錯誤保留raw；顯存不足停止，不降精度。
+
+每次完整測試只產生一組主要`summary.xlsx`、`report.md`及`raw/`。技術驗收已整合進同一份Excel的`Technical Acceptance`工作表及Markdown；機器可讀的驗收證據位於`raw/technical_acceptance.json`，不再自動追加兩套整理報告。只整理既有成果（不執行模型、在新目錄產生一組報告，不覆寫來源）：
+
+```powershell
+& .\experiments\research_tools\run_basic_tests.ps1 -ProjectRoot . -ReportOnly -SourceRun 'experiments/results/algorithms/research_full/basic_實際RunID'
+```
+
+獨立`acceptance` CLI保留相容性，平常不必另外執行。`-Mode formal -View <人審View> -GoldCertification <真實人審收據>`仍受原有Gold及訓練批准Guard限制；完整Provisional模型與功能通過不自動取得正式資格。Formal另須指向停用`allow_unreviewed`且使用真正批准訓練模型的QA設定，不能直接將現有provisional設定改名冒充合格。
+
+主Excel包含`Overview`、`Architecture Comparison`、`Architecture Per-Question`、`SC Results`、`SD Results`、`TI Results`、`INT Results`、`Cross Study IDs`、`Provenance`、`Technical Acceptance`及`Failures & Limitations`。只有11個階段完成且技術檢查均通過，完整測試入口才回傳成功。ReportOnly成功只代表報告已產生，不代表來源實驗或正式研究資格通過；回溯整理的未完成階段及SD不等價紀錄會保留。
+
+舊SD logits診斷、v2與單題FP32工具已按原路徑封存於`experiments/archive/cleanup_20261025_final/`；SHA與用途見`experiments/cleanup/20261025_final/`四份清單。封存程式不是現行CLI；若重現歷史版本，應在隔離副本按清單還原原路徑，不能覆寫現行程式。GPU歷史Run及訓練來源尚未同步到此電腦，未搬移或刪除。
 
 A2操作與相容性見 [TRAINING.md](experiments/a2_faq_finetuning/TRAINING.md)、[TRAINING_COMPATIBILITY.md](experiments/a2_faq_finetuning/TRAINING_COMPATIBILITY.md)。A2／A3的needs_review預設阻擋正式訓練，allow-unreviewed只作provisional。A3使用原生Chat Template及assistant標籤邊界檢查；A5沿用模型載入器並保留完整Top-5 Prompt，不以截斷文件規避輸入限制。訓練參數與來源以實際設定／Checkpoint為準。
 
@@ -154,7 +183,7 @@ python -m experiments.evaluation.run smoke --project-root . --run-dir $run --all
 
 Canonical LF恢復副本、A1恢復設定、舊FAQ索引／候選庫、訓練來源備份仍保留，避免破壞既有引用與Hash。`robot/`七個舊FAQ99 LoRA、模型測試及建庫腳本已確認無正式依賴並刪除；另清除舊比較題目檔與`experiments/test_imports.py`臨時Import診斷器。`robot/faq.txt`僅保留原始FAQ99來源，不是正式訓練、研究題庫或Baseline執行輸入。
 
-`experiments/baselines/`的test_baseline、test_faq、test_hybrid與test_retrieval仍是現有架構的專用固定題庫Benchmark／檢索檢查，不是舊robot演算法實驗，保留供必要診斷與歷史入口相容。歷史結果、暫時清理計畫與盤點報告已清除；`experiments/results/`供新Run使用。靜態整理不代表GPU功能或答案品質重新通過驗證。
+`experiments/baselines/`的test_baseline、test_faq、test_hybrid與test_retrieval仍是現有架構的專用固定題庫Benchmark／檢索檢查，不是舊robot演算法實驗，保留供必要診斷與歷史入口相容。研究結果必須保留追溯性，僅在核對原路徑、用途及SHA後封存；開發電腦本輪沒有任何結果檔案可搬移，GPU證據未受操作。`experiments/results/`供新Run使用。靜態整理不代表GPU功能或答案品質重新通過驗證。
 
 ## 研究Suite V1：固定用途與唯一人工審核表
 
@@ -322,13 +351,14 @@ Provisional會使用既有functional入口，但不傳limit/groups，執行完�
 
 ```text
 experiments/results/algorithms/research_full/<UTC_GUID>/
-  summary.xlsx                 # 九個中文工作表
+  summary.xlsx                 # 架構、演算法、來源、失敗及技術驗收
   report.md                    # 狀態、實際樣本、比較與限制
   raw/
     identity.json / settings.json / state.json / active.lock
     stages/<階段>/attempt_<GUID>/  # 原Runner、Adapter、逐題證據與內部報告
     prior_reports/             # Resume前的報告，保留原證據
     receipt_<GUID>.json / failure_<GUID>.json
+    technical_acceptance.json  # 技術驗收，不是Gold／訓練批准
 ```
 
 完成標記必須等全部11階段、最終來源驗證與整合報告都成功。單一階段失敗保留其他成果、阻擋其Evaluation，仍執行無相依的階段；預檢或身分變動則停止全Run。可續跑：
@@ -339,7 +369,7 @@ python -m experiments.research_tools.run_all --mode provisional --resume <原res
 
 Resume核對模型/設定/題庫/人審/程式/套件環境與已提交證據，成功階段不重跑；QA中斷時，只沿用同條件下具完整60題收據的架構，保留原答案及時間，未提交架構重跑。其他演算法以整個失敗階段為重跑單位，不接續不完整Cache或KV狀態。每次嘗試獨立目錄，不覆蓋歷史證據。
 
-Excel包含研究總覽、QA架構比較、QA逐題比較、SC、SD、TI、INT、跨實驗同題比較、研究設定與限制。表頭凍結/篩選/配色及欄寬由既有OOXML Writer輸出，不新增Excel套件。QA另分42個已見與18個保留意圖；Warmup與Initial Fill不混入Measured平均，P95少於20筆不估計。跨實驗只對齊相同ID/版本/文字，不合併不同計時意義。Provisional品質未評定；正式資料Gold也不等於生成答案已正確，缺乏指標以unavailable呈現。
+Excel工作表採上方統一命名。表頭凍結/篩選/配色及欄寬由既有OOXML Writer輸出，不新增Excel套件。QA另分42個已見與18個保留意圖；Warmup與Initial Fill不混入Measured平均，P95少於20筆不估計。跨實驗只對齊相同ID/版本/文字，不合併不同計時意義。Provisional品質未評定；正式資料Gold也不等於生成答案已正確，缺乏指標以unavailable呈現。
 
 ## 完整Provisional模型訓練（GPU執行）
 

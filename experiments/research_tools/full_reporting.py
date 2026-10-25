@@ -3,7 +3,7 @@ from collections import defaultdict
 import math
 import statistics
 
-from .common import read_json, read_rows
+from .common import read_json, read_rows, write_json
 from .reporting import generate, workbook, text, flatten
 
 
@@ -20,7 +20,7 @@ def report(run, state, identity):
     sheets = {name: [] for name in ("研究總覽", "QA 架構比較", "QA 逐題比較", "Semantic Cache",
               "Speculative Decoding", "Topic Identification", "Integrated Efficiency",
               "跨實驗同題比較", "研究設定與限制")}
-    wide, qa_groups, cross = {}, defaultdict(list), []
+    wide, qa_groups, cross, failure_rows = {}, defaultdict(list), [], []
     seen = {f"{prefix}{n:02d}" for prefix in ("P", "S") for n in range(1, 22)}
     for job in state["jobs"]:
         sheets["研究總覽"].append({"實驗": job["id"], "狀態": job["status"],
@@ -36,6 +36,18 @@ def report(run, state, identity):
                         dst = wide.setdefault(key, {"Question ID": key, "問題": row["question"]})
                         dst[row["architecture"] + "答案"] = row.get("generated_answer")
                         dst[row["architecture"] + "狀態"] = "未提交／不計分"
+            elif job["target"] == "sd" and job.get("result"):
+                from .collect_provisional import sd_projection
+                for sub in ("benchmark", "prompt_lookup"):
+                    try:
+                        checks = []
+                        comparisons, detail, failures = sd_projection(run / job["result"] / "raw" / sub, job["id"], sub, checks)
+                        sheets["Speculative Decoding"].extend({"紀錄類型": "未提交測量統計", "階段": job["stage"], **r} for r in comparisons)
+                        sheets["Speculative Decoding"].extend({"紀錄類型": "逐題", "階段": job["stage"], **r} for r in detail)
+                        failure_rows.extend(failures)
+                        sheets["研究設定與限制"].extend({"實驗": job["id"], **r} for r in checks)
+                    except Exception as exc:
+                        sheets["研究設定與限制"].append({"實驗": job["id"], "子實驗": sub, "限制": str(exc)})
             continue
         child = run / job["result"]
         context = read_json(child / "raw/context.json")
@@ -121,10 +133,36 @@ def report(run, state, identity):
     sheets["跨實驗同題比較"] = [r for r in cross if len(counts[(r["Question ID"], r["資料版本"], r["問題"])]) > 1]
     sheets["研究設定與限制"].append({"身分與設定": identity,
         "限制": "所有生成答案仍需逐答案品質評估；資料Gold不等於輸出正確。TI只量測Detection，非Context Reduction。QA包含42個已見及18個保留意圖。"})
+    sheets["研究設定與限制"].append({"數值策略": identity.get("execution_policy"),
+        "限制": "若SD採FP32，僅在其成對FP32 SD0內比較；不與FP16的其他演算法合併延遲或宣稱跨精度加速。"})
     sheets["研究設定與限制"].extend({"項目": key, "內容": value} for key, value in flatten({
         "硬體": identity.get("hardware"), "設定": identity["configs"], "環境": identity["qa"]["environment"],
         "Gold": identity.get("gold_sha256"), "View": identity.get("view_sha256")}).items())
-    workbook(run / "summary.xlsx", sheets, presentation=True)
+    # Read the same committed evidence as the standalone audit, without creating
+    # another report directory or upgrading any experimental/Gold status.
+    from .acceptance import audit
+    try:
+        checks = audit(run.resolve())
+    except Exception as exc:
+        checks = [{"檢查": "技術驗收流程", "技術狀態": "未驗證", "證據": str(exc)}]
+    technical = [r for r in checks if r["檢查"] not in
+                 {"正式研究資格", "SD v2 獨立單題（不屬原Run）"}]
+    technical_passed = bool(technical) and all(r["技術狀態"] == "通過" for r in technical)
+    write_json(run / "raw/technical_acceptance.json", {
+        "technical_passed": technical_passed, "checks": checks,
+        "meaning": "Technical evidence only; never a Gold or training approval receipt"})
+    titles = {"研究總覽": "Overview", "QA 架構比較": "Architecture Comparison",
+        "QA 逐題比較": "Architecture Per-Question", "Semantic Cache": "SC Results",
+        "Speculative Decoding": "SD Results", "Topic Identification": "TI Results",
+        "Integrated Efficiency": "INT Results", "跨實驗同題比較": "Cross Study IDs",
+        "研究設定與限制": "Provenance"}
+    presentation = {titles[k]: v for k, v in sheets.items()}
+    presentation["Technical Acceptance"] = checks
+    presentation["Failures & Limitations"] = [
+        {"實驗": j["id"], "狀態": j["status"], "原因": j.get("error")}
+        for j in state["jobs"] if j["status"] != "completed"] + [
+        r for r in checks if r["技術狀態"] != "通過"] + failure_rows
+    workbook(run / "summary.xlsx", presentation, presentation=True)
     done = sum(j["status"] == "completed" for j in state["jobs"])
     lines = ["# 資科萬事通整體研究結果", "", f"執行模式：{identity['mode']}；完成階段：{done}/{len(state['jobs'])}。",
              "", "只有全部必要階段及報告完成才代表整體成功。Provisional是完整預備實驗，不是正式研究成果。",
@@ -133,14 +171,25 @@ def report(run, state, identity):
     for j in state["jobs"]:
         lines.append(f"| {j['id']} | {j['status']} | {text(j.get('error', '')).replace('|', '/').replace(chr(10), ' ')} |")
     for name in ("QA 架構比較", "Semantic Cache", "Speculative Decoding", "Topic Identification", "Integrated Efficiency"):
-        lines += ["", f"## {name}", "", "以下是已提交紀錄的描述統計；Calibration不是最終Evaluation。"]
+        lines += ["", f"## {name}", "", "已提交紀錄與未提交測量會明確區分；Calibration不是最終Evaluation。",
+                  "", "|階段／模式|指標|紀錄值|", "|---|---|---|"]
         for row in sheets[name]:
             if row.get("紀錄類型") not in {"逐題", "逐輪"}:
-                lines.append("- " + text(row))
+                label = " / ".join(str(row[k]) for k in ("紀錄類型", "階段", "架構", "模式", "mode", "子實驗", "Cache狀態") if k in row)
+                clean = lambda v: text(v).replace("|", "/").replace("\n", " ")
+                for metric, value in flatten(row).items():
+                    lines.append(f"|{clean(label)}|{clean(metric)}|{clean(value)}|")
                 for metric, value in flatten(row).items():
                     if "speedup" in metric and isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0:
                         observation = "該次描述比值顯示較快" if value > 1 else "該次描述比值顯示較慢" if value < 1 else "該次描述比值未顯示加速"
-                        lines.append(f"  - {metric} = {value:.4f}：{observation}；不代表顯著性或品質提升。")
+                        lines.append(f"|{clean(label)}|{clean(metric)} 解讀|{observation}；不代表顯著性或品質提升。|")
+    lines += ["", "## 技術驗收（不等於正式研究資格）", "",
+              f"技術檢查：{'通過' if technical_passed else '失敗或尚未驗證'}。",
+              "|檢查|技術狀態|證據|", "|---|---|---|"]
+    for check in checks:
+        lines.append("|" + "|".join(text(check.get(k)).replace("|", "/").replace("\n", " ")
+                     for k in ("檢查", "技術狀態", "證據")) + "|")
     lines += ["", "## 解讀限制", "", "加速與否請依各方法的同題、同子實驗Baseline數值判讀；不合併Cold與Prefilled、不同計時範圍或兩次SD0。",
               "分類候選標籤、未審核重用及生成品質不作正式正確率。完整原始輸出、模型來源、設定及錯誤均保留於raw。"]
     (run / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return technical_passed

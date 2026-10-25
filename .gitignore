@@ -17,3 +17,4 @@ experiments/models/
 /experiments/research_tools/run_all.local.json
 /experiments/evaluation/config*.local.json
 /experiments/results/
+/experiments/configs/*.local.json

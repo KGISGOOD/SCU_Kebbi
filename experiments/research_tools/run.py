@@ -60,6 +60,7 @@ def main():
     parser.add_argument("--cache-state", choices=("cold", "prefilled"), default="cold")
     parser.add_argument("--run-dir", help="optional NEW managed result directory; defaults remain unchanged")
     parser.add_argument("--qa-resume-from", help="prior QA benchmark; strict committed-architecture reuse only")
+    parser.add_argument("--sd-fp32", action="store_true", help="explicit SD-only FP32/SDPA control, TF32 off")
     args = parser.parse_args()
     root = args.project_root.resolve()
     if root != ROOT:
@@ -72,6 +73,8 @@ def main():
     data = load_dataset(root, args.dataset)
     view = locate(root, args.view) if args.view else None
     config_hash, code = sha(config), tool_identity()
+    if args.sd_fp32 and (args.target != "sd" or read_json(config).get("precision") != "fp32"):
+        raise ValueError("--sd-fp32 requires target=sd and an explicit fp32 config")
     cert = certification(root, args.gold_certification, data, view) if not args.functional else None
     view_hash = get_views(data, view)[3]
     previous = None
@@ -85,6 +88,7 @@ def main():
                 or context["functional"] != args.functional or context["config_sha256"] != config_hash
                 or context["dataset_identity"] != data["identity"] or context["view_sha256"] != view_hash
                 or context["cache_state"] != args.cache_state or context["code"] != code
+                or context.get("sd_fp32", False) != args.sd_fp32
                 or prior["dataset_identity"] != data["identity"]):
             raise ValueError("Calibration target/data/config/review/code/cache policy mismatch")
         if not (previous / "summary.xlsx").is_file() or not (previous / "report.md").is_file():
@@ -98,6 +102,7 @@ def main():
     stage = "adapter_preflight"
     try:
         context = {"dataset_name": args.dataset, "target": args.target, "stage": args.stage, "functional": args.functional,
+                   "sd_fp32": args.sd_fp32,
                    "human_gold_certified": bool(cert), "dataset_identity": data["identity"],
                    "dataset_hashes": data["hashes"], "suite_revision": data["suite"]["revision"],
                    "config_sha256": config_hash, "view_sha256": view_hash, "code": code,
@@ -158,6 +163,8 @@ def main():
             command += ["--run-dir", str(benchmark), "--scenarios", str(adapter / "scenarios.jsonl"), "--mode", "all"] + allow
         commands = [command]
         if args.target == "sd":
+            if args.sd_fp32:
+                command.append("--fp32-control")
             # Legacy 'all' intentionally excludes lookup. Keep its CLI stable and run BOTH paired studies.
             lookup = list(command)
             lookup[lookup.index("--run-dir") + 1] = str(raw / "prompt_lookup")

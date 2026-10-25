@@ -76,7 +76,8 @@ def workbook(path, sheets, *, presentation=False):
                         + '<sheetData>' + "".join(rows) + '</sheetData>'
                         f'<autoFilter ref="A1:{column(len(fields))}{len(records)+1}"/></worksheet>')
             archive.writestr(f"xl/worksheets/sheet{number}.xml", document)
-            names.append(f'<sheet name="{name}" sheetId="{number}" r:id="rId{number}"/>')
+            sheet_name = escape(name, {'"': '&quot;'})
+            names.append(f'<sheet name="{sheet_name}" sheetId="{number}" r:id="rId{number}"/>')
             relations.append(f'<Relationship Id="rId{number}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet{number}.xml"/>')
             declarations.append(f'<Override PartName="/xl/worksheets/sheet{number}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>')
         archive.writestr("[Content_Types].xml", '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' + "".join(declarations) + '</Types>')
