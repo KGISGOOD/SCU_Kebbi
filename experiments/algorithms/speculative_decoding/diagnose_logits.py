@@ -16,6 +16,37 @@ def read(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
+def config_differences(expected, actual, prefix=""):
+    """Compare the same serialized effective layer. No behavioral keys ignored.
+
+    JSON round-tripping already makes tuples/lists equivalent in both inputs.
+    Missing, null, numeric type changes and metadata remain visible: without
+    evidence of the actual field difference, none is safe to waive.
+    """
+    if isinstance(expected, dict) != isinstance(actual, dict):
+        obj = actual if isinstance(actual, dict) else expected
+        return [{"field": (prefix + "." if prefix else "") + key,
+                 "expected": expected.get(key) if isinstance(expected, dict) else expected,
+                 "actual": actual.get(key) if isinstance(actual, dict) else actual,
+                 "expected_container_type": type(expected).__name__,
+                 "actual_container_type": type(actual).__name__} for key in sorted(obj)] or [
+                     {"field": prefix, "expected": expected, "actual": actual}]
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        result = []
+        for key in sorted(set(expected) | set(actual)):
+            name = prefix + "." + key if prefix else key
+            if key not in expected or key not in actual:
+                result.append({"field": name, "expected_present": key in expected,
+                               "actual_present": key in actual, "expected": expected.get(key),
+                               "actual": actual.get(key)})
+            else:
+                result.extend(config_differences(expected[key], actual[key], name))
+        return result
+    return ([] if type(expected) is type(actual) and expected == actual else
+            [{"field": prefix, "expected": expected, "actual": actual,
+              "expected_type": type(expected).__name__, "actual_type": type(actual).__name__}])
+
+
 def describe(scores, tokenizer):
     import torch
     scores = scores.detach().float().cpu()
@@ -88,6 +119,8 @@ class Observer:
         else:
             output_positions = []
         self.pending = {"call": self.calls, "input_shape": list(ids.shape),
+                        "parameter_dtype": str(next(module.parameters()).dtype),
+                        "attention_implementation": getattr(module.config, "_attn_implementation", None),
                         "input_positions": positions, "position_mapping": method,
                         "logits_to_keep": keep if type(keep) is int else str(keep),
                         "output_positions": output_positions,
@@ -159,11 +192,14 @@ def main():
                 or r["output_token_ids"][:81] != generated[:81]):
             raise ValueError(f"source identity/prefix mismatch: {version}")
         paired[version] = r
-    config = read(locate(args.config))
-    if config != read(source / "run.json")["config"]:
-        raise ValueError("diagnostic config differs from the original benchmark effective config")
+    supplied_config = read(locate(args.config))
+    config = read(source / "run.json")["config"]
+    input_config_diff = config_differences(config, supplied_config)
     destination.mkdir(parents=True, exist_ok=False)
     try:
+        write_json(destination / "input_config_diff.json", {
+            "differences": input_config_diff, "execution_config": config,
+            "policy": "replay recorded benchmark configuration, never silently use changed local settings"})
         for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_DATASETS_OFFLINE"):
             os.environ[name] = "1"
         import torch
@@ -199,7 +235,7 @@ def main():
             "logits_dtype": str(reference.logits.dtype),
             "raw_logits": describe(reference.logits[0, -1], engine.tokenizer)})
         del reference, full
-        records = []
+        records, all_config_diff = [], []
         for version, length in variants:
             observer = Observer(fixed, engine.tokenizer)
             handles = [engine.target.register_forward_pre_hook(observer.before, with_kwargs=True),
@@ -212,21 +248,50 @@ def main():
                 for handle in handles:
                     handle.remove()
             captures = [r for r in observer.records if r["causal_prefix_matches_fixed_prefix"]]
+            diffs = config_differences(paired[version].get("effective_generation_config"), row["effective_generation_config"])
+            all_config_diff.extend({"version": version, **d} for d in diffs)
+            old_ids, new_ids = generated, row["output_token_ids"]
+            first_diff = next((i for i in range(min(len(old_ids), len(new_ids))) if old_ids[i] != new_ids[i]),
+                              min(len(old_ids), len(new_ids)) if len(old_ids) != len(new_ids) else None)
             record = {"version": version, "generation": row, "target_forward_observations": observer.records,
+                      "generation_config_differences": diffs,
+                      "first_different_new_token_index": first_diff,
                       "mapping_errors": observer.mapping_errors,
                       "reproduces_source_tokens": row["output_token_ids"] == paired[version]["output_token_ids"],
                       "exact_token_match_sd0": row["output_token_ids"] == generated,
                       "capture_complete": bool(captures),
                       "timings": "instrumented/synchronizing: NOT usable for performance comparisons"}
             write_json(destination / f"{version}.json", record)
-            if row["effective_generation_config"] != paired[version].get("effective_generation_config"):
-                raise ValueError(f"effective generation config differs from source: {version}; telemetry preserved")
+            for difference in diffs:
+                print("CONFIG_DIFF " + json.dumps({"version": version, **difference}, ensure_ascii=False), flush=True)
             records.append(record)
         engine.verify_sources()
         complete = all(r["capture_complete"] for r in records)
+        replay_sd0 = records[0]["generation"]["output_token_ids"]
+        replay_equal = all(r["generation"]["output_token_ids"] == replay_sd0 for r in records)
+        configs_equal = not all_config_diff and not input_config_diff
+        write_json(destination / "generation_config_diff.json", {
+            "differences": all_config_diff, "comparison_layer": "effective_generation_config vs effective_generation_config",
+            "normalization": "none; no field difference proven behavior-neutral"})
+        for difference in input_config_diff:
+            print("CONFIG_DIFF " + json.dumps(difference, ensure_ascii=False), flush=True)
+        argmax = {r["version"]: [o["raw_logits"]["argmax"] for o in r["target_forward_observations"]
+                                 if o["causal_prefix_matches_fixed_prefix"]] for r in records}
+        baseline_argmax = set(argmax.get("SD0", []))
+        path_difference = any(set(values) != baseline_argmax for mode, values in argmax.items() if mode != "SD0")
+        evidence_category = ("configuration_identity_not_verified" if not configs_equal else
+                             "raw_target_argmax_differs_by_forward_path" if complete and path_difference else
+                             "raw_logits_do_not_explain_decision; inspect acceptance/processors/stop path" if complete and not replay_equal else
+                             "no_reproduced_mismatch" if replay_equal else "insufficient_capture")
         write_json(destination / "diagnostic_summary.json", {
-            "capture_complete": complete, "equivalence_passed": all(r["exact_token_match_sd0"] for r in records),
+            "capture_complete": complete, "equivalence_passed": replay_equal and configs_equal and complete and replay_sd0 == generated,
+            "baseline_reproduces_source": replay_sd0 == generated,
+            "replay_token_equivalence_only": replay_equal, "generation_config_verified": configs_equal,
             "source_reproduced": all(r["reproduces_source_tokens"] for r in records),
+            "argmax_at_fixed_prefix": argmax,
+            "evidence_category": evidence_category,
+            "root_cause": "not established; differing raw argmax supports a numerical/path hypothesis but does not prove FP16 or cache fault",
+            "root_cause_evidence_sufficient": False,
             "generation_calls": len(records), "fixed_prefix_forward_calls": 1,
             "resume_authorized_by_this_tool": False,
             "interpretation": "raw forward logits only; inspect installed assisted acceptance/logits processors before attributing a cause"})
