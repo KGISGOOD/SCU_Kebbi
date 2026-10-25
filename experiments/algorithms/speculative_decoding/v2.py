@@ -242,15 +242,21 @@ def main():
             engine.config["max_new_tokens"] = old_limit
         engine.verify_sources()
         passed = repeatable and all(r["exact_token_match_sd0"] for r in rows) and all(r["exact_token_match_sd0"] for r in boundary_rows)
+        # Coverage includes actual boundary forwards, not just full-length runs.
+        # This changes reporting only; it does not reclassify Token mismatches.
+        boundary_outputs = [output for case in boundary_rows for output in (case["baseline"], case["speculative"])]
+        coverage_outputs = rows + boundary_outputs
         summary = {"status": "passed_on_measured_inputs" if passed else "failed_lossless",
             "provisional": True, "baseline_repeatable": repeatable, "measurements": len(rows),
             "failed": sum(r["status"] == "failed_lossless" for r in rows),
             "boundary_failed": sum(not r["exact_token_match_sd0"] for r in boundary_rows),
             "boundary_tests": len(boundary_rows), "boundary_generation_calls": 15,
-            "boundary_coverage": {"k_values": [2, 4, 6, 8], "eos_observed": any(r["stop_reason"] == "eos" for r in rows),
-                "candidate_eos_observed": any(r["eos_candidate_seen"] for r in rows),
-                "crop_observed": any(r["cache_crops"] for r in rows),
-                "token_limit_observed": any(r["stop_reason"] == "token_limit" for r in rows)},
+            "boundary_coverage": {"k_values": [2, 4, 6, 8], "eos_observed": any(r["stop_reason"] == "eos" for r in coverage_outputs),
+                "candidate_eos_observed": any(r["eos_candidate_seen"] for r in coverage_outputs),
+                "crop_observed": any(r["cache_crops"] for r in coverage_outputs),
+                "token_limit_observed": any(r["stop_reason"] == "token_limit" for r in coverage_outputs),
+                "main_token_limit_observed": any(r["stop_reason"] == "token_limit" for r in rows),
+                "boundary_token_limit_observed": any(r["stop_reason"] == "token_limit" for r in boundary_outputs)},
             "limitations": "Unobserved boundaries are unverified. Block-vs-serial floating-point equivalence is not guaranteed; no universal lossless claim or replacement of V1."}
         write_json(output / "summary.json", summary)
         (output / "report.md").write_text("# SD v2 獨立驗收\n\n" + str(summary) + "\n\n未覆寫V1；若仍失敗，停止重做並保留技術限制。\n", encoding="utf-8")
