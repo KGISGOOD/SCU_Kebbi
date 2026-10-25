@@ -24,6 +24,7 @@ def main():
     parser.add_argument("--repeats", type=int)
     parser.add_argument("--warmups", type=int)
     parser.add_argument("--allow-unreviewed", action="store_true")
+    parser.add_argument("--scenario-id", help="explicit single-scenario diagnostic; never a complete Evaluation")
     args = parser.parse_args()
     if args.mode == "sd2_3":
         from .compatibility import adaptive_policy
@@ -76,6 +77,11 @@ def main():
         cases.append(row)
     if not cases or len({r["scenario_id"] for r in cases}) != len(cases):
         raise ValueError("empty scenarios or duplicate scenario_id")
+    source_indices = {r["scenario_id"]: i for i, r in enumerate(cases)}
+    if args.scenario_id:
+        cases = [r for r in cases if r["scenario_id"] == args.scenario_id]
+        if len(cases) != 1:
+            raise ValueError("diagnostic scenario ID absent from the supplied existing source")
     provisional = any(r["review_status"] != "approved" for r in cases)
     if provisional and not args.allow_unreviewed:
         raise ValueError("scenarios require human review; --allow-unreviewed is development only")
@@ -100,6 +106,10 @@ def main():
                                   "mode": args.mode, "variants": variants, "provisional": provisional,
                                   "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                                   "purpose": "controlled A0 speculative decoding development benchmark"})
+    if args.scenario_id:
+        write_json(run / "diagnostic_scope.json", {"selected_scenario_id": args.scenario_id,
+                   "complete_evaluation": False, "source_sha256": hashes["scenarios"],
+                   "generation_policy_changed": False})
     write_json(run / "scenarios.snapshot.json", cases)
     raw = run / "measurements.raw.jsonl"
     with raw.open("x", encoding="utf-8", newline="\n") as stream:
@@ -121,6 +131,15 @@ def main():
                                       "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
                                       "matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32}
         write_json(run / "identity.json", engine.identity)
+        if args.scenario_id:
+            import inspect
+            from transformers.generation.utils import GenerationMixin
+            from transformers.generation.candidate_generator import AssistedCandidateGenerator
+            write_json(run / "installed_generation_sources.json", {
+                "transformers": engine.api["transformers"],
+                "assisted_decoding": inspect.getsource(GenerationMixin._assisted_decoding),
+                "prepare_cache": inspect.getsource(GenerationMixin._prepare_cache_for_generation),
+                "candidate_generator": inspect.getsource(AssistedCandidateGenerator)})
         order = list(variants)
         random.Random(config["seed"]).shuffle(order)
         preparation_total = 0.0
@@ -133,7 +152,7 @@ def main():
             write_json(run / snapshot_file, snapshot)
             for warmup, repeats in ((True, config["warmups"]), (False, config["repeats"])):
                 for repeat in range(repeats):
-                    offset = (index + repeat) % len(order)
+                    offset = (source_indices[scenario["scenario_id"]] + repeat) % len(order)
                     sequence = order[offset:] + order[:offset]
                     for position, (version, length) in enumerate(sequence):
                         current = {"scenario_id": scenario["scenario_id"], "experiment_version": version,
@@ -142,7 +161,8 @@ def main():
                         result = engine.generate(snapshot, inputs, version, length, repeat, warmup,
                                                  config["seed"] + repeat)
                         result.update(measurement_id=f"M{len(rows) + 1:06d}", order_position=position,
-                                      prompt_snapshot=snapshot_file, provisional=provisional)
+                                      prompt_snapshot=snapshot_file, provisional=provisional,
+                                      source_scenario_index=source_indices[scenario["scenario_id"]])
                         append_jsonl(raw, result)
                         rows.append(result)
                         print(f"{result['measurement_id']} {version} {scenario['scenario_id']} "
@@ -153,7 +173,7 @@ def main():
         if hashes != {"config": file_hash(config_path), "scenarios": file_hash(scenario_path)}:
             raise ValueError("config/scenario source changed during run")
         stage = "comparison_and_reporting"
-        failures = report(run, rows, engine.identity, provisional)
+        failures = report(run, rows, engine.identity, provisional, engine.tokenizer)
         if failures:
             raise ValueError(f"{failures} token-equivalence/repeatability failures; inspect results, no lossless claim")
         write_json(run / "completed.json", {"status": "completed", "source_verification": "passed",

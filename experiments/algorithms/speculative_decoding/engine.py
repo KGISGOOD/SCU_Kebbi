@@ -120,6 +120,7 @@ class SDEngine:
         self.identity["attention_implementation"] = {
             "target": getattr(self.target.config, "_attn_implementation", None),
             "draft": getattr(self.draft.config, "_attn_implementation", None) if self.draft is not None else None}
+        self.identity["diagnostics_schema"] = "sd_token_difference_v1"
 
     def prepare(self, scenario):
         from experiments.baselines.rag_baseline.prompts import build_prompt, create_context_from_documents
@@ -225,6 +226,8 @@ class SDEngine:
             policy = lookup_request(self.target, length, ngram)
         try:
             with policy as lookup_stats:
+                call_target_defaults = deepcopy(self.target.generation_config.to_dict())
+                call_draft_defaults = deepcopy(assistant.generation_config.to_dict()) if assistant is not None else None
                 sync()
                 start = time.perf_counter()
                 with torch.inference_mode():
@@ -251,6 +254,8 @@ class SDEngine:
         if settings != after:
             raise RuntimeError("fixed assistant settings changed during generation")
         text = self.tokenizer.decode(ids, skip_special_tokens=True).strip()
+        eos = common.eos_token_id
+        eos_ids = list(eos) if isinstance(eos, (list, tuple)) else [eos] if eos is not None else []
         sync()
         execution = time.perf_counter() - execution_start
         return {"scenario_id": snapshot["scenario_id"], "experiment_version": version,
@@ -259,6 +264,11 @@ class SDEngine:
                 "prompt_identity": snapshot["prompt_identity"], "retrieval_identity": snapshot["retrieval_identity"],
                 "target_identity": self.identity["target"], "draft_identity": self.identity["draft"],
                 "output_text": text, "output_token_ids": ids, "output_token_sha256": fingerprint(ids),
+                "effective_generation_config": common.to_dict(),
+                "effective_target_model_generation_config": call_target_defaults,
+                "effective_draft_model_generation_config": call_draft_defaults,
+                "effective_eos_token_ids": eos_ids,
+                "token_boundary": "raw generate sequence sliced at input_token_count; no decode/re-encode",
                 "input_token_count": count, "generated_token_count": len(ids),
                 "generation_seconds": generation_seconds, "tokens_per_second": len(ids) / generation_seconds,
                 "retrieval_seconds": snapshot["retrieval_seconds"],
@@ -280,7 +290,7 @@ class SDEngine:
                 "cuda_peak_allocated_bytes": peak, "cuda_peak_reserved_bytes": reserved,
                 "cuda_allocated_before_bytes": before, "cuda_free_total_before_bytes": free_before,
                 "residency": self.identity["residency"], "exact_token_match_sd0": None,
-                "stop_reason": "eos" if ids[-1] == self.tokenizer.eos_token_id else
+                "stop_reason": "eos" if ids[-1] in eos_ids else
                                "token_limit" if len(ids) >= self.config["max_new_tokens"] else "other",
                 "generation_speedup_sd0": None, "end_to_end_speedup_sd0": None}
 

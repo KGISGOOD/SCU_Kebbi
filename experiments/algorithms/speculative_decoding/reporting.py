@@ -17,17 +17,45 @@ def append_jsonl(path, value):
         stream.write(json.dumps(value, ensure_ascii=False, allow_nan=False) + "\n")
 
 
-def report(run, rows, identity, provisional):
+def token_difference(row, ref, tokenizer=None):
+    left, right = ref["output_token_ids"], row["output_token_ids"]
+    index = next((i for i, (a, b) in enumerate(zip(left, right)) if a != b), min(len(left), len(right)))
+    if left == right:
+        return None
+    start, stop = max(0, index - 5), index + 6
+    def window(ids):
+        return [{"index": i, "id": ids[i],
+                 "token": tokenizer.convert_ids_to_tokens(ids[i]) if tokenizer else None,
+                 "decoded_token": tokenizer.decode([ids[i]], skip_special_tokens=False) if tokenizer else None}
+                for i in range(start, min(stop, len(ids)))]
+    return {"first_different_new_token_index": index, "absolute_sequence_index": row["input_token_count"] + index,
+            "sd0_length": len(left), "method_length": len(right), "sd0_sha256": ref["output_token_sha256"],
+            "method_sha256": row["output_token_sha256"], "sd0_stop_reason": ref["stop_reason"],
+            "method_stop_reason": row["stop_reason"], "sd0_window": window(left), "method_window": window(right),
+            "sd0_measurement_id": ref["measurement_id"], "method_measurement_id": row["measurement_id"],
+            "note": "Index is zero-based; end-of-sequence versus another token is a strict mismatch."}
+
+
+def report(run, rows, identity, provisional, tokenizer=None):
     baseline = {(r["scenario_id"], r["repeat_index"], r["warmup"]): r
                 for r in rows if r["experiment_version"] == "SD0"}
+    if len(baseline) != sum(r["experiment_version"] == "SD0" for r in rows):
+        raise ValueError("duplicate paired SD0 key; comparison would be ambiguous")
     for row in rows:
         ref = baseline[(row["scenario_id"], row["repeat_index"], row["warmup"])]
         if ref["prompt_identity"] != row["prompt_identity"] or ref["retrieval_identity"] != row["retrieval_identity"]:
             raise ValueError("baseline and assisted inputs differ")
+        if ref["target_identity"] != row["target_identity"] or ref["seed"] != row["seed"]:
+            raise ValueError("paired Target identity or seed differs")
         row["exact_token_match_sd0"] = row["output_token_ids"] == ref["output_token_ids"]
         row["status"] = "success" if row["exact_token_match_sd0"] else "failed_token_mismatch"
         row["error"] = None if row["exact_token_match_sd0"] else "token IDs differ from paired SD0"
         row["baseline_measurement_id"] = ref["measurement_id"]
+        row["token_difference"] = token_difference(row, ref, tokenizer)
+        row["first_different_new_token_index"] = (row["token_difference"] or {}).get("first_different_new_token_index")
+        row["sd0_output_length"] = len(ref["output_token_ids"])
+        row["sd0_output_token_sha256"] = ref["output_token_sha256"]
+        row["sd0_stop_reason"] = ref["stop_reason"]
         row["generation_speedup_sd0"] = ref["generation_seconds"] / row["generation_seconds"]
         row["end_to_end_speedup_sd0"] = ref["end_to_end_seconds"] / row["end_to_end_seconds"]
     # Greedy target itself must also be repeatable. Separate this finding from
@@ -59,7 +87,9 @@ def report(run, rows, identity, provisional):
               "cuda_peak_allocated_bytes", "cuda_peak_reserved_bytes", "assistant_candidate_limit",
               "prompt_lookup_candidate_limit", "max_matching_ngram_size",
               "prompt_identity", "retrieval_identity", "target_identity", "draft_identity", "output_text",
-              "output_token_sha256", "residency", "fallback", "error"]
+              "output_token_sha256", "residency", "fallback", "error", "baseline_measurement_id",
+              "stop_reason", "first_different_new_token_index", "sd0_output_length",
+              "sd0_output_token_sha256", "sd0_stop_reason", "token_difference"]
     with (run / "comparison.csv").open("x", encoding="utf-8-sig", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
