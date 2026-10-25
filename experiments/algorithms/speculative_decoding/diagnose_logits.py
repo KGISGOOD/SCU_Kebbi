@@ -1,0 +1,242 @@
+"""Read-only Target forward telemetry for SC-E16-N; never a benchmark/pass waiver."""
+from __future__ import annotations
+
+import argparse
+import inspect
+import json
+import os
+from pathlib import Path
+import traceback
+
+from .reporting import write_json
+from experiments.algorithms.semantic_cache.cache import fingerprint
+
+
+def read(path):
+    return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def describe(scores, tokenizer):
+    import torch
+    scores = scores.detach().float().cpu()
+    if not torch.isfinite(scores).all():
+        raise ValueError("nonfinite raw Target logits")
+    top = torch.topk(scores, 5)
+    def token(i):
+        value = float(scores[i])
+        return {"id": i, "token": tokenizer.convert_ids_to_tokens(i),
+                "logit": value, "rank": int((scores > value).sum()) + 1,
+                "equal_logit_count": int((scores == value).sum())}
+    return {"eot": token(128009), "jian": token(26892),
+            "eot_minus_jian": float(scores[128009] - scores[26892]),
+            "argmax": int(scores.argmax()), "top5": [token(int(i)) for i in top.indices]}
+
+
+class Observer:
+    """Observe causal logit at one absolute input position; never edit tensors/cache.
+
+    logits position t predicts token t+1. Position mapping is accepted only when
+    the input positions and logits_to_keep mapping can be established explicitly.
+    A candidate suffix may exist beyond t; the entire causal prefix must match.
+    """
+    def __init__(self, prefix, tokenizer):
+        self.prefix, self.tokenizer = prefix, tokenizer
+        self.wanted = len(prefix) - 1
+        self.seen, self.pending, self.records = {}, None, []
+        self.calls, self.mapping_errors = 0, []
+
+    def before(self, module, args, kwargs):
+        self.calls += 1
+        ids = kwargs.get("input_ids", args[0] if args else None)
+        cache = kwargs.get("past_key_values")
+        try:
+            cache_length = int(cache.get_seq_length()) if cache is not None else 0
+        except (AttributeError, TypeError):
+            cache_length = None
+        self.pending = None
+        if ids is None or ids.ndim != 2 or ids.shape[0] != 1:
+            self.mapping_errors.append({"call": self.calls, "reason": "input_ids unavailable/batch != 1"})
+            return
+        values = ids[0].detach().cpu().tolist()
+        positions = kwargs.get("cache_position")
+        method = "cache_position"
+        if positions is None:
+            positions = kwargs.get("position_ids")
+            method = "position_ids (single unpadded sequence)"
+        if positions is not None:
+            positions = positions.detach().reshape(-1).cpu().tolist()
+        elif cache_length is not None:
+            positions = list(range(cache_length, cache_length + len(values)))
+            method = "contiguous append from pre-forward cache length"
+        if positions is None or len(positions) != len(values):
+            self.mapping_errors.append({"call": self.calls, "reason": "ambiguous input position mapping"})
+            return
+        # HF can crop/rewrite speculative suffixes. Overwrite positions, never
+        # assume cached candidate tokens from an earlier round were accepted.
+        for pos, value in zip(positions, values):
+            self.seen[pos] = value
+        matching = all(self.seen.get(i) == value for i, value in enumerate(self.prefix))
+        keep = kwargs.get("logits_to_keep", kwargs.get("num_logits_to_keep", 0))
+        if hasattr(keep, "detach"):
+            indices = keep.detach().reshape(-1).cpu().tolist()
+            try:
+                output_positions = [positions[i] for i in indices]
+            except IndexError:
+                output_positions = []
+        elif type(keep) is int and keep >= 0:
+            output_positions = positions[-keep:] if keep else positions
+        else:
+            output_positions = []
+        self.pending = {"call": self.calls, "input_shape": list(ids.shape),
+                        "input_positions": positions, "position_mapping": method,
+                        "logits_to_keep": keep if type(keep) is int else str(keep),
+                        "output_positions": output_positions,
+                        "cache_type": type(cache).__name__ if cache is not None else None,
+                        "cache_length_before": cache_length,
+                        "use_cache": kwargs.get("use_cache"),
+                        "causal_prefix_matches_fixed_prefix": matching}
+
+    def after(self, module, args, kwargs, output):
+        state = self.pending
+        if state is None:
+            return
+        logits = getattr(output, "logits", None)
+        if logits is None:
+            self.mapping_errors.append({"call": self.calls, "reason": "forward returned no logits"})
+            return
+        positions = state.pop("output_positions")
+        if logits.shape[1] != len(positions):
+            self.mapping_errors.append({"call": self.calls, "reason": "logit length disagrees with explicit mapping",
+                                        "shape": list(logits.shape), "mapped_length": len(positions)})
+            return
+        if self.wanted not in positions:
+            return
+        index = positions.index(self.wanted)
+        state.update(logits_shape=list(logits.shape), logits_dtype=str(logits.dtype),
+                     absolute_predictor_position=self.wanted, local_logit_index=index,
+                     predicts_new_token_index=81,
+                     raw_logits=describe(logits[0, index], self.tokenizer))
+        self.records.append(state)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--source-run", type=Path, required=True, help="existing failed SD benchmark directory")
+    parser.add_argument("--run-dir", type=Path, required=True)
+    args = parser.parse_args()
+    root = args.project_root.resolve()
+    def locate(p):
+        return (p if p.is_absolute() else root / p).resolve()
+    source, destination = locate(args.source_run), locate(args.run_dir)
+    if (root / "experiments/results/algorithms").resolve() not in destination.parents:
+        raise ValueError("diagnostics must use a NEW directory under experiments/results/algorithms")
+    rows = [json.loads(line) for line in (source / "results.jsonl").read_text(encoding="utf-8-sig").splitlines() if line.strip()]
+    rows = [r for r in rows if r["scenario_id"] == "SC-E16-N"]
+    baseline = next(r for r in rows if r["experiment_version"] == "SD0")
+    snapshot_path = (source / baseline["prompt_snapshot"]).resolve()
+    if source not in snapshot_path.parents:
+        raise ValueError("prompt snapshot must belong to source run")
+    snapshot = read(snapshot_path)
+    prompt_ids = snapshot["input_token_ids"]
+    if fingerprint(prompt_ids) != snapshot["prompt_identity"] or len(prompt_ids) != snapshot["input_token_count"]:
+        raise ValueError("saved prompt identity/count mismatch")
+    generated = baseline["output_token_ids"]
+    if len(generated) != 82 or generated[81] != 128009:
+        raise ValueError("source SD0 does not match the user-confirmed 82-token EOS case")
+    variants = [("SD0", None), ("SD2-1", None)] + [(f"SD2-2-k{k}", k) for k in (2, 4, 6, 8)]
+    paired = {}
+    for version, _ in variants:
+        matches = [r for r in rows if r["experiment_version"] == version
+                   and r["repeat_index"] == baseline["repeat_index"] and r["warmup"] == baseline["warmup"]]
+        if len(matches) != 1:
+            raise ValueError(f"missing/duplicate source pair: {version}")
+        r = matches[0]
+        if (r["seed"] != baseline["seed"] or r["prompt_identity"] != snapshot["prompt_identity"]
+                or r["retrieval_identity"] != snapshot["retrieval_identity"]
+                or r["target_identity"] != baseline["target_identity"]
+                or r["output_token_ids"][:81] != generated[:81]):
+            raise ValueError(f"source identity/prefix mismatch: {version}")
+        paired[version] = r
+    config = read(locate(args.config))
+    if config != read(source / "run.json")["config"]:
+        raise ValueError("diagnostic config differs from the original benchmark effective config")
+    destination.mkdir(parents=True, exist_ok=False)
+    try:
+        for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_DATASETS_OFFLINE"):
+            os.environ[name] = "1"
+        import torch
+        from .engine import SDEngine
+        from transformers.generation.utils import GenerationMixin
+        from transformers.generation.candidate_generator import AssistedCandidateGenerator
+        write_json(destination / "installed_sources.json", {
+            "assisted_decoding": inspect.getsource(GenerationMixin._assisted_decoding),
+            "sample": inspect.getsource(GenerationMixin._sample),
+            "prepare_cache": inspect.getsource(GenerationMixin._prepare_cache_for_generation),
+            "candidate_generator": inspect.getsource(AssistedCandidateGenerator)})
+        engine = SDEngine(root, config, with_draft=True)
+        if engine.identity["target"] != baseline["target_identity"]:
+            raise ValueError("Target source differs from recorded baseline")
+        if any(engine.identity["draft"] != r["draft_identity"] for r in paired.values()):
+            raise ValueError("Draft source differs from recorded generation")
+        if engine.tokenizer(snapshot["prompt"], return_tensors="pt", truncation=False)["input_ids"][0].tolist() != prompt_ids:
+            raise ValueError("current tokenizer does not reproduce saved prompt IDs")
+        fixed = prompt_ids + generated[:81]
+        inputs = {"input_ids": torch.tensor([prompt_ids], device=config["device"])}
+        inputs["attention_mask"] = torch.ones_like(inputs["input_ids"])
+        write_json(destination / "identity.json", {"engine": engine.identity, "source_run": str(source),
+                   "source_prompt": str(snapshot_path), "prompt_identity": snapshot["prompt_identity"],
+                   "prefix_sha256": fingerprint(fixed), "new_token_index": 81,
+                   "performance_measurement": False, "gold_certification": False})
+        # Full-prefix recomputation is a reference path, NOT the SD0 ground truth.
+        full = torch.tensor([fixed], device=config["device"])
+        with torch.inference_mode():
+            reference = engine.target(input_ids=full, attention_mask=torch.ones_like(full), use_cache=False,
+                                      return_dict=True, logits_to_keep=1)
+        write_json(destination / "fixed_prefix_reference.json", {
+            "path": "full prefix, use_cache=False; same dtype/backend; no generation",
+            "logits_dtype": str(reference.logits.dtype),
+            "raw_logits": describe(reference.logits[0, -1], engine.tokenizer)})
+        del reference, full
+        records = []
+        for version, length in variants:
+            observer = Observer(fixed, engine.tokenizer)
+            handles = [engine.target.register_forward_pre_hook(observer.before, with_kwargs=True),
+                       engine.target.register_forward_hook(observer.after, with_kwargs=True)]
+            try:
+                row = engine.generate(snapshot, inputs, version,
+                                      config["standard_draft_tokens"] if version == "SD2-1" else length,
+                                      baseline["repeat_index"], baseline["warmup"], baseline["seed"])
+            finally:
+                for handle in handles:
+                    handle.remove()
+            captures = [r for r in observer.records if r["causal_prefix_matches_fixed_prefix"]]
+            record = {"version": version, "generation": row, "target_forward_observations": observer.records,
+                      "mapping_errors": observer.mapping_errors,
+                      "reproduces_source_tokens": row["output_token_ids"] == paired[version]["output_token_ids"],
+                      "exact_token_match_sd0": row["output_token_ids"] == generated,
+                      "capture_complete": bool(captures),
+                      "timings": "instrumented/synchronizing: NOT usable for performance comparisons"}
+            write_json(destination / f"{version}.json", record)
+            if row["effective_generation_config"] != paired[version].get("effective_generation_config"):
+                raise ValueError(f"effective generation config differs from source: {version}; telemetry preserved")
+            records.append(record)
+        engine.verify_sources()
+        complete = all(r["capture_complete"] for r in records)
+        write_json(destination / "diagnostic_summary.json", {
+            "capture_complete": complete, "equivalence_passed": all(r["exact_token_match_sd0"] for r in records),
+            "source_reproduced": all(r["reproduces_source_tokens"] for r in records),
+            "generation_calls": len(records), "fixed_prefix_forward_calls": 1,
+            "resume_authorized_by_this_tool": False,
+            "interpretation": "raw forward logits only; inspect installed assisted acceptance/logits processors before attributing a cause"})
+        if not complete:
+            raise RuntimeError("missing unambiguously mapped divergence-position logits; inspect mapping_errors")
+        print(f"Diagnostic captured (not an equivalence pass or benchmark): {destination}")
+    except Exception:
+        write_json(destination / "failed.json", {"traceback": traceback.format_exc()})
+        raise
+
+
+if __name__ == "__main__":
+    main()
