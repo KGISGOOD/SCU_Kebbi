@@ -1,0 +1,27 @@
+{
+  "models": {
+    "base": "LOCAL_MODELS/Llama-3.2-3B-Instruct",
+    "bge": "LOCAL_MODELS/bge-m3",
+    "draft": "LOCAL_MODELS/Llama-3.2-1B-Instruct",
+    "reranker": "LOCAL_MODELS/bge-reranker-v2-m3",
+    "a2_1": "experiments/models/training_v2/20261028_003944_e3c6657d/a2_1/final_model",
+    "a2_2": "experiments/models/training_v2/20261028_003944_e3c6657d/a2_2/final_model",
+    "a3": "experiments/models/training_v2/20261028_003944_e3c6657d/a3/final_adapter"
+  },
+  "training_bundle": "experiments/datasets/training_v2/converted",
+  "dense_index": "experiments/vector_stores/type1_type2_bge_m3_v1",
+  "device": "cuda",
+  "qa_precision": "fp16",
+  "sd_precision": "fp32",
+  "int_precision": "fp32",
+  "seed": 42,
+  "max_new_tokens": 256,
+  "max_input_tokens": 2048,
+  "repeats": 3,
+  "warmups": 1,
+  "sc_threshold": 0.75,
+  "faq_threshold": null,
+  "review_file": null,
+  "ti_thresholds": null,
+  "settings_origin": "predeclared_before_804_evaluation_not_optimized_on_test"
+}

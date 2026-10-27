@@ -11,6 +11,7 @@ venv/
 *.log
 
 experiments/models/
+experiments/benchmark_804/config.local.json
 
 # Machine-local algorithm resource paths; keep example configs tracked.
 /experiments/algorithms/**/config*.local.json
