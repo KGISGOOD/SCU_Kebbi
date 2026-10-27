@@ -3,3 +3,7 @@ experiments/datasets/scu_fixed_questions_v1_1.jsonl text eol=lf
 experiments/datasets/研究題目審核表.csv text eol=lf
 experiments/datasets/答案來源審核表.csv text eol=lf
 experiments/datasets/題目更新建議.xlsx -text
+
+# V2 provenance pins training source bytes; preserve existing LF/CRLF on checkout.
+experiments/a2_faq_finetuning/*.py -text
+experiments/a3_faq_sft/*.py -text

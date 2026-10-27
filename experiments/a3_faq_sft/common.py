@@ -134,6 +134,10 @@ def snapshot(root, manifest):
 
 def validate_data(root, directory):
     manifest = read_json(directory / "dataset_manifest.json")
+    if manifest.get("schema_version") == "training_v2_converted_v1":
+        from experiments.a2_faq_finetuning.v2_data import load_bundle
+        files, manifest, _ = load_bundle(root, directory)
+        return {s: files[s + ".jsonl"] for s in ("train", "validation")}, manifest
     if manifest.get("schema_version") not in {"a3_sft_data_v1", "a3_sft_data_v2"}:
         raise DataError("unknown A3 dataset schema")
     source_manifest = resolve(root, manifest["intent_manifest"])

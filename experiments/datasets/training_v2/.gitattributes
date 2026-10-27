@@ -1,0 +1,3 @@
+# Frozen receipts bind exact bytes, including XLSX ZIP bytes and JSONL newlines.
+# Do not transform these generated data/receipt files on Windows checkout.
+* -text

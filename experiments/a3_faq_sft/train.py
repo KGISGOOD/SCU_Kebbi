@@ -81,7 +81,7 @@ def main():
             review_path = resolve(root, args.training_review)
             review_hash = sha(review_path)
             training_review = read_json(review_path)
-            if dataset_manifest["schema_version"] == "a3_sft_data_v2":
+            if dataset_manifest["schema_version"] in {"a3_sft_data_v2", "training_v2_converted_v1"}:
                 from experiments.research_tools.training_approval import verify
                 training_review, review_hash = verify(review_path, "a3_training_review_v1", training_path,
                                                      directory / "dataset_manifest.json",
@@ -95,16 +95,16 @@ def main():
                     or len(approved) != len(ids) or set(approved) != set(ids)
                     or any(not isinstance(training_review.get(k), str) or not training_review[k].strip()
                            for k in ("reviewer", "reviewed_at", "evidence"))):
-                raise DataError("invalid human Train approval: require exact 42 IDs, hashes, reviewer, timestamp and evidence")
+                raise DataError("invalid human Train approval: require exact Train IDs, hashes, reviewer, timestamp and evidence")
             reviewed_at = datetime.fromisoformat(training_review["reviewed_at"].replace("Z", "+00:00"))
             if reviewed_at.tzinfo is None or sha(review_path) != review_hash:
                 raise DataError("Train approval needs a timezone and must remain unchanged")
             pending = []  # Explicit external human approval; immutable dataset stays needs_review.
-        if (dataset_manifest["schema_version"] == "a3_sft_data_v2"
+        if (dataset_manifest["schema_version"] in {"a3_sft_data_v2", "training_v2_converted_v1"}
                 and not args.training_review and not args.check_only and not args.allow_unreviewed):
             raise DataError("revised supervised answers need human --training-review for formal training; --allow-unreviewed explicitly permits provisional training")
         if (not args.check_only and not args.allow_unreviewed
-                and dataset_manifest["schema_version"] != "a3_sft_data_v2"):
+                and dataset_manifest["schema_version"] not in {"a3_sft_data_v2", "training_v2_converted_v1"}):
             raise DataError("formal A3 training requires a revised v2 dataset; original v1 remains available for provisional Smoke")
         if pending and not args.allow_unreviewed and not args.check_only:
             raise DataError("Train rows need human review: %s; --allow-unreviewed permits provisional smoke only"
@@ -113,12 +113,15 @@ def main():
         name, identity = model_identity(root, args.base_model)
         tokenizer = load_tokenizer(name, args.offline, args.revision)
         tokenized = [encode_sample(tokenizer, row, args.max_length) for row in data["train"]]
+        validation_tokens = ([encode_sample(tokenizer, row, args.max_length) for row in data["validation"]]
+                             if dataset_manifest["schema_version"] == "training_v2_converted_v1" else [])
         token_summary = {
             "train_examples": len(tokenized), "train_faq_ids": [r["faq_id"] for r in tokenized],
             "max_sequence_tokens": max(len(r["input_ids"]) for r in tokenized),
             "supervised_tokens": sum(r["supervised_tokens"] for r in tokenized),
             "masking": "system/user/assistant header and padding=-100; assistant content+turn ending supervised",
             "truncation": "forbidden; overflow is an error", "pending_review": pending,
+            "validation_examples_tokenized": len(validation_tokens),
         }
         if args.check_only:
             print(json.dumps({"structural_ok": True, "tokenization_ok": True,
@@ -179,6 +182,8 @@ def main():
         if identity["kind"] == "hub":
             tokenizer = load_tokenizer(name, args.offline, revision)
             tokenized = [encode_sample(tokenizer, row, args.max_length) for row in data["train"]]
+            if validation_tokens:
+                validation_tokens = [encode_sample(tokenizer, row, args.max_length) for row in data["validation"]]
         token_summary.update(
             max_sequence_tokens=max(len(r["input_ids"]) for r in tokenized),
             supervised_tokens=sum(r["supervised_tokens"] for r in tokenized))
@@ -220,6 +225,8 @@ def main():
             "trainable_parameters": sum(p.numel() for p in parameters),
             "training_precision": args.precision, "max_length": args.max_length,
             "training_review_sha256": review_hash,
+            "data_contract": dataset_manifest["schema_version"],
+            "dataset_manifest_sha256": sha(directory / "dataset_manifest.json"),
         }
 
         def save_adapter(destination, epoch):
@@ -302,6 +309,28 @@ def main():
                         break
                 if epoch_consumed == len(tokenized):
                     completed_epochs += 1
+                if validation_tokens and not stop:
+                    model.eval()
+                    val_loss, val_count = 0.0, 0
+                    with torch.inference_mode():
+                        for start_index in range(0, len(validation_tokens), args.batch_size):
+                            samples = validation_tokens[start_index:start_index + args.batch_size]
+                            inputs = collate(samples, tokenizer.pad_token_id, args.device)
+                            context = (torch.autocast(device_type="cuda", dtype=amp_dtype)
+                                       if args.device == "cuda" and args.precision != "fp32" else nullcontext())
+                            with context:
+                                loss = model(**inputs).loss
+                            if loss is None or not torch.isfinite(loss):
+                                raise DataError("nonfinite validation assistant loss")
+                            count = sum(r["supervised_tokens"] for r in samples)
+                            val_loss += float(loss.float().cpu()) * count
+                            val_count += count
+                    log.write(json.dumps({"phase": "validation_no_optimizer", "epoch": epoch,
+                                          "validation_loss": val_loss / val_count,
+                                          "supervised_tokens": val_count,
+                                          "examples": len(validation_tokens)}, allow_nan=False) + "\n")
+                    log.flush()
+                    model.train()
                 if stop:
                     break
                 if epoch < args.epochs and not args.final_only:
@@ -310,7 +339,8 @@ def main():
         write_json(output / "completed.json", {
             "status": "completed_smoke" if args.max_steps is not None else "completed_training",
             "provisional": provisional, "optimizer_steps": steps, "completed_epochs": completed_epochs,
-            "examples_consumed": consumed_examples, "validation_used": False,
+            "examples_consumed": consumed_examples, "validation_used": bool(validation_tokens),
+            "validation_selection_performed": False,
             "adapter": str(output / "final_adapter"), "reload_inference_verified": False,
         })
         print("Saved A3 adapter: %s; provisional=%s" % (output / "final_adapter", provisional))

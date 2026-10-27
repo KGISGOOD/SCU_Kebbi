@@ -1,4 +1,4 @@
-"""Train A2-1/A2-2 with masked cosine MNRL; no evaluation queries are read.
+"""Train A2-1/A2-2 with masked cosine MNRL; optional frozen V2 held-out Validation.
 
 Uses explicit legacy and SentenceTransformers 6.1.0 training API profiles.
 Only the user may execute this program on the training computer.
@@ -54,6 +54,7 @@ def load_arguments():
     for key in ("learning_rate", "scale", "weight_decay", "max_grad_norm"):
         parser.add_argument("--" + key.replace("_", "-"), type=float, default=config[key])
     parser.add_argument("--training", default=str(DATA_DIR / "faq_training_candidates.jsonl"))
+    parser.add_argument("--v2-data-dir", help="converted frozen V2 bundle; no legacy FAQ/diagnostic inputs are read")
     parser.add_argument("--manifest", default=str(DATA_DIR / "faq_split_manifest.json"))
     parser.add_argument("--diagnostics", default="experiments/datasets/scu_faq_matching_test_v1.jsonl")
     parser.add_argument("--output-dir", help="must not already exist; relative to project root")
@@ -76,11 +77,11 @@ def load_arguments():
         value = getattr(args, key)
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
             parser.error("%s must be a finite number" % key)
-    if not (2 <= args.batch_size <= 42 and args.epochs >= 1 and args.max_length >= 1
+    if not (2 <= args.batch_size and (args.v2_data_dir or args.batch_size <= 42) and args.epochs >= 1 and args.max_length >= 1
             and args.save_every_epochs >= 1 and 0 <= args.seed < 2**32
             and args.learning_rate > 0 and args.scale > 0 and args.weight_decay >= 0
             and args.max_grad_norm > 0):
-        parser.error("invalid hyperparameters: batch 2..42, positive epochs/length/LR/scale/clip/save interval required")
+        parser.error("invalid hyperparameters: batch>=2 (legacy<=42), positive epochs/length/LR/scale/clip/save interval required")
     args.config = str(config_path)
     return parser, args, config, config_digest
 
@@ -95,14 +96,21 @@ def main() -> int:
         # This path dictionary deliberately has no eval-query or candidate-corpus path.
         paths = {key: resolve_path(root, getattr(args, key))
                  for key in ("training", "manifest", "diagnostics")}
-        validation = collect_validation(root, paths, include_eval=False)
+        if args.v2_data_dir:
+            from .v2_data import a2_inputs, make_schedule as make_v2_schedule
+            v2_directory = resolve_path(root, args.v2_data_dir)
+            rows, diagnostics, config, validation = a2_inputs(root, v2_directory, config)
+            paths["training"] = v2_directory / "a2_train.jsonl"
+        else:
+            validation = collect_validation(root, paths, include_eval=False)
         if not validation["structural_ok"]:
             raise DataError("training data validation failed before model loading:\n" +
                             json.dumps([i for i in validation["issues"] if i["severity"] == "error"],
                                        ensure_ascii=False, indent=2))
         read_issues = []
-        rows = read_jsonl(paths["training"], read_issues)
-        diagnostics = read_jsonl(paths["diagnostics"], read_issues)
+        if not args.v2_data_dir:
+            rows = read_jsonl(paths["training"], read_issues)
+            diagnostics = read_jsonl(paths["diagnostics"], read_issues)
         if read_issues:
             raise DataError(json.dumps(read_issues, ensure_ascii=False))
         assert_input_hashes(validation["input_sha256"])
@@ -115,7 +123,12 @@ def main() -> int:
             from experiments.research_tools.training_approval import verify
             manifest_path = resolve_path(root, args.training_manifest)
             review_path = resolve_path(root, args.training_review)
-            derived = validate_manifest(root, manifest_path, paths["training"])
+            if args.v2_data_dir:
+                if manifest_path != v2_directory / "dataset_manifest.json":
+                    raise DataError("V2 approval must bind the converted dataset manifest")
+                derived = {"faq_ids": [r["faq_id"] for r in rows], "source_sha256": {}}
+            else:
+                derived = validate_manifest(root, manifest_path, paths["training"])
             training_review, review_digest = verify(review_path, "a2_training_review_v1", paths["training"],
                                                     manifest_path, [r["faq_id"] for r in rows])
             if derived["faq_ids"] != [r["faq_id"] for r in rows]:
@@ -130,9 +143,10 @@ def main() -> int:
         if not args.allow_unreviewed and not args.training_review:
             raise DataError("formal A2 training requires --training-manifest AND --training-review; status alone is not approval")
         by_id, hard, diagnostic_ids, excluded, excluded_hard = prepare_training(rows, diagnostics, config)
-        schedule = make_schedule(by_id, args.batch_size, args.epochs, args.seed,
+        schedule_builder = make_v2_schedule if args.v2_data_dir else make_schedule
+        schedule = schedule_builder(by_id, args.batch_size, args.epochs, args.seed,
                                  diagnostic_ids, excluded)
-        expected_pairs = 126 * args.epochs
+        expected_pairs = sum(len(r["positive"]) for r in rows) * args.epochs
         if sum(len(batch["samples"]) for batch in schedule) != expected_pairs:
             raise DataError("schedule coverage mismatch; no training will start")
         # Select an actual API implementation, not merely a relaxed version range.
@@ -225,6 +239,7 @@ def main() -> int:
             "explicit_stored_negative_arrays_used": False,
             "excluded_hard_candidates": excluded_hard,
             "training_api": model_api_description(model, api_profile),
+            "data_contract": "frozen_training_v2" if args.v2_data_dir else "legacy_faq",
         }
         code_paths = [Path(__file__).resolve(), Path(__file__).with_name("training_data.py"),
                       Path(__file__).with_name("training_loss.py"), Path(__file__).with_name("common.py"),
@@ -233,6 +248,8 @@ def main() -> int:
                       Path(__file__).with_name("training_compat.py")]
         code_paths += [Path(__file__).with_name("prepare_review.py"),
                        Path(__file__).resolve().parents[1] / "research_tools/training_approval.py"]
+        if args.v2_data_dir:
+            code_paths.append(Path(__file__).with_name("v2_data.py"))
         run_config = {
             **provenance, "arguments": {key: str(value) if isinstance(value, Path) else value
                                        for key, value in vars(args).items()},
@@ -249,7 +266,7 @@ def main() -> int:
             "empty_effective_hard_ids": sorted(faq_id for faq_id, value in hard.items() if not value),
             "data_validation_statistics": validation["statistics"],
             "code_sha256": {str(path): sha256_file(path) for path in code_paths},
-            "utc_started": timestamp, "evaluation_during_training": False,
+            "utc_started": timestamp, "evaluation_during_training": bool(args.v2_data_dir),
         }
         write_json_exclusive(output / "run_config.json", run_config)
         if training_review is not None:
@@ -346,6 +363,14 @@ def main() -> int:
                 log.write(json.dumps(record, ensure_ascii=False, allow_nan=False) + "\n")
                 log.flush()
                 epoch_finished = index + 1 == len(schedule) or schedule[index + 1]["epoch"] != batch["epoch"]
+                if args.v2_data_dir and epoch_finished:
+                    from .v2_data import evaluate_a2
+                    val = evaluate_a2(model, v2_directory, root, config, args, api_profile,
+                                      device, objective)
+                    val.update(epoch=batch["epoch"], phase="validation_no_optimizer")
+                    log.write(json.dumps(val, ensure_ascii=False, allow_nan=False) + "\n")
+                    log.flush()
+                    model.train()
                 if (not args.final_only and epoch_finished and batch["epoch"] < args.epochs
                         and batch["epoch"] % args.save_every_epochs == 0):
                     save_model(output / "checkpoints" / ("epoch_%03d" % batch["epoch"]), batch["epoch"])
@@ -361,6 +386,7 @@ def main() -> int:
             "elapsed_seconds": time.monotonic() - started,
             "cuda_peak_allocated_bytes": torch.cuda.max_memory_allocated() if device == "cuda" else None,
             "final_model": str(output / "final_model"), "validation_selection_performed": False,
+            "validation_loss_recorded": bool(args.v2_data_dir),
             "final_model_reload_verified": args.verify_save_load,
         })
         print(json.dumps({"output": str(output), "final_model": str(output / "final_model"),

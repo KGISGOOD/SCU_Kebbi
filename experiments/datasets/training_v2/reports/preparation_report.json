@@ -1,0 +1,53 @@
+{
+    "structural_ok":  true,
+    "counts":  {
+                   "a2_train_pairs.jsonl":  159,
+                   "a2_train_hard.jsonl":  52,
+                   "a2_train_questions.jsonl":  269,
+                   "a2_train.jsonl":  110,
+                   "train.jsonl":  269,
+                   "a2_validation_pairs.jsonl":  39,
+                   "a2_validation_hard.jsonl":  2,
+                   "a2_validation_questions.jsonl":  67,
+                   "a2_validation.jsonl":  28,
+                   "validation.jsonl":  67
+               },
+    "checked_input_files":  68,
+    "human_approved":  false,
+    "native_tokenization_checked":  false,
+    "cross_split_hard_excluded":  [
+
+                                  ],
+    "split_counts":  {
+                         "train":  {
+                                       "rows":  269,
+                                       "intents":  110,
+                                       "families":  14
+                                   },
+                         "validation":  {
+                                            "rows":  67,
+                                            "intents":  28,
+                                            "families":  8
+                                        }
+                     },
+    "cpu_checks":  {
+                       "stdlib_data_checks":  "passed",
+                       "a2_a3_loaders":  "passed",
+                       "syntax_files":  25,
+                       "epochs_checked":  3,
+                       "optimizer_steps_planned_each_a2":  60,
+                       "positive_exposures_each_a2":  477,
+                       "schedule_sha256_each_a2":  "6f2e92fd06fbc4b80b508db223fb74428a1e821817e5d9e4e84cb55315facc3d",
+                       "hard_visible_exposures":  {
+                                                      "a2_1":  0,
+                                                      "a2_2":  276
+                                                  },
+                       "validation_batches_checked_each_a2":  6,
+                       "cross_split_overlapping_source_spans":  0,
+                       "chat_template_tokenization":  "pending actual GPU-computer local tokenizer",
+                       "large_models_loaded":  false,
+                       "human_approval":  false
+                   },
+    "powershell_script_syntax":  "passed",
+    "training_cli_help":  "both entrypoints passed without model imports"
+}

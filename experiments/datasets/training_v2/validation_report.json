@@ -1,0 +1,282 @@
+{
+    "schema_version":  "training_v2_validation_2",
+    "status":  "deterministic_checks_passed_semantics_unverified",
+    "errors_count":  0,
+    "errors":  [
+
+               ],
+    "source_files_read":  51,
+    "source_files_unchanged":  true,
+    "source_files_with_selected_evidence":  26,
+    "source_coverage_units":  1469,
+    "csv_records_accounted_for":  942,
+    "text_paragraphs_accounted_for":  527,
+    "coverage_meaning":  "All source bytes parsed and units inventoried; unselected paragraphs/CSV rows are not claimed semantically certified",
+    "master_rows":  336,
+    "knowledge_groups":  138,
+    "independent_atomic_knowledge_points":  134,
+    "previous_261_qa_unchanged":  false,
+    "historical_baseline_reconciled_by_documented_corrections":  true,
+    "content_review":  {
+                           "checked_rows":  336,
+                           "changed_rows":  37,
+                           "question_changes":  22,
+                           "answer_changes":  16,
+                           "review_status":  "assistant_source_review_not_human_approval",
+                           "unresolved":  [
+                                              "未載生效日期的規則不可推定現行有效。",
+                                              "文華獎學金申請期間的上年度與次年度須由當次公告定位。",
+                                              "關於我們之方案設計與其他宣傳文字不宜擅自統一用詞。",
+                                              "112入學各課程區塊與跨域認列不得自行相加推定畢業學分。"
+                                          ]
+                       },
+    "supplement":  {
+                       "reviewed_previous_unused_files":  37,
+                       "new_basic_questions":  33,
+                       "new_paraphrases":  42,
+                       "newly_referenced_files":  12,
+                       "still_unreferenced_files":  25
+                   },
+    "topics":  [
+                   {
+                       "Name":  "112入學課程",
+                       "Count":  38
+                   },
+                   {
+                       "Name":  "企業實習",
+                       "Count":  32
+                   },
+                   {
+                       "Name":  "115住宿",
+                       "Count":  17
+                   },
+                   {
+                       "Name":  "專題歷年成果",
+                       "Count":  2
+                   },
+                   {
+                       "Name":  "實驗室與資源",
+                       "Count":  28
+                   },
+                   {
+                       "Name":  "抵免與免修",
+                       "Count":  33
+                   },
+                   {
+                       "Name":  "文華獎學金",
+                       "Count":  33
+                   },
+                   {
+                       "Name":  "跨領域學程",
+                       "Count":  24
+                   },
+                   {
+                       "Name":  "專題實作",
+                       "Count":  24
+                   },
+                   {
+                       "Name":  "修課規則",
+                       "Count":  15
+                   },
+                   {
+                       "Name":  "學生組織",
+                       "Count":  6
+                   },
+                   {
+                       "Name":  "大學社會責任",
+                       "Count":  3
+                   },
+                   {
+                       "Name":  "課程學習方式",
+                       "Count":  6
+                   },
+                   {
+                       "Name":  "系所定位與招生",
+                       "Count":  18
+                   },
+                   {
+                       "Name":  "企業與校友資源",
+                       "Count":  13
+                   },
+                   {
+                       "Name":  "課程模組與設備",
+                       "Count":  12
+                   },
+                   {
+                       "Name":  "國際交流與升學",
+                       "Count":  7
+                   },
+                   {
+                       "Name":  "師資授課資訊",
+                       "Count":  9
+                   },
+                   {
+                       "Name":  "學生實作與學習資源",
+                       "Count":  4
+                   },
+                   {
+                       "Name":  "輔系與雙主修",
+                       "Count":  4
+                   },
+                   {
+                       "Name":  "校園服務聯絡",
+                       "Count":  5
+                   },
+                   {
+                       "Name":  "獎助資訊查詢",
+                       "Count":  3
+                   }
+               ],
+    "content_correction_counts":  {
+                                      "unchanged_question_and_answer_rows":  299,
+                                      "revised_paraphrase_rows_including_shared_answer_fixes":  29,
+                                      "affected_paraphrase_groups":  22,
+                                      "affected_positive_pairs":  33,
+                                      "newly_excluded_rows":  0
+                                  },
+    "types":  [
+                  {
+                      "Name":  "basic_qa",
+                      "Count":  134
+                  },
+                  {
+                      "Name":  "paraphrase",
+                      "Count":  198
+                  },
+                  {
+                      "Name":  "multi_information",
+                      "Count":  4
+                  }
+              ],
+    "deterministic_checks_passed_rows":  336,
+    "positive_pairs":  198,
+    "hard_negative_candidate_pairs":  54,
+    "hard_negative_participant_questions":  88,
+    "overlapping_intent_exclusion_pairs":  10,
+    "uses":  [
+                 {
+                     "model":  "A2-1",
+                     "candidate_question_rows":  306
+                 },
+                 {
+                     "model":  "A2-2",
+                     "candidate_question_rows":  306
+                 },
+                 {
+                     "model":  "A3",
+                     "candidate_question_rows":  336
+                 }
+             ],
+    "excluded_draft_rows":  18,
+    "excluded_reasons":  [
+                             {
+                                 "Name":  "scope_conflict",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "unresolved_source_conflict",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "expired_time_scope",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "expired_application_deadline",
+                                 "Count":  2
+                             },
+                             {
+                                 "Name":  "no_primary_evidence",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "unobservable_live_state",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "ambiguous_eligibility_text",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "unresolved_course_relationship",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "conflicting_secondary_summary",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "conflicting_fee_in_same_source",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "ambiguous_credit_direction",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "unreliable_transcription_entity_mapping",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "personal_class_not_department_rule",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "scope_sensitive_course_conflict",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "planned_resource_not_confirmed_available",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "missing_referenced_course_list",
+                                 "Count":  1
+                             },
+                             {
+                                 "Name":  "conditional_regulatory_claim_not_verified",
+                                 "Count":  1
+                             }
+                         ],
+    "bounded_source_risks":  [
+                                 {
+                                     "kind":  "merge_conflict",
+                                     "path":  "畢業專題_爬蟲/type1/雷鳥全球管理學院與東吳大學.txt",
+                                     "excluded_as_evidence":  true
+                                 },
+                                 {
+                                     "kind":  "scope_sensitive_external_credit_cap",
+                                     "path":  "畢業專題_爬蟲/type1/課程資訊_學士班.txt",
+                                     "excluded_as_universal_answer":  true
+                                 }
+                             ],
+    "excel_jsonl_identical":  true,
+    "split_created":  false,
+    "human_approval_created":  false,
+    "formal_training_eligible_rows":  0,
+    "semantic_equivalence_independently_verified_pairs":  0,
+    "hard_negative_semantics_independently_verified_pairs":  0,
+    "semantic_pending_rows":  336,
+    "undated_source_scope_rows":  270,
+    "assistant_source_scope_reviewed_candidate_rows":  336,
+    "independent_semantic_entailment_verified_rows":  0,
+    "bounded_role_logic_checks":  "credit direction, minima versus caps, prerequisites, qualifiers, time and eligibility branches",
+    "near_duplicate_policy":  "Exact normalized questions rejected; same-intent paraphrases retained deliberately. Different scopes are not deduplicated just by similarity. No embedding-based global near-duplicate claim.",
+    "high_lexical_similarity_variant_pairs":  [
+
+                                              ],
+    "limitations":  [
+                        "Exact evidence and literal checks do not prove arbitrary natural-language entailment or global factual truth",
+                        "Paraphrase and hard-negative intent rationales are assistant-authored candidates, not independent semantic verification",
+                        "No model-based hard-negative difficulty ranking, tokenization or training has been run",
+                        "No live website/complete document-version verification; no use of old FAQ answers",
+                        "All candidates are excluded from formal training eligibility until independent semantic/source assurance is available"
+                    ],
+    "artifacts":  {
+                      "qa_master_sha256":  "ab3c83287f14e4c77a8f78c64c1d667a9f02ad87416712f09782e1bdc9e55739",
+                      "source_manifest_sha256":  "edb5f15fa35f6977052816f55befe66a8d4650f54896461c780e394f6f03588b",
+                      "excel_sha256":  "4b3d12fcfb6a6e390584cce8db30c90e97c9c69f69cb615a40bd32ce72dc565c",
+                      "excluded_sha256":  "aa1d9be39bb87bce1d8bd276decc76bb8d4be350bd4866993db142dfe1fb8a6e",
+                      "validator_sha256":  "ad06669fde480998735b33d4bd23f0c8348adaf2f74bfe8bf93d09f5f48ebe49"
+                  }
+}
