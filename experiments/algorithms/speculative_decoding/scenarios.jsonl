@@ -1,7 +1,0 @@
-{"scenario_id":"SDQ01","query":"系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？","category":"short_answer_candidate","review_status":"needs_review","rationale":"P05 原題，答案長度仍以實際生成為準。"}
-{"scenario_id":"SDQ02","query":"請介紹資料科學系的課程、實作學習與畢業後發展，依據資料分別說明。","category":"long_answer_candidate","review_status":"needs_review","rationale":"跨面向的長回答探測，不預設檢索一定涵蓋所有內容。"}
-{"scenario_id":"SDQ03","query":"系上 NVIDIA DLI 證照相關的學習資源有哪些？","category":"proper_noun","review_status":"needs_review","rationale":"專有名詞與知識文件相關查詢，實際可回答性需人工核對。"}
-{"scenario_id":"SDQ04","query":"請用條列方式說明資料科學系學生可以接觸的實習與專題學習機會。","category":"bullet_answer_candidate","review_status":"needs_review","rationale":"格式要求不保證輸出一定符合；仍使用不變的 A0 Prompt 模板。"}
-{"scenario_id":"SDQ05","query":"本系學生考研時，推甄錄取率高還是考試錄取率高？","category":"retrieval_dependent","review_status":"needs_review","rationale":"P07 原題，需保留 Top-5 內容以人工確認依據。"}
-{"scenario_id":"SDQ06","query":"我想了解資料科學系。孩子在考慮大學畢業就工作，家裡也在想是否要繼續念碩士。請依系上資料說明，讀完四年是否一定要讀研究所才能找到好工作？","category":"longer_input_candidate","review_status":"needs_review","rationale":"P06 口語延伸，實際完整 Prompt 長度由檢索結果及 Tokenizer 決定。"}
-{"scenario_id":"SDQ07","query":"今晚台北每個小時的即時降雨機率是多少？","category":"out_of_knowledge_scope","review_status":"needs_review","rationale":"無即時天氣資料的範圍外探測，不加入虛構 FAQ 事實。"}
