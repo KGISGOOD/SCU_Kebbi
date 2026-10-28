@@ -24,6 +24,12 @@ def qualify(root, config, allow_provisional):
                 info = {"path": str(p), "provenance": provenance}
             else:
                 info = inference_identity(p, sentence_model=key in {"bge", "a2_1", "a2_2"})
+                if key in {"base", "draft"}:
+                    context = read(p / "config.json").get("max_position_embeddings")
+                    budget = config["max_input_tokens"] + config["max_new_tokens"]
+                    if type(context) is not int or context < budget:
+                        raise ValueError(f"{key} context={context}; configured input+generation={budget}; no truncation/fallback")
+                    info["context_window"] = context
                 if key == "bge" and read_checkpoint_provenance(p) is not None:
                     raise ValueError("A1/A0/A4 original BGE path points to an A2-trained output")
                 if key in {"a2_1", "a2_2"}:

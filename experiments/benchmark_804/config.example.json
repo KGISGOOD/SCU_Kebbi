@@ -16,7 +16,7 @@
   "int_precision": "fp32",
   "seed": 42,
   "max_new_tokens": 256,
-  "max_input_tokens": 2048,
+  "max_input_tokens": 4096,
   "repeats": 3,
   "warmups": 1,
   "sc_threshold": 0.75,

@@ -23,6 +23,33 @@
 
 ## 稽核、模型資格及恢復
 
+### 完整 Prompt 的 4096-token 配置
+
+`max_input_tokens` 可設定至 4096。A0、A4、A5、SC、SD、Prompt Lookup、INT
+均以完整生成 Prompt 為限制對象，不截斷文件；原始 Base 與 Draft 的
+`config.json/max_position_embeddings` 必須至少容納輸入上限加 `max_new_tokens`，
+執行時另檢查實際 Token 數與已載入模型容量。這不是 3090 顯存足夠的保證；
+FP32 的既有顯存檢查與 OOM 失敗紀錄保留，不自動降低精度。
+FAQ/Embedding 的 512-token 問題限制、A3 單輪問題限制及 TI Attention 的
+2048-token 安全限制是不同用途，不隨生成 Prompt 預算改動。
+
+修正前 QA A0/A4 的共用 LLMLoader 會截斷至 2048；因此舊 QA full 成功
+不代表所有題目都使用完整檢索內容。現在只有明確選用完整 Prompt 協定的
+Adapter 會開啟嚴格檢查，其他舊入口預設不變。
+
+舊 Run 的設定、程式與模型 Hash 均釘選；修改程式或將 2048 改為 4096
+後不可強行 Resume。請保留原 config.local.json，另存新的本機設定檔並
+建立新 Run，以免修改舊 Run 仍釘選的原始設定。舊 A1 的 FAQ 測量可繼續
+作為原 Run 的有效證據，但不冒充新的 4096 完整 Prompt 協定測量。
+舊 Run 可使用 `--report-only <原Run目錄>` 重建衍生報告，不執行模型、不
+改寫逐題紀錄；失敗 Worker 沒有 records/index.json 時會列入缺失證據與
+失敗清單，其他已提交紀錄仍會進入報告。已存在的 index/逐題 Hash 仍嚴格驗證。
+
+八種 QA 都在 plan 中。若 A2-1/A2-2/A3/A5 未啟動，先查看
+`raw/resource_issues.json` 及 `raw/stages.json`：資料夾存在不等於通過資格。
+Provisional 模型需明確 `--allow-provisional`，不等同正式研究批准；
+Train Hash、完整 Epoch、Adapter/Base identity 等檢查不會因此略過。
+
 稽核V2實際Train問題、FAQ標準問題與804的NFC／空白正規化完全相同及3-gram Jaccard>=.85，後者只是字面旗標。不能據零字串命中宣稱語意／知識未曝光。GPU另檢查trusted local index.pkl中的文件、source_group及原題完整出現情形；不把使用者上傳的檔案當pickle載入。若確有訓練／FAQ／知識文本原題命中，預設阻擋完整測量，保留所有題目。只有明確`--allow-overlap-for-measurement`可保留曝光分層繼續效能蒐證，不可聲稱獨立未見泛化。
 
 Checkpoint先核對A2完整性、mode、>=3 Epoch、共同原始模型及Positive Schedule；Train Hash必須與本次稽核V2一致。A3核對Adapter完整性、>=3 Epoch、無smoke limit、V2 Train Hash及原始Base identity。GPU的A3/A5 Smoke會真正從磁碟重新載入Adapter並生成新Token，結果保留；開發端沒有冒充已載入。A4只用原始BGE。

@@ -34,6 +34,14 @@ class QAEngine:
             from experiments.evaluation.wrappers import Architecture
             self.engine = Architecture(architecture, root, architecture_config(root, config, allow_provisional), resources)
             self.metadata = self.engine.metadata
+            if architecture in {"A0", "A4-1", "A4-2"}:
+                llm = self.engine.engine.llm_loader
+                context = llm.model.config.max_position_embeddings
+                if config["max_input_tokens"] + config["max_new_tokens"] > context:
+                    raise ValueError("configured full prompt plus generation exceeds QA model context window")
+                llm.strict_max_input_tokens = config["max_input_tokens"]
+                self.metadata.update(max_input_tokens=config["max_input_tokens"], truncation=False,
+                                     model_context_window=context)
             return
         from experiments.shared.embeddings import BGEM3Embedder
         key = {"A1": "bge", "A2-1": "a2_1", "A2-2": "a2_2"}[architecture]

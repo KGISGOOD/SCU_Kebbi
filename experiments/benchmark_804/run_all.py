@@ -27,8 +27,8 @@ def validate_config(config):
     for k in ("seed", "max_new_tokens", "max_input_tokens", "repeats", "warmups"):
         if type(config[k]) is not int or config[k] < (0 if k == "seed" else 1):
             raise ValueError("invalid " + k)
-    if config["max_input_tokens"] > 2048 or not -1 <= config["sc_threshold"] <= 1:
-        raise ValueError("respect existing A0 2048-token cap and cosine threshold range")
+    if config["max_input_tokens"] > 4096 or not -1 <= config["sc_threshold"] <= 1:
+        raise ValueError("benchmark input cap must be <=4096; cosine threshold must be in [-1, 1]")
     if config["settings_origin"] != "predeclared_before_804_evaluation_not_optimized_on_test":
         raise ValueError("settings must be frozen before test; no threshold search/calibration entry")
 
@@ -206,6 +206,10 @@ def main():
     overall = "failed_or_partial" if failed else "smoke_only" if args.smoke_only else "completed_available_experiments_pending_quality"
     save(run / "run.json", dict(read(run / "run.json"), status=overall, formal_quality_certified=False), replace=True)
     verdict = generate(run, root)
+    if verdict["missing_completed_indices"]:
+        failed = True
+        save(run / "run.json", dict(read(run / "run.json"), status="failed_missing_completed_evidence"), replace=True)
+        generate(run, root)
     if verdict["token_guard_failures"]:
         save(run / "run.json", dict(read(run / "run.json"), status="failed_token_guard_measurements_retained"), replace=True)
         generate(run, root)

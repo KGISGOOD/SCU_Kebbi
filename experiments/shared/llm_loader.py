@@ -139,13 +139,19 @@ class LLMLoader:
             repetition_penalty if repetition_penalty is not None else self.repetition_penalty
         )
 
-        # Tokenize input
-        inputs = self.tokenizer(
-            prompt,
-            return_tensors="pt",
-            truncation=True,
-            max_length=2048,  # Leave room for generation
-        )
+        # Benchmark adapters explicitly opt into full-prompt validation. Keep
+        # the legacy policy for callers that have not selected this protocol.
+        strict_limit = getattr(self, "strict_max_input_tokens", None)
+        if strict_limit is None:
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048)
+        else:
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=False)
+            count = inputs["input_ids"].shape[1]
+            context = self.model.config.max_position_embeddings
+            if count > strict_limit or count + max_new_tokens > context:
+                raise ValueError(
+                    f"full prompt has {count} tokens; input limit={strict_limit}, "
+                    f"max_new_tokens={max_new_tokens}, model context={context}; no truncation allowed")
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         # Generate

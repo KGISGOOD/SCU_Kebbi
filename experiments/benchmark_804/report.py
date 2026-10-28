@@ -91,10 +91,15 @@ def generate(run, root):
     annotations = read(run / "raw/annotations.snapshot.json")
     plan = read(run / "raw/plan.json")
     stages = read(run / "raw/stages.json") if (run / "raw/stages.json").exists() else {}
-    evidence, warmups, result_hashes = [], [], {}
+    evidence, warmups, result_hashes, missing_records = [], [], {}, []
     for job in plan:
         directory = run / "raw/jobs" / job["id"] / "records"
-        if not directory.exists():
+        # Workers can fail before their first atomic result commit. Directory
+        # creation alone is not evidence that an index has been committed.
+        if not (directory / "index.json").is_file():
+            missing_records.append({"job": job["id"], "status": "no_committed_result_index",
+                                    "reason": "No records/index.json; no measured result assumed",
+                                    "stage_status": stages.get(job["id"], {"status": "not_executed"})})
             continue
         store = Records(directory)
         result_hashes[str(store.pointer.relative_to(run))] = sha(store.pointer)
@@ -106,7 +111,7 @@ def generate(run, root):
                 evidence.append(r)
     evidence = derive(evidence)
     group, by_type = defaultdict(list), defaultdict(list)
-    table, failures, quality = [], [], []
+    table, failures, quality = [], list(missing_records), []
     cache_labels = {(p["query_id"], p["origin_id"]): p for p in annotations.get("cache_pairs", [])}
     origin_queries = defaultdict(list)
     for q in questions:
@@ -197,6 +202,7 @@ def generate(run, root):
                "recorded_measured": sum(r["job"] == j["id"] for r in evidence),
                "stage_status": stages.get(j["id"], {"status": "not_executed"}),
                "formal_quality_certified": False} for j in plan]
+    checks += missing_records
     checks += [{"item": "training/test exposure", "detail": {k: audit[k] for k in ("exact_train_overlap", "exact_faq_overlap", "near_train_overlap")}},
                {"item": "TI/RAG integration", "status": "unavailable_no_claim_of_combined_attention_RAG"},
                {"item": "Gold", "status": "missing answers remain pending; no fabricated accuracy"},
@@ -213,9 +219,11 @@ def generate(run, root):
         if status.get("status") in {"failed", "unavailable"}:
             failures.append({"job": j, **status})
     token_failures = sum(r["status"] in {"failed_token_mismatch", "failed_sd0_not_repeatable", "failed_int_token_mismatch"} for r in evidence)
+    missing_completed = sum(r["stage_status"].get("status") == "completed_measurements" for r in missing_records)
     sheets = {"Overview": [{"run": run.name, "status": read(run / "run.json")["status"],
                             "questions": len(questions), "measured_records": len(evidence), "warmup_excluded": len(warmups),
-                            "token_guard_failures": token_failures, "human_gold_certified": False}],
+                            "token_guard_failures": token_failures, "missing_result_indices": len(missing_records),
+                            "missing_completed_indices": missing_completed, "human_gold_certified": False}],
               "Comparison": comparison, "Per Question": table, "Question Coverage": coverage,
               "By Type": type_stats, "Pending Quality": quality, "TI Metrics": ti_metrics,
               "Configuration": [{"key": k, "value": v} for k, v in config.items()],
@@ -249,5 +257,6 @@ def generate(run, root):
     save(run / "raw/report_manifest.json", {"result_indices_sha256": result_hashes,
          "summary_sha256": sha(run / "summary.xlsx"), "report_sha256": sha(run / "report.md"),
          "measured_records": len(evidence), "token_guard_failures": token_failures,
+         "missing_result_indices": missing_records, "missing_completed_indices": missing_completed,
          "formal_quality_certified": False}, replace=True)
-    return {"token_guard_failures": token_failures}
+    return {"token_guard_failures": token_failures, "missing_completed_indices": missing_completed}

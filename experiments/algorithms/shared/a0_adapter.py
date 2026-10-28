@@ -113,6 +113,7 @@ class A0Adapter:
         llm = self.llm
         llm.model_id, llm.device, llm.torch_dtype = str(paths["model"]), device, dtype
         llm.max_new_tokens = config["max_new_tokens"]
+        llm.strict_max_input_tokens = config.get("max_input_tokens", 2048)
         llm.temperature, llm.top_p, llm.do_sample, llm.repetition_penalty = 1.0, 1.0, False, 1.0
         llm.tokenizer = AutoTokenizer.from_pretrained(str(paths["model"]), local_files_only=True,
                                                      trust_remote_code=False, use_fast=True)
@@ -121,6 +122,9 @@ class A0Adapter:
         llm.model = AutoModelForCausalLM.from_pretrained(str(paths["model"]), local_files_only=True,
                                                        trust_remote_code=False, torch_dtype=dtype)
         llm.model.to(device).eval()
+        if (type(llm.strict_max_input_tokens) is not int or llm.strict_max_input_tokens <= 0
+                or llm.strict_max_input_tokens + llm.max_new_tokens > llm.model.config.max_position_embeddings):
+            raise ValueError("A0 full input budget plus generation exceeds model context window")
         torch.manual_seed(config["seed"])
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(config["seed"])
@@ -134,7 +138,7 @@ class A0Adapter:
             "generation": {"do_sample": False, "max_new_tokens": llm.max_new_tokens,
                            "repetition_penalty": 1.0, "seed": config["seed"],
                            "precision": config["precision"], "device": device,
-                           "input_limit": 2048, "top_k": 5},
+                           "input_limit": llm.strict_max_input_tokens, "truncation": False, "top_k": 5},
             "embedding": {"normalization": "L2", "max_seq_length": 512},
             "packages": {p: importlib.metadata.version(p) for p in
                          ("torch", "transformers", "sentence-transformers", "numpy", "langchain-core")},
@@ -179,8 +183,9 @@ class A0Adapter:
             prompt = build_prompt(create_context_from_documents(docs), query)
             tokens = self.llm.tokenizer(prompt, truncation=False)["input_ids"]
             context_limit = self.llm.model.config.max_position_embeddings
-            if len(tokens) > 2048 or len(tokens) + self.llm.max_new_tokens > context_limit:
-                raise ValueError(f"full A0 prompt has {len(tokens)} tokens; refuse silent truncation")
+            if len(tokens) > self.llm.strict_max_input_tokens or len(tokens) + self.llm.max_new_tokens > context_limit:
+                raise ValueError(f"full A0 prompt has {len(tokens)} tokens; input limit={self.llm.strict_max_input_tokens}, "
+                                 f"max_new_tokens={self.llm.max_new_tokens}, model context={context_limit}; no truncation allowed")
             return len(tokens)
         input_tokens, preparation = measured(prepare)
         answer, generation = measured(self.pipeline.generate_answer, query, docs)
