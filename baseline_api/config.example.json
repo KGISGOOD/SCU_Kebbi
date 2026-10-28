@@ -1,0 +1,11 @@
+{
+  "model": "LOCAL_MODELS/Llama-3.2-3B-Instruct",
+  "bge": "LOCAL_MODELS/bge-m3",
+  "knowledge_index": "experiments/vector_stores/type1_type2_bge_m3_v1",
+  "device": "cuda",
+  "precision": "fp16",
+  "seed": 42,
+  "max_input_tokens": 4096,
+  "max_new_tokens": 256,
+  "request_timeout_seconds": 120
+}

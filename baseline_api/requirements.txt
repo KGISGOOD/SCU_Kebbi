@@ -1,0 +1,4 @@
+# Add only HTTP dependencies to the already working GPU environment.
+# Do not install experiments/requirements.txt over its validated model stack.
+fastapi>=0.115,<1.0
+uvicorn>=0.30,<1.0
