@@ -82,7 +82,7 @@ def main():
             review_hash = sha(review_path)
             training_review = read_json(review_path)
             if dataset_manifest["schema_version"] in {"a3_sft_data_v2", "training_v2_converted_v1"}:
-                from experiments.research_tools.training_approval import verify
+                from experiments.shared.training_approval import verify
                 training_review, review_hash = verify(review_path, "a3_training_review_v1", training_path,
                                                      directory / "dataset_manifest.json",
                                                      [r["faq_id"] for r in data["train"]])
@@ -152,7 +152,7 @@ def main():
             "arguments": {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
             "defaults": config, "versions": runtime_versions, "python": platform.python_version(),
             "code_sha256": {p.name: sha(p) for p in sorted(Path(__file__).parent.glob("*.py"))},
-            "approval_code_sha256": sha(Path(__file__).resolve().parents[1] / "research_tools/training_approval.py"),
+            "approval_code_sha256": sha(Path(__file__).resolve().parents[1] / "shared/training_approval.py"),
             "config_sha256": sha(resolve(root, args.config)),
             "optimizer": "AdamW; constant LR; token-weighted gradient accumulation",
         })

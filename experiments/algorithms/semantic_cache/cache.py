@@ -11,22 +11,7 @@ import math
 import unicodedata
 
 
-NORMALIZATION_VERSION = "nfc_strip_collapse_whitespace_v1"
-
-
-def normalize_question(query):
-    """Conservative exact-key policy: preserve case, punctuation and negation."""
-    if not isinstance(query, str):
-        raise ValueError("query must be a string")
-    normalized = " ".join(unicodedata.normalize("NFC", query).split())
-    if not normalized:
-        raise ValueError("query must not be empty after normalization")
-    return normalized
-
-
-def fingerprint(value):
-    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
-                                     separators=(",", ":"), allow_nan=False).encode("utf-8")).hexdigest()
+from experiments.shared.identity import fingerprint, normalize_question, NORMALIZATION_VERSION
 
 
 @dataclass(frozen=True)

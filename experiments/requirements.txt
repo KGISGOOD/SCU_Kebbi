@@ -1,15 +1,15 @@
-# Core dependencies for the RAG baseline
-torch>=2.0.0,<2.4.0
-transformers>=4.43.0,<4.48.0
-sentence-transformers>=2.2.2,<2.5.0
-faiss-cpu>=1.7.4,<1.9.0
-langchain>=0.1.0,<0.2.0
-langchain-core>=0.1.0,<0.2.0
-langchain-huggingface>=0.1.0,<0.2.0
-tqdm>=4.65.0,<5.0.0
-numpy>=1.24.0,<1.27.0
+# GPU execution profile. Install manually in a separate environment; no auto-install.
+# Python >=3.10. Match torch CUDA wheels to the GPU driver.
+torch>=2.2,<3
+transformers==5.16.1
+sentence-transformers==6.1.0
+peft==0.20.0
+faiss-cpu>=1.7.4,<2
+numpy>=1.24,<3
+langchain-core>=0.1,<2
+accelerate>=0.26
+huggingface-hub>=0.20
+packaging>=23
+tqdm>=4.65
 jieba>=0.42.1
-
-# Optional: For GPU support (uncomment and adjust as needed)
-# faiss-gpu>=1.7.4,<1.9.0
-# torch>=2.0.0,<2.4.0  # with CUDA version matching your system
+# XLSX reports use the standard library. No model downloads are performed.

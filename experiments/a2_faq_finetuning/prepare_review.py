@@ -4,7 +4,7 @@ import json
 
 from .common import DATA_DIR, default_root, read_jsonl, resolve_path, sha256_file, write_json_exclusive
 from .validate_a2_data import collect_validation
-from experiments.research_tools.training_approval import template
+from experiments.shared.training_approval import template
 
 
 def validate_manifest(root, path, training):
@@ -62,7 +62,7 @@ def main():
     if not report["structural_ok"]:
         raise ValueError(json.dumps(report["issues"], ensure_ascii=False))
     if args.training_review:
-        from experiments.research_tools.training_approval import verify
+        from experiments.shared.training_approval import verify
         verify(resolve_path(root, args.training_review), "a2_training_review_v1", output / "train.jsonl",
                output / "dataset_manifest.json", manifest["faq_ids"])
     print(json.dumps({"derived_hashes_valid": True, "human_receipt_verified": bool(args.training_review),

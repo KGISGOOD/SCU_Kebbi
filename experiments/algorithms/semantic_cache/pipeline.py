@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import time
 from .cache import AnswerCache, normalize_question, NORMALIZATION_VERSION
-from ..shared.a0_adapter import measured, sync
+from experiments.shared.a0_adapter import measured, sync
 
 
 class CachedA0:

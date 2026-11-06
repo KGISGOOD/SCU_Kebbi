@@ -4,12 +4,14 @@ from __future__ import annotations
 from .common import path, sha, read
 
 
-def qualify(root, config, allow_provisional):
-    from experiments.evaluation.model_resources import inference_identity
+def qualify(root, config, allow_provisional, required=None):
+    from experiments.shared.model_resources import inference_identity
     from experiments.a2_faq_finetuning.common import read_checkpoint_provenance
     from experiments.a3_faq_sft.model_loader import verify_adapter, model_identity
     values, issues, hashes = {}, {}, {}
     for key, relative in config["models"].items():
+        if required is not None and key not in required:
+            continue
         p = path(root, relative)
         try:
             if not p.is_dir():

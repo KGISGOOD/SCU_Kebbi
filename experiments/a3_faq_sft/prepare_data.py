@@ -49,12 +49,12 @@ def main():
                 "construction": "source-linked Train answer revisions; held-out rows unchanged" if revised else "original Q/A only; no A2 positives or evaluation queries",
             })
             if revised:
-                from experiments.research_tools.training_approval import template
+                from experiments.shared.training_approval import template
                 write_json(directory / "training_review.template.json", template(
                     "a3_training_review_v1", directory / "train.jsonl", directory / "dataset_manifest.json", sorted(revised)))
         data, _ = validate_data(root, directory)
         if args.training_review:
-            from experiments.research_tools.training_approval import verify
+            from experiments.shared.training_approval import verify
             verify(resolve(root, args.training_review), "a3_training_review_v1", directory / "train.jsonl",
                    directory / "dataset_manifest.json", [r["faq_id"] for r in data["train"]])
         print(json.dumps({"structural_ok": True, "counts": {k: len(v) for k, v in data.items()},

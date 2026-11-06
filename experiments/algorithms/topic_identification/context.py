@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import re
 import time
-from experiments.algorithms.shared.a0_adapter import sync, measured
-from experiments.algorithms.semantic_cache.cache import fingerprint
+from experiments.shared.a0_adapter import sync, measured
+from experiments.shared.identity import fingerprint
 
 
 DEPENDENCY_PATTERN = r"它|他們|她們|這|那|上述|前面|剛才|剛剛|之前|繼續|接著|同樣|比較|相較|如果|所以|還有|也能|也可以|分別|兩者|哪一個|呢|\b(it|they|that|those|also|same)\b"

@@ -70,8 +70,8 @@ def environment():
 
 
 def code_hashes(root):
-    folders = ("benchmark_804", "algorithms", "evaluation", "shared", "baselines",
-               "a2_faq_finetuning", "a3_faq_sft", "a5_rag_finetuned_llm", "research_tools")
+    folders = ("benchmark_804", "qa", "algorithms", "shared", "baselines",
+               "a2_faq_finetuning", "a3_faq_sft", "a5_rag_finetuned_llm")
     return {p.relative_to(root).as_posix(): sha(p) for folder in folders
             for p in sorted((root / "experiments" / folder).rglob("*.py")) if "__pycache__" not in p.parts}
 

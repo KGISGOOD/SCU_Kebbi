@@ -19,7 +19,7 @@ import uuid
 from .common import (DATA_DIR, DataError, default_root, read_json, read_jsonl,
                      resolve_path, sha256_file, write_json_exclusive, write_jsonl_exclusive,
                      assert_input_hashes, checkpoint_files, read_checkpoint_provenance)
-from .evaluate_faq_retrieval import local_model_identity, package_versions
+from .model_identity import local_model_identity, package_versions
 from .training_data import (batch_documents, make_schedule, prepare_training, schedule_hash)
 from .validate_a2_data import collect_validation
 from .training_compat import (embedding_gradient_report, forward_training_texts,
@@ -120,7 +120,7 @@ def main() -> int:
             raise DataError("--training-review and --training-manifest must be supplied together")
         if args.training_review:
             from .prepare_review import validate_manifest
-            from experiments.research_tools.training_approval import verify
+            from experiments.shared.training_approval import verify
             manifest_path = resolve_path(root, args.training_manifest)
             review_path = resolve_path(root, args.training_review)
             if args.v2_data_dir:
@@ -244,10 +244,10 @@ def main() -> int:
         code_paths = [Path(__file__).resolve(), Path(__file__).with_name("training_data.py"),
                       Path(__file__).with_name("training_loss.py"), Path(__file__).with_name("common.py"),
                       Path(__file__).with_name("validate_a2_data.py"),
-                      Path(__file__).with_name("evaluate_faq_retrieval.py"),
+                      Path(__file__).with_name("model_identity.py"),
                       Path(__file__).with_name("training_compat.py")]
         code_paths += [Path(__file__).with_name("prepare_review.py"),
-                       Path(__file__).resolve().parents[1] / "research_tools/training_approval.py"]
+                       Path(__file__).resolve().parents[1] / "shared/training_approval.py"]
         if args.v2_data_dir:
             code_paths.append(Path(__file__).with_name("v2_data.py"))
         run_config = {

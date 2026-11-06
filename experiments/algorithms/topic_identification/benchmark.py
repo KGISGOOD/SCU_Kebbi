@@ -13,19 +13,19 @@ import traceback
 from .data import load_cases, split_manifest, check_separation
 from .metrics import fit_threshold
 from .reporting import write_json, append, detection_report, context_report
-from experiments.algorithms.semantic_cache.cache import fingerprint
+from experiments.shared.identity import fingerprint
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[3])
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--phase", choices=("calibrate", "evaluate", "all"), default="all")
     parser.add_argument("--mode", choices=("detection", "all"), default="detection", help="all additionally runs TI3-3 generation")
     parser.add_argument("--thresholds", type=Path)
-    parser.add_argument("--calibration", type=Path, default=Path("experiments/algorithms/topic_identification/calibration.jsonl"))
-    parser.add_argument("--evaluation", type=Path, default=Path("experiments/algorithms/topic_identification/evaluation.jsonl"))
+    parser.add_argument("--calibration", type=Path, default=Path("experiments/datasets/test_scenarios/ti_calibration.jsonl"))
+    parser.add_argument("--evaluation", type=Path, default=Path("experiments/datasets/test_scenarios/ti_evaluation.jsonl"))
     parser.add_argument("--allow-unreviewed", action="store_true")
     args = parser.parse_args()
     root = args.project_root.resolve()
@@ -33,7 +33,7 @@ def main():
         path = Path(value).expanduser()
         return (path if path.is_absolute() else root / path).resolve()
     config_path, run = locate(args.config), locate(args.run_dir)
-    from experiments.algorithms.shared.a0_adapter import file_hash
+    from experiments.shared.a0_adapter import file_hash
     hashes = {str(config_path): file_hash(config_path)}
     config = json.loads(config_path.read_text(encoding="utf-8-sig"))
     keys = {"model", "bge", "knowledge_index", "device", "precision", "seed", "max_new_tokens",
@@ -71,11 +71,13 @@ def main():
         hashes[str(locate(path))] = file_hash(locate(path))
     source_cases = load_cases(locate(args.evaluation if args.phase == "evaluate" else args.calibration),
                              "evaluation" if args.phase == "evaluate" else "calibration", args.allow_unreviewed)
+    from experiments.shared.first_round import verify_evidence, export, TIMING_DEFINITION
+    evidence_hashes = verify_evidence(root, source_cases)
     run.mkdir(parents=True, exist_ok=False)
     for key in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_DATASETS_OFFLINE"):
         os.environ[key] = "1"
-    from experiments.algorithms.shared.a0_adapter import A0Adapter, measured
-    write_json(run / "run.json", {"status": "running", "config": config, "phase": args.phase, "mode": args.mode,
+    from experiments.shared.a0_adapter import A0Adapter, measured
+    write_json(run / "run.json", {"first_round_summary_timing": TIMING_DEFINITION, "status": "running", "config": config, "phase": args.phase, "mode": args.mode,
                                   "source_hashes_initial": hashes, "purpose": "auxiliary topic/context development research",
                                   "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                                   "provisional": any(r["review_status"] != "approved" for r in source_cases)})
@@ -111,6 +113,9 @@ def main():
                 stage, current = f"{split}_features", case["scenario_id"]
                 row = {"scenario_id": case["scenario_id"], "query": case["query"], "split": split,
                        "review_status": case["review_status"], "gold_shift": case["gold_shift"],
+                       "history": case["history"], "turn_id": case.get("turn_id"),
+                       "family_id": case["family_id"], "required_history_ids": case["required_history_ids"],
+                       "candidate_label_reason": case.get("candidate_label_reason"),
                        "embedding": features.embedding(case), "attention": features.attention(case)}
                 append(run / f"{split}_features.jsonl", row)
                 rows.append(row)
@@ -123,6 +128,7 @@ def main():
             for method in ("TI0", *features.definition["layers"]):
                 scores = [(r["embedding"] if method == "TI0" else r["attention"])["scores"][method] for r in calibration_rows]
                 methods[method] = fit_threshold(scores, [r["gold_shift"] for r in calibration_rows])
+            detection_report(run, calibration_rows, methods, prefix="calibration_")
             payload = {"schema": "ti_thresholds_v1", "identity_id": identity_id, "methods": methods,
                        "calibration_manifest": split_manifest(source_cases),
                        "calibration_sha256": hashes[str(locate(args.calibration))],
@@ -151,6 +157,7 @@ def main():
                 hashes[str(locate(args.evaluation))] = file_hash(locate(args.evaluation))
             evaluation = source_cases if args.phase == "evaluate" else load_cases(locate(args.evaluation), "evaluation", args.allow_unreviewed)
             check_separation(payload["calibration_manifest"], evaluation)
+            evidence_hashes.update(verify_evidence(root, evaluation))
             write_json(run / "evaluation.snapshot.json", evaluation)
             rows = extract(evaluation, "evaluation")
             summary["evaluation"] = detection_report(run, rows, methods)
@@ -185,6 +192,10 @@ def main():
         adapter.verify_sources()
         if any(file_hash(Path(path)) != digest for path, digest in hashes.items()):
             raise ValueError("configuration/calibration/evaluation/threshold source changed during run")
+        for source_path, digest in evidence_hashes.items():
+            if file_hash(Path(source_path)) != digest:
+                raise ValueError("source evidence changed during run")
+        export(run, "TI")
         write_json(run / "summary.json", summary)
         write_json(run / "completed.json", {"status": "completed", "provisional": summary["provisional"],
                                             "source_hashes_final": hashes, "source_verification": "passed",

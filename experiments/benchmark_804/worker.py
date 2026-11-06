@@ -63,7 +63,7 @@ def sd_verdict(result, baseline):
 
 
 def qa_job(root, config, job, state, canonical, resources, dev, data, smoke_only, allow):
-    from experiments.evaluation.wrappers import measured
+    from experiments.shared.qa_runtime import measured
     engine = QAEngine(job["architecture"], root, config, resources, canonical, allow)
     metadata = engine.metadata
     for i in range(config["warmups"]):
@@ -98,7 +98,7 @@ def qa_job(root, config, job, state, canonical, resources, dev, data, smoke_only
 
 
 def sc_job(root, config, job, state, dev, data, smoke_only):
-    from experiments.algorithms.shared.a0_adapter import A0Adapter
+    from experiments.shared.a0_adapter import A0Adapter
     from experiments.algorithms.semantic_cache.pipeline import CachedA0
     adapter = A0Adapter(root, a0_config(config))
     smoke = CachedA0(adapter, job["mode"], config["sc_threshold"])
@@ -281,7 +281,7 @@ def int_job(root, config, job, state, folder, dev, data, smoke_only):
 
 
 def ti_job(root, config, state, dev, data, annotations, smoke_only, allow_provisional=False):
-    from experiments.algorithms.shared.a0_adapter import A0Adapter
+    from experiments.shared.a0_adapter import A0Adapter
     from experiments.algorithms.topic_identification.features import TopicFeatures
     adapter = A0Adapter(root, a0_config(config))
     settings = dict(a0_config(config), max_attention_tokens=2048)

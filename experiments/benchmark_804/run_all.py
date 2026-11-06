@@ -19,7 +19,7 @@ def validate_config(config):
                 "seed", "max_new_tokens", "max_input_tokens", "repeats", "warmups", "sc_threshold",
                 "faq_threshold", "review_file", "ti_thresholds", "settings_origin"}
     if set(config) != expected or set(config["models"]) != {"base", "bge", "draft", "reranker", "a2_1", "a2_2", "a3"}:
-        raise ValueError("use the exact config.example.json schema; no legacy/smoke defaults")
+        raise ValueError("use experiments/configs/benchmark.example.json schema; no legacy/smoke defaults")
     if config["device"] != "cuda":
         raise ValueError("this benchmark profile is for the GPU computer; use --check-only on development PC")
     if any(config[k] not in {"fp16", "bf16", "fp32"} for k in ("qa_precision", "sd_precision", "int_precision")):
@@ -65,8 +65,8 @@ def execute(root, run, job, smoke):
     return status
 
 
-def main():
-    p = argparse.ArgumentParser(description=__doc__)
+def main(argv=None):
+    p = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     p.add_argument("--project-root", type=Path, default=ROOT)
     p.add_argument("--config", default="experiments/benchmark_804/config.local.json")
     p.add_argument("--resume", type=Path, help="existing run, immutable settings/identities required")
@@ -75,7 +75,11 @@ def main():
     p.add_argument("--allow-provisional", action="store_true", help="explicitly permits provisional trained models; never human Gold/Formal")
     p.add_argument("--allow-overlap-for-measurement", action="store_true", help="explicitly retain/report exposed test cases for measurement; never independent generalization")
     p.add_argument("--report-only", type=Path)
-    args = p.parse_args()
+    p.add_argument("--jobs", help="comma-separated independent job IDs; omitted means existing full plan")
+    args = p.parse_args(argv)
+    selected = sorted(set(args.jobs.split(","))) if args.jobs else None
+    if selected and any(not name or name != name.strip() for name in selected):
+        p.error("--jobs needs non-empty comma-separated job IDs without whitespace")
     root = args.project_root.resolve()
     if args.report_only:
         from .report import generate
@@ -94,6 +98,8 @@ def main():
         if (root / "experiments/results/benchmark_804").resolve() not in run.parents:
             raise ValueError("resume must be inside experiments/results/benchmark_804")
         identity = read(run / "raw/identity.json")
+        if selected != identity.get("selected_jobs"):
+            raise ValueError("resume must preserve selected jobs; never mix separate experiments")
         if read(run / "raw/config.json") != config:
             raise ValueError("resume config differs; start NEW run, do not replace original evidence")
         if args.allow_provisional != identity["allow_provisional"] or args.allow_overlap_for_measurement != identity["allow_overlap"]:
@@ -130,6 +136,11 @@ def main():
         dev = [{"id": "DEV_" + r["faq_id"], "question": r["messages"][1]["content"]} for r in development[:2]]
         save(run / "raw/development.json", dev)
         plan = jobs(data, annotations, config)
+        if selected:
+            unknown = set(selected) - {j["id"] for j in plan}
+            if unknown:
+                raise ValueError("unknown jobs: " + ", ".join(sorted(unknown)))
+            plan = [j for j in plan if j["id"] in selected]
         issues, resources = {}, {}
         if not args.check_only:
             from .resources import qualify, audit_index
@@ -161,6 +172,7 @@ def main():
                         sibling = f.parent / name
                         hashes[str(sibling)] = sha(sibling)
         identity = {"files_sha256": hashes, "environment": environment(),
+                    "selected_jobs": selected,
                     "allow_provisional": args.allow_provisional, "allow_overlap": args.allow_overlap_for_measurement}
         save(run / "raw/identity.json", identity)
         save(run / "raw/host_diagnostic.json", {"platform_display_only": platform.platform(),

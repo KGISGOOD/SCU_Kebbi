@@ -6,7 +6,7 @@
   "device": "cuda",
   "precision": "fp32",
   "seed": 42,
-  "max_input_tokens": 2048,
+  "max_input_tokens": 4096,
   "max_new_tokens": 256,
   "standard_draft_tokens": 4,
   "repeats": 3,

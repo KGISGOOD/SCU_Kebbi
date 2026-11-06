@@ -14,13 +14,13 @@ from .reporting import write_json, append_jsonl, report
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[3])
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--mode", choices=("all", "sd0", "sd2_1", "sd2_2", "sd2_3", "sd2_4"), default="all")
     parser.add_argument("--max-matching-ngram-size", type=int)
-    parser.add_argument("--scenarios", type=Path, default=Path("experiments/algorithms/speculative_decoding/scenarios.jsonl"))
+    parser.add_argument("--scenarios", type=Path, default=Path("experiments/datasets/test_scenarios/sd.jsonl"))
     parser.add_argument("--repeats", type=int)
     parser.add_argument("--warmups", type=int)
     parser.add_argument("--allow-unreviewed", action="store_true")
@@ -54,8 +54,8 @@ def main():
         minimum = 0 if key == "seed" else 2 if key == "max_new_tokens" else 1
         if type(config[key]) is not int or config[key] < minimum:
             raise ValueError(f"invalid {key}; minimum {minimum}")
-    if config["max_input_tokens"] > 2048:
-        raise ValueError("A0 comparison input limit must not exceed its existing 2048-token policy")
+    if config["max_input_tokens"] > 4096:
+        raise ValueError("reviewed full-input cap is 4096; no truncation; loaded model context is checked separately")
     if config["device"] not in {"cuda", "cpu"} or config["precision"] not in {"fp16", "bf16", "fp32"}:
         raise ValueError("invalid device/precision")
     for key in ("model", "draft_model", "bge", "knowledge_index"):
@@ -79,11 +79,17 @@ def main():
         cases.append(row)
     if not cases or len({r["scenario_id"] for r in cases}) != len(cases):
         raise ValueError("empty scenarios or duplicate scenario_id")
+    from experiments.shared.first_round import verify_evidence, export, TIMING_DEFINITION
     source_indices = {r["scenario_id"]: i for i, r in enumerate(cases)}
     if args.scenario_id:
         cases = [r for r in cases if r["scenario_id"] == args.scenario_id]
         if len(cases) != 1:
             raise ValueError("diagnostic scenario ID absent from the supplied existing source")
+    evidence_hashes = verify_evidence(root, cases)
+    for case in cases:
+        minimum = case.get("minimum_measured_repeats", 1)
+        if type(minimum) is not int or minimum < 1 or config["repeats"] < minimum:
+            raise ValueError(f"{case['scenario_id']}: dataset requires at least {minimum} measured repeats")
     provisional = any(r["review_status"] != "approved" for r in cases)
     if provisional and not args.allow_unreviewed:
         raise ValueError("scenarios require human review; --allow-unreviewed is development only")
@@ -95,7 +101,7 @@ def main():
     run.mkdir(parents=True, exist_ok=False)
     for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_DATASETS_OFFLINE"):
         os.environ[name] = "1"
-    from experiments.algorithms.shared.a0_adapter import file_hash
+    from experiments.shared.a0_adapter import file_hash
     hashes = {"config": file_hash(config_path), "scenarios": file_hash(scenario_path)}
     variants = [("SD0", None)]
     if args.mode in {"all", "sd2_1"}:
@@ -104,7 +110,7 @@ def main():
         variants.extend((f"SD2-2-k{k}", k) for k in (2, 4, 6, 8))
     if args.mode == "sd2_4":
         variants.extend((f"SD2-4-k{k}", k) for k in (2, 4, 6, 8))
-    write_json(run / "run.json", {"status": "running", "config": config, "source_hashes": hashes,
+    write_json(run / "run.json", {"first_round_summary_timing": TIMING_DEFINITION, "status": "running", "config": config, "source_hashes": hashes,
                                   "mode": args.mode, "variants": variants, "provisional": provisional,
                                   "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                                   "purpose": "controlled A0 speculative decoding development benchmark"})
@@ -184,6 +190,9 @@ def main():
             raise ValueError("config/scenario source changed during run")
         stage = "comparison_and_reporting"
         failures = report(run, rows, engine.identity, provisional, engine.tokenizer)
+        if verify_evidence(root, cases) != evidence_hashes:
+            raise ValueError("source evidence changed during run")
+        export(run, "SD")
         if failures:
             raise ValueError(f"{failures} token-equivalence/repeatability failures; inspect results, no lossless claim")
         write_json(run / "completed.json", {"status": "completed", "source_verification": "passed",

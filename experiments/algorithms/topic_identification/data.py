@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from experiments.algorithms.semantic_cache.cache import fingerprint, normalize_question
+from experiments.shared.identity import fingerprint, normalize_question
 
 
 def case_signature(case):

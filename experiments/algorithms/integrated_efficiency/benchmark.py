@@ -12,12 +12,12 @@ import time
 import traceback
 
 from experiments.algorithms.semantic_cache.threshold_data import load_sequence
-from experiments.algorithms.semantic_cache.cache import fingerprint
-from experiments.algorithms.speculative_decoding.reporting import write_json, append_jsonl
+from experiments.shared.identity import fingerprint
+from experiments.shared.result_io import write_json, append_jsonl
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[3])
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--run-dir", type=Path, required=True)
@@ -26,7 +26,7 @@ def main():
     parser.add_argument("--threshold", type=float)
     parser.add_argument("--prompt-lookup-tokens", type=int)
     parser.add_argument("--max-matching-ngram-size", type=int)
-    parser.add_argument("--scenarios", type=Path, default=Path("experiments/algorithms/integrated_efficiency/scenarios.jsonl"))
+    parser.add_argument("--scenarios", type=Path, default=Path("experiments/datasets/test_scenarios/int.jsonl"))
     parser.add_argument("--repeats", type=int)
     parser.add_argument("--warmups", type=int)
     parser.add_argument("--allow-unreviewed", action="store_true")
@@ -58,8 +58,8 @@ def main():
         minimum = 0 if key == "seed" else 2 if key == "max_new_tokens" else 1
         if type(config[key]) is not int or config[key] < minimum:
             raise ValueError(f"{key}: integer >= {minimum} required")
-    if config["max_input_tokens"] > 2048:
-        raise ValueError("preserve existing A0 full-input policy: <=2048; never truncate Top-5")
+    if config["max_input_tokens"] > 4096:
+        raise ValueError("reviewed full-input cap is 4096; never truncate Top-5")
     if config["decoder"] not in {"standard", "draft_1b", "prompt_lookup"}:
         raise ValueError("invalid decoder")
     if config["device"] not in {"cpu", "cuda"} or config["precision"] not in {"fp32", "fp16", "bf16"}:
@@ -79,14 +79,16 @@ def main():
     if (root / "experiments/results/algorithms").resolve() not in run.parents:
         raise ValueError("run-dir must be a NEW child of experiments/results/algorithms")
     cases = load_sequence(scenario_path, "functional", args.allow_unreviewed)
+    from experiments.shared.first_round import verify_evidence, export, TIMING_DEFINITION
+    evidence_hashes = verify_evidence(root, cases)
     provisional = any(r["review_status"] != "approved" or any(j["review_status"] != "approved"
                       for j in r.get("reuse_judgments", [])) for r in cases)
     run.mkdir(parents=True, exist_ok=False)
     for key in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_DATASETS_OFFLINE"):
         os.environ[key] = "1"
-    from experiments.algorithms.shared.a0_adapter import file_hash
+    from experiments.shared.a0_adapter import file_hash
     hashes = {"config": file_hash(config_path), "scenarios": file_hash(scenario_path)}
-    write_json(run / "run.json", {"status": "running", "config": config, "variants": variants,
+    write_json(run / "run.json", {"first_round_summary_timing": TIMING_DEFINITION, "status": "running", "config": config, "variants": variants,
                                   "source_hashes": hashes, "dataset_identity": hashes["scenarios"],
                                   "provisional": provisional, "purpose": "functional integrated online benchmark",
                                   "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -145,6 +147,9 @@ def main():
             raise ValueError("experiment identity changed during run")
         stage = "reporting_and_token_comparison"
         failures = report(run, rows, provisional)
+        if verify_evidence(root, cases) != evidence_hashes:
+            raise ValueError("source evidence changed during run")
+        export(run, "INT")
         if failures:
             raise ValueError(f"{failures} input/token/repeatability failures; inspect results")
         write_json(run / "completed.json", {"status": "completed", "provisional": provisional,

@@ -4,8 +4,8 @@ from __future__ import annotations
 import statistics
 import time
 
-from experiments.algorithms.shared.a0_adapter import measured, sync
-from experiments.algorithms.semantic_cache.cache import fingerprint
+from experiments.shared.a0_adapter import measured, sync
+from experiments.shared.identity import fingerprint
 
 
 METHOD_VERSION = "content_mass_ratio_layer_head_query_mean_v1"

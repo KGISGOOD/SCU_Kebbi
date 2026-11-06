@@ -19,7 +19,7 @@ def append(path, value):
         stream.write(json.dumps(value, ensure_ascii=False, allow_nan=False) + "\n")
 
 
-def detection_report(run, feature_rows, thresholds):
+def detection_report(run, feature_rows, thresholds, prefix=""):
     output, summary = [], {}
     for raw in feature_rows:
         for method, score in {**raw["embedding"]["scores"], **raw["attention"]["scores"]}.items():
@@ -29,6 +29,9 @@ def detection_report(run, feature_rows, thresholds):
             prediction = int(score < threshold)
             threshold_seconds = time.perf_counter() - start
             row = {"scenario_id": raw["scenario_id"], "split": raw["split"], "method": method,
+                   "history": raw.get("history"), "turn_id": raw.get("turn_id"),
+                   "family_id": raw.get("family_id"), "required_history_ids": raw.get("required_history_ids"),
+                   "candidate_label_reason": raw.get("candidate_label_reason"),
                    "question": raw["query"], "review_status": raw["review_status"],
                    "gold_shift": raw["gold_shift"], "score": score, "threshold": threshold,
                    "prediction_shift": prediction, "threshold_decision_seconds": threshold_seconds,
@@ -36,14 +39,14 @@ def detection_report(run, feature_rows, thresholds):
                    "forward_seconds": data.get("forward_seconds"),
                    "timing_scope": "independent BGE call" if method == "TI0" else
                                    "one full prefill shared by all four attention layer groups; do not sum group times"}
-            append(run / "classification.jsonl", row)
+            append(run / (prefix + "classification.jsonl"), row)
             output.append(row)
     for method in thresholds:
         rows = [r for r in output if r["method"] == method]
         summary[method] = classification([r["gold_shift"] for r in rows], [r["prediction_shift"] for r in rows])
         summary[method]["mean_detection_seconds"] = statistics.mean(r["detection_seconds"] for r in rows)
         summary[method]["threshold"] = thresholds[method]["threshold"]
-    with (run / "classification.csv").open("x", encoding="utf-8-sig", newline="") as stream:
+    with (run / (prefix + "classification.csv")).open("x", encoding="utf-8-sig", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=list(output[0]))
         writer.writeheader()
         writer.writerows(output)

@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 import traceback
 
-from .cache import fingerprint
+from experiments.shared.identity import fingerprint
 from .threshold_data import load_sequence, manifest, assert_independent, judge_reuse
 from .threshold_reporting import write_json, append, summarize, comparison_csv
 
@@ -58,12 +58,12 @@ def main():
     def locate(value):
         p = Path(value).expanduser()
         return (p if p.is_absolute() else root / p).resolve()
-    from ..shared.a0_adapter import A0Adapter, file_hash, measured
+    from experiments.shared.a0_adapter import A0Adapter, file_hash, measured
     config_path, run = locate(args.config), locate(args.run_dir)
     hashes = {str(config_path): file_hash(config_path)}
     config = json.loads(config_path.read_text(encoding="utf-8-sig"))
     required = {"model", "bge", "knowledge_index", "device", "precision", "max_new_tokens", "seed"}
-    if not isinstance(config, dict) or not required <= set(config) or set(config) - required - {"threshold", "thresholds"}:
+    if not isinstance(config, dict) or not required <= set(config) or set(config) - required - {"threshold", "thresholds", "max_input_tokens"}:
         raise ValueError("use the existing SC GPU config, optionally adding thresholds; unexpected fields rejected")
     if args.repeats < 1 or any(type(config[k]) is not int or config[k] < (1 if k == "max_new_tokens" else 0)
                               for k in ("seed", "max_new_tokens")):
@@ -73,7 +73,9 @@ def main():
     if config["device"] == "cpu" and config["precision"] != "fp32":
         raise ValueError("CPU requires precision=fp32")
     thresholds = parse_thresholds(args.thresholds if args.thresholds is not None else config.get("thresholds", DEFAULT_THRESHOLDS))
-    source = locate(args.scenarios or Path(f"experiments/algorithms/semantic_cache/threshold_{args.split}.jsonl"))
+    if args.scenarios is None and args.split != "functional":
+        raise ValueError("research calibration/evaluation requires an explicit independent --scenarios file")
+    source = locate(args.scenarios or Path("experiments/datasets/test_scenarios/int.jsonl"))
     hashes[str(source)] = file_hash(source)
     cases = load_sequence(source, args.split, args.allow_unreviewed)
     selection = None

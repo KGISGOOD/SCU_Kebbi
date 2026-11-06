@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 import time
 
-from experiments.algorithms.shared.a0_adapter import A0Adapter, measured, sync, tree_hash
-from experiments.algorithms.semantic_cache.cache import fingerprint
+from experiments.shared.a0_adapter import A0Adapter, measured, sync, tree_hash
+from experiments.shared.identity import fingerprint
 from .compatibility import check_api, check_pair, tokenizer_identity
 
 
@@ -292,6 +292,9 @@ class SDEngine:
                 "residency": self.identity["residency"], "exact_token_match_sd0": None,
                 "stop_reason": "eos" if ids[-1] in eos_ids else
                                "token_limit" if len(ids) >= self.config["max_new_tokens"] else "other",
+                "reached_token_limit": len(ids) >= self.config["max_new_tokens"] and ids[-1] not in eos_ids,
+                "answer_completeness": "unverified_truncated_at_token_budget"
+                    if len(ids) >= self.config["max_new_tokens"] and ids[-1] not in eos_ids else "not_quality_verified",
                 "generation_speedup_sd0": None, "end_to_end_speedup_sd0": None}
 
     def verify_sources(self):

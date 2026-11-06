@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from .cache import normalize_question, fingerprint
+from experiments.shared.identity import normalize_question, fingerprint
 
 
 def load_sequence(path, split, allow_unreviewed):

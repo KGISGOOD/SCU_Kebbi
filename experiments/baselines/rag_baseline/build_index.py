@@ -165,7 +165,7 @@ def main():
     # Delay all HF/ST imports until the offline environment is installed.
     from experiments.shared.embeddings import BGEM3Embedder
     from experiments.shared.vector_store import FAISSVectorStore
-    from experiments.evaluation.model_resources import local_snapshot, inference_identity
+    from experiments.shared.model_resources import local_snapshot, inference_identity
     from experiments.a2_faq_finetuning.common import read_checkpoint_provenance
     model_path = args.embedding_model_path
     if model_path is not None:

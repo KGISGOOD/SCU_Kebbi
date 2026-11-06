@@ -2,7 +2,7 @@
 import csv
 import statistics
 
-from experiments.algorithms.speculative_decoding.reporting import write_json, append_jsonl
+from experiments.shared.result_io import write_json, append_jsonl
 
 
 def report(run, rows, provisional):

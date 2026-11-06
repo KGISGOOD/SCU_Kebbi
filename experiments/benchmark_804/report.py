@@ -85,7 +85,7 @@ def latency(r):
 
 
 def generate(run, root):
-    from experiments.research_tools.reporting import workbook
+    from experiments.shared.excel import workbook
     config, questions = read(run / "raw/config.json"), read(run / "raw/questions.snapshot.json")
     audit = read(run / "raw/data_audit.json")
     annotations = read(run / "raw/annotations.snapshot.json")

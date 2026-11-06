@@ -17,15 +17,18 @@ def write(path, value):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[3])
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--run-dir", type=Path, required=True, help="NEW directory; never resume or overwrite")
     parser.add_argument("--mode", choices=("none", "exact", "semantic", "all"), default="all")
     parser.add_argument("--threshold", type=float)
-    parser.add_argument("--scenarios", type=Path, default=Path("experiments/algorithms/semantic_cache/scenarios.jsonl"))
+    parser.add_argument("--repeats", type=int, default=1)
+    parser.add_argument("--scenarios", type=Path, default=Path("experiments/datasets/test_scenarios/sc.jsonl"))
     parser.add_argument("--allow-unreviewed", action="store_true", help="development run only")
     args = parser.parse_args()
+    if args.repeats < 1:
+        raise ValueError("repeats must be >=1")
     from .cache import normalize_question, NORMALIZATION_VERSION
     root = args.project_root.resolve()
     def locate(path):
@@ -33,7 +36,7 @@ def main():
     config_path, scenarios_path = locate(args.config), locate(args.scenarios)
     config = json.loads(config_path.read_text(encoding="utf-8-sig"))
     expected_keys = {"model", "bge", "knowledge_index", "device", "precision", "max_new_tokens", "seed", "threshold"}
-    if set(config) != expected_keys:
+    if not expected_keys <= set(config) or set(config) - expected_keys - {"max_input_tokens"}:
         raise ValueError(f"config requires exactly {sorted(expected_keys)}")
     if args.threshold is not None:
         config["threshold"] = args.threshold
@@ -66,6 +69,8 @@ def main():
         if key in labeled_keys and labeled_keys[key] != case["intent_key"]:
             raise ValueError(f"{case['query_id']}: identical normalized queries have conflicting intent labels; review data")
         labeled_keys[key] = case["intent_key"]
+    from experiments.shared.first_round import verify_evidence, export, TIMING_DEFINITION
+    source_hashes = verify_evidence(root, cases)
     provisional = any(r["review_status"] != "approved" for r in cases)
     if provisional and not args.allow_unreviewed:
         raise ValueError("scenarios need human review; use --allow-unreviewed only for development")
@@ -78,14 +83,15 @@ def main():
            for k in ("model", "bge", "knowledge_index")):
         raise ValueError("run directory must not be inside an immutable resource")
     run.mkdir(parents=True, exist_ok=False)
-    from ..shared.a0_adapter import A0Adapter, file_hash, measured
+    from experiments.shared.a0_adapter import A0Adapter, file_hash, measured
     from .pipeline import CachedA0
     initial = {"status": "running", "purpose": "development diagnostic, not formal Test",
                "provisional": provisional, "config": config, "mode": args.mode,
                "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                "scenarios_sha256": file_hash(scenarios_path), "config_sha256": file_hash(config_path),
                "exact_normalization": NORMALIZATION_VERSION, "semantic_safety_verified": False,
-               "scenario_count": len(cases)}
+               "first_round_summary_timing": TIMING_DEFINITION, "scenario_count": len(cases), "repeats": args.repeats,
+               "source_hashes": source_hashes, "cache_scope": "fresh instance per mode and repeat"}
     write(run / "run.json", initial)
     write(run / "scenarios.snapshot.json", cases)
     try:
@@ -95,79 +101,86 @@ def main():
         modes = ("none", "exact", "semantic") if args.mode == "all" else (args.mode,)
         summary = {}
         all_records = {}
-        for mode in modes:
-            import torch
-            torch.manual_seed(config["seed"])
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(config["seed"])
-            _, warmup_seconds = measured(adapter.answer, cases[0]["query"])
-            engine = CachedA0(adapter, mode, config["threshold"])
-            records, origins = [], {}
-            output = run / mode
-            output.mkdir(exist_ok=False)
-            with (output / "results.jsonl").open("x", encoding="utf-8", newline="\n") as stream:
-                stream.write("")  # create a fresh result stream before the first request
-            for case in cases:
-                try:
-                    # Only the query string enters the online pipeline.
-                    result = engine.answer(case["query"])
-                    result.update(query_id=case["query_id"], category=case["category"], provisional=provisional)
-                    result["intent_reuse_proxy"] = None
-                    if result["hit"]:
-                        origin = origins[result["cache_id"]]
-                        result["origin_query_id"] = origin["query_id"]
-                        result["intent_reuse_proxy"] = origin["intent_key"] == case["intent_key"]
-                    elif result["cache_id"]:
-                        origins[result["cache_id"]] = case
-                    # intent_reuse_proxy is not human answer-quality verification.
-                    write(output / f"{len(records) + 1:04d}.json", result)
-                    with (output / "results.jsonl").open("a", encoding="utf-8", newline="\n") as stream:
-                        stream.write(json.dumps(result, ensure_ascii=False, allow_nan=False) + "\n")
-                    records.append(result)
-                    print(f"{mode} {case['query_id']} hit={result['hit']} "
-                          f"seconds={result['timings']['end_to_end_seconds']:.4f}", flush=True)
-                except Exception as error:
-                    failure = getattr(error, "cache_failure", {"error": str(error)})
-                    failure.update(query_id=case["query_id"], traceback=traceback.format_exc())
-                    write(output / f"{len(records) + 1:04d}.failed.json", failure)
-                    raise
-            def average(rows):
-                return statistics.mean(r["timings"]["end_to_end_seconds"] for r in rows) if rows else None
-            hits = [r for r in records if r["hit"]]
-            misses = [r for r in records if not r["hit"]]
-            summary[mode] = {"count": len(records), "hit_count": len(hits), "miss_count": len(misses),
-                             "hit_rate": len(hits) / len(records), "mean_end_to_end_seconds": average(records),
-                             "mean_hit_seconds": average(hits), "mean_miss_seconds": average(misses),
-                             "intent_proxy_incompatible_hits": sum(r["intent_reuse_proxy"] is False for r in hits),
-                             "intent_proxy_compatible_hits": sum(r["intent_reuse_proxy"] is True for r in hits),
-                             "median_end_to_end_seconds": statistics.median(
-                                 r["timings"]["end_to_end_seconds"] for r in records),
-                             "total_end_to_end_seconds": sum(r["timings"]["end_to_end_seconds"] for r in records),
-                             "stage_mean_seconds": {
-                                 key: statistics.mean(r["timings"][key] for r in records)
-                                 for key in records[0]["timings"]},
-                             "warmup_seconds_excluded": warmup_seconds}
-            all_records[mode] = records
+        for repeat in range(args.repeats):
+            for mode in modes:
+                import torch
+                torch.manual_seed(config["seed"])
+                if torch.cuda.is_available():
+                    torch.cuda.manual_seed_all(config["seed"])
+                _, warmup_seconds = measured(adapter.answer, cases[0]["query"])
+                engine = CachedA0(adapter, mode, config["threshold"])
+                records, origins = [], {}
+                output = (run if args.repeats == 1 else run / f"repeat_{repeat:03d}") / mode
+                output.mkdir(parents=True, exist_ok=False)
+                with (output / "results.jsonl").open("x", encoding="utf-8", newline="\n") as stream:
+                    stream.write("")  # create a fresh result stream before the first request
+                for case in cases:
+                    try:
+                        # Only the query string enters the online pipeline.
+                        result = engine.answer(case["query"])
+                        result.update(query_id=case["query_id"], category=case["category"], provisional=provisional,
+                                      repeat_index=repeat, warmup=False, answer_reuse_safety="unverified",
+                                      expected_cache_behavior=case.get("expected_cache_behavior"))
+                        result["intent_reuse_proxy"] = None
+                        if result["hit"]:
+                            origin = origins[result["cache_id"]]
+                            result["origin_query_id"] = origin["query_id"]
+                            result["intent_reuse_proxy"] = origin["intent_key"] == case["intent_key"]
+                        elif result["cache_id"]:
+                            origins[result["cache_id"]] = case
+                        # intent_reuse_proxy is not human answer-quality verification.
+                        write(output / f"{len(records) + 1:04d}.json", result)
+                        with (output / "results.jsonl").open("a", encoding="utf-8", newline="\n") as stream:
+                            stream.write(json.dumps(result, ensure_ascii=False, allow_nan=False) + "\n")
+                        records.append(result)
+                        print(f"{mode} {case['query_id']} hit={result['hit']} "
+                              f"seconds={result['timings']['end_to_end_seconds']:.4f}", flush=True)
+                    except Exception as error:
+                        failure = getattr(error, "cache_failure", {"error": str(error)})
+                        failure.update(query_id=case["query_id"], traceback=traceback.format_exc())
+                        write(output / f"{len(records) + 1:04d}.failed.json", failure)
+                        raise
+                def average(rows):
+                    return statistics.mean(r["timings"]["end_to_end_seconds"] for r in rows) if rows else None
+                hits = [r for r in records if r["hit"]]
+                misses = [r for r in records if not r["hit"]]
+                key = mode if args.repeats == 1 else f"{mode}_r{repeat}"
+                summary[key] = {"count": len(records), "hit_count": len(hits), "miss_count": len(misses),
+                                 "hit_rate": len(hits) / len(records), "mean_end_to_end_seconds": average(records),
+                                 "mean_hit_seconds": average(hits), "mean_miss_seconds": average(misses),
+                                 "intent_proxy_incompatible_hits": sum(r["intent_reuse_proxy"] is False for r in hits),
+                                 "intent_proxy_compatible_hits": sum(r["intent_reuse_proxy"] is True for r in hits),
+                                 "median_end_to_end_seconds": statistics.median(
+                                     r["timings"]["end_to_end_seconds"] for r in records),
+                                 "total_end_to_end_seconds": sum(r["timings"]["end_to_end_seconds"] for r in records),
+                                 "stage_mean_seconds": {
+                                     key: statistics.mean(r["timings"][key] for r in records)
+                                     for key in records[0]["timings"]},
+                                 "warmup_seconds_excluded": warmup_seconds}
+                all_records[(repeat, mode)] = records
         adapter.verify_sources()
         if file_hash(scenarios_path) != initial["scenarios_sha256"] or file_hash(config_path) != initial["config_sha256"]:
             raise ValueError("config or scenarios changed during run")
         write(run / "summary.json", {"provisional": provisional, "modes": summary,
                                      "answer_quality_verified": False, "semantic_safety_verified": False})
-        if "none" in all_records:
+        if any(mode == "none" for _, mode in all_records):
             comparisons = []
-            for mode, rows in all_records.items():
+            for (repeat, mode), rows in all_records.items():
                 if mode == "none":
                     continue
-                for baseline, result in zip(all_records["none"], rows):
+                for baseline, result in zip(all_records[(repeat, "none")], rows):
                     if baseline["query_id"] != result["query_id"]:
                         raise RuntimeError("mode query sequence mismatch")
                     comparisons.append({
-                        "query_id": result["query_id"], "mode": mode, "hit": result["hit"],
+                        "query_id": result["query_id"], "mode": mode, "repeat_index": repeat, "hit": result["hit"],
                         "answer_equal_to_none": result["answer"] == baseline["answer"],
                         "seconds_saved_vs_none": baseline["timings"]["end_to_end_seconds"]
                                                  - result["timings"]["end_to_end_seconds"],
-                        "note": "answer equality is not answer correctness; one fixed-order development pass"})
+                        "note": "answer equality is not answer correctness; fixed-order development sequence within each isolated repeat"})
             write(run / "comparisons.json", comparisons)
+        if verify_evidence(root, cases) != source_hashes:
+            raise ValueError("source evidence changed during run")
+        export(run, "SC")
         write(run / "completed.json", {"status": "completed", "source_verification": "passed"})
     except Exception:
         write(run / "failed.json", {"status": "failed", "traceback": traceback.format_exc()})

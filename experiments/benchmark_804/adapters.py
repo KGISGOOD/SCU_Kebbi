@@ -6,8 +6,10 @@ from .common import path
 
 def architecture_config(root, config, allow_provisional):
     m = config["models"]
-    return {"base_model": str(path(root, m["base"])), "bge_model": str(path(root, m["bge"])),
-            "a3_adapter": str(path(root, m["a3"])), "dense_index": config["dense_index"],
+    return {"base_model": str(path(root, m["base"])) if "base" in m else None,
+            "bge_model": str(path(root, m["bge"])) if "bge" in m else None,
+            "a3_adapter": str(path(root, m["a3"])) if "a3" in m else None,
+            "dense_index": config.get("dense_index"),
             "device": config["device"], "precision": config["qa_precision"], "seed": config["seed"],
             "max_new_tokens": config["max_new_tokens"], "a5_max_input_tokens": config["max_input_tokens"],
             "allow_unreviewed": allow_provisional}
@@ -31,8 +33,15 @@ class QAEngine:
         self.architecture = architecture
         self.capture = None
         if architecture not in {"A1", "A2-1", "A2-2"}:
-            from experiments.evaluation.wrappers import Architecture
-            self.engine = Architecture(architecture, root, architecture_config(root, config, allow_provisional), resources)
+            from experiments.shared.qa_runtime import Architecture
+            runtime_resources = dict(resources)
+            if architecture in {"A3", "A5"}:
+                # The qualified object is preserved verbatim, including provenance.
+                # Only bridge the new resource registry key to the runtime contract.
+                if "a3" not in resources:
+                    raise ValueError("qualified A3 adapter resource is missing; inspect resource_issues.json")
+                runtime_resources["a3_adapter"] = resources["a3"]
+            self.engine = Architecture(architecture, root, architecture_config(root, config, allow_provisional), runtime_resources)
             self.metadata = self.engine.metadata
             if architecture in {"A0", "A4-1", "A4-2"}:
                 llm = self.engine.engine.llm_loader

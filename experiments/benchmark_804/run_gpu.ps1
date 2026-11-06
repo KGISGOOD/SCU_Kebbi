@@ -45,7 +45,7 @@ if(!(Test-Path -LiteralPath $config)){
             throw "First execution requires local -BaseModel, -Bge, -Draft and -Reranker directories. Missing: $key"
         }
     }
-    $value=Get-Content -LiteralPath 'experiments/benchmark_804/config.example.json' -Raw -Encoding UTF8|ConvertFrom-Json
+    $value=Get-Content -LiteralPath 'experiments/configs/benchmark.example.json' -Raw -Encoding UTF8|ConvertFrom-Json
     foreach($key in $models.Keys){$value.models.$key=[IO.Path]::GetFullPath($models[$key])}
     [IO.File]::WriteAllText((Join-Path (Get-Location) $config),($value|ConvertTo-Json -Depth 12)+[char]10,[Text.UTF8Encoding]::new($false))
     Write-Output "Created $config. Confirm dense_index and trained model paths before a long run; existing configs are never overwritten."

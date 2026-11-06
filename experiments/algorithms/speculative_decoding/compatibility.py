@@ -5,7 +5,7 @@ import inspect
 import json
 import hashlib
 
-from experiments.algorithms.semantic_cache.cache import fingerprint
+from experiments.shared.identity import fingerprint
 
 
 SUPPORTED_TRANSFORMERS = "5.16.1"
