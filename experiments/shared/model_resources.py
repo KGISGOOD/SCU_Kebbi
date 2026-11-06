@@ -17,6 +17,9 @@ def sentence_module_kind(kind):
     aliases = {
         "sentence_transformers.base.modules.transformer.Transformer": "Transformer",
         "sentence_transformers.base.modules.pooling.Pooling": "Pooling",
+        # ST 6.1 keeps Pooling in sentence_transformer, unlike the shared
+        # Transformer/Normalize modules. Still verify public-class identity below.
+        "sentence_transformers.sentence_transformer.modules.pooling.Pooling": "Pooling",
         "sentence_transformers.base.modules.normalize.Normalize": "Normalize",
     }
     if kind in public:
