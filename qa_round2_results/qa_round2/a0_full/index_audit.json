@@ -1,0 +1,10 @@
+{
+  "status": "inspected_local_docstore",
+  "documents": 4658,
+  "full_test_question_matches": [],
+  "cache_initial_state": "empty_new_instance_per_mode_repeat",
+  "source_groups": [
+    "type1",
+    "type2"
+  ]
+}

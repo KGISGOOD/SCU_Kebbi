@@ -1,0 +1,48 @@
+{
+  "architecture": "A0",
+  "purpose": "functional_custom_questions",
+  "formal_quality_certified": false,
+  "human_gold_certified": false,
+  "question_count": 50,
+  "repeats": 1,
+  "warmups": 0,
+  "first_round_summary_timing": {
+    "units": "seconds; measured requests only, warmups excluded",
+    "total": "answer call or topic detection; excludes model load, setup, evidence checks and report export",
+    "faq": "entire measured FAQ matching call for A1/A2, including query embedding; no LLM generation",
+    "rag": "measured document retrieval plus reranking when separately measured; excludes Prompt construction",
+    "llm": "synchronized model.generate call only; excludes text decoding and Prompt construction",
+    "unused_or_unmeasured": "blank, not a fabricated zero; Cache Hits do not inherit origin generation time",
+    "sd_total": "controlled sum of once-measured shared preparation and mode execution; labelled in category",
+    "ti": "total is detection cost, not an answer-generation latency; attention prefill is not generation",
+    "order": "one CSV row per measured attempt, no averaging; IDs, repeats and failures remain in detailed JSONL"
+  },
+  "timing_scope": "CUDA-synchronized answer call; excludes load, initialization, hashing and export",
+  "config": {
+    "models": {
+      "base": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--meta-llama--Llama-3.2-3B-Instruct\\snapshots\\0cb88a4f764b7a12671c53f0838cd831a0843b95",
+      "bge": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-m3\\snapshots\\5617a9f61b028005a4858fdac845db406aefb181",
+      "draft": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--meta-llama--Llama-3.2-1B-Instruct\\snapshots\\9213176726f574b556790deb65791e0c5aa438b6",
+      "reranker": "C:\\Users\\rsy\\.cache\\huggingface\\hub\\models--BAAI--bge-reranker-v2-m3\\snapshots\\953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+      "a2_1": "experiments/models/training_v2/20261028_003944_e3c6657d/a2_1/final_model",
+      "a2_2": "experiments/models/training_v2/20261028_003944_e3c6657d/a2_2/final_model",
+      "a3": "experiments/models/training_v2/20261028_003944_e3c6657d/a3/final_adapter"
+    },
+    "training_bundle": "experiments/datasets/training_v2/converted",
+    "dense_index": "experiments/vector_stores/type1_type2_bge_m3_v1",
+    "device": "cuda",
+    "qa_precision": "fp16",
+    "sd_precision": "fp32",
+    "int_precision": "fp32",
+    "seed": 42,
+    "max_new_tokens": 256,
+    "max_input_tokens": 4096,
+    "repeats": 3,
+    "warmups": 1,
+    "sc_threshold": 0.75,
+    "faq_threshold": null,
+    "review_file": null,
+    "ti_thresholds": null,
+    "settings_origin": "predeclared_before_804_evaluation_not_optimized_on_test"
+  }
+}
