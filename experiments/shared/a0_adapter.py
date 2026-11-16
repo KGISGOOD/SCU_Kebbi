@@ -176,10 +176,13 @@ class A0Adapter:
         self.validate_query(query)
         return self.embedder.encode(query)
 
-    def answer(self, query):
+    def answer(self, query, *, query_vector=None):
         from experiments.baselines.rag_baseline.prompts import build_prompt, create_context_from_documents
         self.validate_query(query)
-        (docs, scores), retrieval = measured(self.pipeline.retrieve, query)
+        if query_vector is None:
+            (docs, scores), retrieval = measured(self.pipeline.retrieve, query)
+        else:
+            (docs, scores), retrieval = measured(self.pipeline.retrieve, query, query_vector=query_vector)
         def prepare():
             prompt = build_prompt(create_context_from_documents(docs), query,
                                   prompt_version=self.pipeline.prompt_version)

@@ -50,7 +50,7 @@ class RAGPipeline:
         )
 
     def retrieve(
-        self, query: str
+        self, query: str, *, query_vector=None
     ) -> Tuple[List[Document], List[float]]:
         """Retrieve documents for a query.
 
@@ -61,7 +61,8 @@ class RAGPipeline:
             Tuple of (documents, scores).
         """
         # Use the retriever which correctly converts query embedding to numpy array
-        retriever_results = self.retriever.retrieve(query)
+        retriever_results = (self.retriever.retrieve(query) if query_vector is None
+                             else self.retriever.retrieve(query, query_vector=query_vector))
         documents = [doc for doc, _ in retriever_results]
         scores = [score for _, score in retriever_results]
         return documents, scores

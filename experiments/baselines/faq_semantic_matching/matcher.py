@@ -163,7 +163,7 @@ class FAQMatcher:
             return False
 
     def match(self, question: str,
-              return_faq: bool = False) -> Tuple[Optional[str], float,
+              return_faq: bool = False, *, query_vector=None) -> Tuple[Optional[str], float,
                                                  Optional[Dict[str, Any]],
                                                  List[Dict[str, Any]],
                                                  float]:
@@ -193,7 +193,8 @@ class FAQMatcher:
         start_time = time.perf_counter()
 
         # Embed the question
-        query_embedding = np.array(self.embedder.embed_query(question), dtype=np.float32)
+        query_embedding = (np.array(self.embedder.embed_query(question), dtype=np.float32)
+                           if query_vector is None else np.asarray(query_vector, dtype=np.float32).reshape(-1))
 
         # Search the vector store for top-k similar FAQs
         # We set top_k to 2 to get the top-1 and top-2 for analysis

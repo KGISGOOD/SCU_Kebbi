@@ -51,8 +51,9 @@ class ResourceGuard:
     Metadata/inventory checks detect changes; they are NOT content hashes.
     On other systems use full hashing rather than claim an immutable snapshot.
     """
-    def __init__(self, adapter):
+    def __init__(self, adapter, extra_hashes=None):
         self.adapter, self.handles = adapter, []
+        self.extra_hashes = {str(Path(p).resolve()): value for p, value in (extra_hashes or {}).items()}
         self.locked = os.name == 'nt'
         if self.locked:
             import ctypes
@@ -71,6 +72,7 @@ class ResourceGuard:
                         raise OSError(ctypes.get_last_error(), 'cannot protect resource from writes: ' + path)
                     self.handles.append(handle)
                 adapter.verify_sources()
+                self.verify_extra()
                 self.initial = self.snapshot()
                 if before != self.initial:
                     raise ValueError('resource changed while establishing snapshot')
@@ -80,6 +82,13 @@ class ResourceGuard:
             atexit.register(self.close)
         else:
             adapter.verify_sources()
+            self.verify_extra()
+
+    def verify_extra(self):
+        from experiments.shared.a0_adapter import file_hash
+        for path, expected in self.extra_hashes.items():
+            if file_hash(Path(path)) != expected:
+                raise ValueError('integrated FAQ/code resource changed: ' + path)
 
     def snapshot(self):
         files = set()
@@ -89,11 +98,13 @@ class ResourceGuard:
             files.update(p.resolve() for p in (self.adapter.root / folder).rglob('*.py'))
         files.add(Path(__file__).resolve())
         files.add(Path(__file__).with_name('cache_chat.py').resolve())
+        files.update(Path(p) for p in self.extra_hashes)
         return {str(p): (p.stat().st_size, p.stat().st_mtime_ns, p.stat().st_ino) for p in files}
 
     def verify(self):
         if not self.locked:
             self.adapter.verify_sources()
+            self.verify_extra()
         elif not self.handles or self.snapshot() != self.initial:
             raise ValueError('protected resource inventory changed; restart required')
 
@@ -150,7 +161,7 @@ class ReviewedCacheA0:
                              'answer_sha256': hashlib.sha256(pending['answer'].encode('utf-8')).hexdigest()}
         return key, 'stored_' + status
 
-    def answer(self, query):
+    def answer(self, query, *, query_vector=None):
         from experiments.shared.a0_adapter import measured
         started = time.perf_counter()
         self.pending = None
@@ -169,7 +180,8 @@ class ReviewedCacheA0:
         # resources may themselves be stale. Never silently generate with them.
         if not valid:
             raise ValueError('Cache Miss: resource_version_unverified; RAG also refused; restart: ' + error)
-        vector = stage('embedding_seconds', self.adapter.embed, query)
+        vector = (stage('embedding_seconds', self.adapter.embed, query)
+                  if query_vector is None else query_vector)
         entry, score, candidate = stage('cache_lookup_seconds', self.cache.lookup, query, vector)
         reason = 'empty_cache' if candidate is None else 'below_threshold'
         hit, hit_type, review = False, None, None
@@ -189,7 +201,10 @@ class ReviewedCacheA0:
         if hit:
             answer = entry.answer
         else:
-            answer, detail = stage('rag_llm_seconds', self.adapter.answer, query)
+            if query_vector is None:
+                answer, detail = stage('rag_llm_seconds', self.adapter.answer, query)
+            else:
+                answer, detail = stage('rag_llm_seconds', lambda: self.adapter.answer(query, query_vector=vector))
             save_status = 'ineligible'
             if self.eligible(answer, detail):
                 self.pending = {'query': query, 'answer': answer, 'vector': vector, 'detail': detail}

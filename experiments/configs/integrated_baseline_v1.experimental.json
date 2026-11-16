@@ -1,0 +1,33 @@
+{
+  "model": "LOCAL_MODELS/Llama-3.2-3B-Instruct",
+  "bge": "LOCAL_MODELS/bge-m3",
+  "knowledge_index": "experiments/vector_stores/type1_type2_bge_m3_v1",
+  "device": "cuda",
+  "precision": "fp16",
+  "seed": 42,
+  "max_input_tokens": 4096,
+  "max_new_tokens": 256,
+  "request_timeout_seconds": 120,
+  "prompt_version": "baseline_senior_v2",
+  "faq": {
+    "review_file": "experiments/datasets/faq_csv_review.csv",
+    "faq_file": "experiments/datasets/faq_精簡問答_138筆.csv",
+    "threshold": 0.9,
+    "threshold_status": "uncalibrated",
+    "bge_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "bge_content_sha256": "abfff3f64e1e257a3f76286e13358376f19772afb22f42804d31c8a5619108c9",
+    "acceptance_mode": "experimental",
+    "min_margin": 0.05
+  },
+  "cache": {
+    "threshold": 0.9,
+    "threshold_status": "uncalibrated",
+    "reuse_mode": "bounded_semantic",
+    "max_entries": 128,
+    "persistent": false,
+    "ttl_seconds": 3600,
+    "verify_sources_each_request": false,
+    "acceptance_mode": "experimental",
+    "auto_write": true
+  }
+}

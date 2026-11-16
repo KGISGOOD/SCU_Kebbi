@@ -130,12 +130,15 @@ class FAQFallback:
             'index': 'in_memory_IndexFlatIP_L2', 'shared_embedding': True,
         })
 
-    def answer(self, query):
+    def match_only(self, query, *, query_vector=None):
         from experiments.shared.a0_adapter import measured
         self.adapter.validate_query(query)
         # match() returns the raw top-1 FAQ even when legacy global threshold rejects it.
         # Ignore its answer/acceptance; our independent policy owns the decision.
-        (_, score, candidate, top2, _), seconds = measured(self.matcher.match, query, return_faq=True)
+        kwargs = {'return_faq': True}
+        if query_vector is not None:
+            kwargs['query_vector'] = query_vector
+        (_, score, candidate, top2, _), seconds = measured(self.matcher.match, query, **kwargs)
         second_score = top2[1]['similarity_score'] if len(top2) > 1 else None
         mode = getattr(self, 'acceptance_mode', 'strict')
         accepted, reason = acceptance(query, candidate, score, self.threshold, mode=mode,
@@ -148,9 +151,13 @@ class FAQFallback:
                                             else 'exact_question_approved_with_evidence') if accepted else None,
                      faq_human_verified=bool(accepted and mode == 'strict'),
                      faq_score_margin=score-second_score if second_score is not None else None)
-        if accepted:
-            answer, detail = candidate['answer'], {'retrieval_seconds': None, 'generation_seconds': None,
-                                                 'input_tokens': None, 'faq_sources': candidate['sources']}
+        return (candidate['answer'] if accepted else None), dict(route, faq_seconds=seconds,
+                             faq_sources=candidate['sources'] if accepted else None)
+
+    def answer(self, query):
+        answer, route = self.match_only(query)
+        if route['faq_accepted']:
+            detail = {'retrieval_seconds': None, 'generation_seconds': None, 'input_tokens': None}
         else:
             answer, detail = self.adapter.answer(query)
-        return answer, dict(detail, faq_seconds=seconds, **route)
+        return answer, dict(detail, **route)

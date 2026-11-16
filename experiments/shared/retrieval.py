@@ -33,7 +33,7 @@ class Retriever:
         self.embedder = embedder
         self.top_k = top_k
 
-    def retrieve(self, query: str) -> List[Tuple[Document, float]]:
+    def retrieve(self, query: str, *, query_vector=None) -> List[Tuple[Document, float]]:
         """Retrieve top-k documents for a query.
 
         Args:
@@ -43,8 +43,11 @@ class Retriever:
             List of (document, score) tuples, sorted by score descending.
         """
         # Embed the query
-        query_embedding = self.embedder.embed_query(query)
-        query_array = np.array([query_embedding])
+        if query_vector is None:
+            query_embedding = self.embedder.embed_query(query)
+            query_array = np.array([query_embedding])
+        else:
+            query_array = np.asarray(query_vector, dtype=np.float32).reshape(1, -1)
 
         # Search the vector store
         documents, scores = self.vector_store.similarity_search(query_array, k=self.top_k)
