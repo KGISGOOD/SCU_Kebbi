@@ -62,6 +62,7 @@ class ChatResponse(BaseModel):
     cache_size: Optional[int] = None
     answer_verification: Optional[str] = None
     stage_timings: Optional[dict] = None
+    speculative: Optional[dict] = None
     answer_char_count: Optional[int] = None
     exceeds_100_characters: Optional[bool] = None
 
@@ -72,7 +73,7 @@ def load_settings(config_path):
     config = json.loads(path.read_text(encoding="utf-8-sig"))
     expected = {"model", "bge", "knowledge_index", "device", "precision", "seed",
                 "max_input_tokens", "max_new_tokens", "request_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"prompt_version", "faq", "cache"} != expected:
+    if not isinstance(config, dict) or set(config) - {"prompt_version", "faq", "cache", "speculative"} != expected:
         raise ValueError("use baseline_api/config.example.json schema")
     from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION, validate_prompt_version
     validate_prompt_version(config.get("prompt_version", PROMPT_VERSION))
@@ -82,6 +83,9 @@ def load_settings(config_path):
         from baseline_api.integrated_chat import load_config
         if load_config(path) != config:
             raise ValueError('API config changed during validation')
+    if 'speculative' in config:
+        from baseline_api.speculative import validate_speculative
+        validate_speculative(config)
     for key in ("model", "bge", "knowledge_index"):
         if not isinstance(config[key], str) or not config[key].strip():
             raise ValueError("explicit local resource path required: " + key)
@@ -108,7 +112,7 @@ def create_app(config_path, run_dir=None):
     config = load_settings(config_path)
     from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION
     selected_prompt = config.get("prompt_version", PROMPT_VERSION)
-    api_mode = 'integrated' if 'faq' in config else 'rag'
+    api_mode = ('integrated' if 'faq' in config else 'rag') + ('_speculative' if 'speculative' in config else '')
 
     @asynccontextmanager
     async def lifespan(app):
@@ -148,10 +152,13 @@ def create_app(config_path, run_dir=None):
         async def load_once():
             try:
                 def construct():
-                    if api_mode == 'integrated':
+                    if api_mode.startswith('integrated'):
                         from baseline_api.integrated_chat import IntegratedQA
                         adapter = IntegratedQA(ROOT, config)
                         a0 = adapter.adapter
+                    elif 'speculative' in config:
+                        from baseline_api.speculative import SpeculativeA0
+                        adapter = a0 = SpeculativeA0(ROOT, config)
                     else:
                         from experiments.shared.a0_adapter import A0Adapter
                         adapter = a0 = A0Adapter(ROOT, config)
@@ -215,7 +222,7 @@ def create_app(config_path, run_dir=None):
         return JSONResponse(status_code=200 if ready else 503,
                             content={"service": "a0_baseline", "status": state.status, "api_mode": api_mode,
                                      "prompt_version": selected_prompt,
-                                     "loaded_prompt_version": ((state.adapter.adapter if api_mode == 'integrated' else state.adapter).identity["prompt_version"]) if ready else None,
+                                     "loaded_prompt_version": ((state.adapter.adapter if api_mode.startswith('integrated') else state.adapter).identity["prompt_version"]) if ready else None,
                                      "models_ready": ready, "busy": busy,
                                      "accepting_requests": ready and not busy})
 
@@ -245,6 +252,7 @@ def create_app(config_path, run_dir=None):
                 "elapsed_seconds": time.perf_counter() - start,
                 "timings": timings, "error": str(error) if error is not None else None,
                 "error_type": type(error).__name__ if error is not None else None,
+                "speculative_failure": getattr(error, "speculative_failure", None),
             }
             # The sole inference worker writes before completing its future.
             # Recording failure therefore cannot masquerade as a successful call.
@@ -255,7 +263,7 @@ def create_app(config_path, run_dir=None):
             try:
                 try:
                     answer, timings = state.adapter.answer(body.question)
-                    if api_mode == 'integrated':
+                    if api_mode.startswith('integrated'):
                         detail = timings
                         timings = dict(detail)
                         timings.update({k: v for k, v in detail['faq'].items() if k != 'answer_source'})
@@ -328,6 +336,7 @@ def create_app(config_path, run_dir=None):
         return ChatResponse(answer=answer, success=True, request_id=request_id,
                             latency_seconds=time.perf_counter() - start, api_mode=api_mode,
                             answer_char_count=len(answer), exceeds_100_characters=len(answer)>100,
+                            speculative=timings.get('speculative'),
                             stage_timings=timings.get('timings') or {k: timings.get(k) for k in
                                 ('retrieval_seconds', 'prompt_check_seconds', 'generation_seconds')}, **routing)
 

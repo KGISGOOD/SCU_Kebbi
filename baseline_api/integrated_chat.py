@@ -25,12 +25,19 @@ def load_config(path):
             or config['cache'].get('acceptance_mode') != 'experimental'
             or not config['cache'].get('auto_write') or config['cache']['threshold'] != 0.9):
         raise ValueError('integrated candidate requires senior_v2, experimental FAQ/cache, 0.9 thresholds and FAQ margin 0.05')
+    if 'speculative' in config:
+        from .speculative import validate_speculative
+        validate_speculative(config)
     return config
 
 
 class IntegratedQA:
     def __init__(self, root, config):
-        self.adapter = A0Adapter(root, config)
+        if 'speculative' in config:
+            from .speculative import SpeculativeA0
+            self.adapter = SpeculativeA0(root, config)
+        else:
+            self.adapter = A0Adapter(root, config)
         self.faq = FAQFallback(root, config, self.adapter)
         faq_identity = self.faq.identity['faq']
         hashes = dict(faq_identity['input_sha256'])
@@ -64,7 +71,12 @@ class IntegratedQA:
             source, verification = cache_detail['answer_source'], cache_detail['answer_verification']
             for name, value in cache_detail['timings'].items():
                 timing[name] = timing.get(name, 0.) + value
-        return answer, {'answer_source': source, 'answer_verification': verification,
+        speculative = {}
+        if 'speculative' in self.adapter.config:
+            from .speculative import unused_statistics
+            speculative['speculative'] = ((cache_detail.get('rag_detail') or {}).get('speculative')
+                                          if source == 'rag' else unused_statistics())
+        return answer, {**speculative, 'answer_source': source, 'answer_verification': verification,
                         'layers': ['faq'] if source == 'faq' else ['faq', 'cache'] if source == 'cache'
                                   else ['faq', 'cache', 'rag', 'llm'],
                         'faq': faq, 'cache': cache_detail,
@@ -73,6 +85,8 @@ class IntegratedQA:
 
     def close(self):
         self.guard.close()
+        if hasattr(self.adapter, 'close'):
+            self.adapter.close()
 
 
 def main():

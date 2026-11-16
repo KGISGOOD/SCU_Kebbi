@@ -35,7 +35,7 @@ This engine is sequential; temporary model configuration is not thread-safe.
 
 
 class SDEngine:
-    def __init__(self, root, config, with_draft):
+    def __init__(self, root, config, with_draft, *, adapter=None):
         self.api = check_api()
         self.config = config
         # Check the actual local checkpoint configuration, not its folder name.
@@ -49,7 +49,10 @@ class SDEngine:
             if (data.get("model_type") != "llama"
                     or (data.get("hidden_size"), data.get("num_hidden_layers")) != dimensions):
                 raise ValueError(f"{role}: config does not match standard Llama 3.2 {dimensions}; check local path")
-        self.adapter, self.a0_load_seconds = measured(A0Adapter, root, config)
+        if adapter is None:
+            self.adapter, self.a0_load_seconds = measured(A0Adapter, root, config)
+        else:
+            self.adapter, self.a0_load_seconds = adapter, None
         self.target, self.tokenizer = self.adapter.llm.model, self.adapter.llm.tokenizer
         self.draft, self.draft_path, self.draft_hash = None, None, None
         self.draft_load_seconds = 0.0
@@ -132,7 +135,8 @@ class SDEngine:
         if len(docs) != 5 or len(scores) != 5:
             raise ValueError("SD comparison requires exactly five existing A0 retrieval documents")
         def construct():
-            prompt = build_prompt(create_context_from_documents(docs), query)
+            prompt = build_prompt(create_context_from_documents(docs), query,
+                                  prompt_version=self.adapter.pipeline.prompt_version)
             # Same tokenizer call/default special-token policy as A0, except
             # truncation is forbidden and checked before generation.
             inputs = self.tokenizer(prompt, return_tensors="pt", truncation=False)
