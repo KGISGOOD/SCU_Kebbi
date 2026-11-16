@@ -8,14 +8,58 @@ from __future__ import annotations
 
 import os
 import sys
+import argparse
+import json
+import time
 from pathlib import Path
 
-from .config import settings
-from .pipeline import create_pipeline_from_config
+
+def configured_chat(config_path):
+    """Single-turn Baseline 1, without importing an HTTP server."""
+    from experiments.shared.a0_adapter import A0Adapter, measured
+    root = Path(__file__).resolve().parents[3]
+    path = Path(config_path).expanduser()
+    path = (path if path.is_absolute() else root / path).resolve()
+    config = json.loads(path.read_text(encoding="utf-8-sig"))
+    if config.get("prompt_version") != "baseline_senior_v2" or "faq" in config:
+        raise ValueError("this CLI requires Baseline 1 with baseline_senior_v2, without FAQ")
+    print("載入 Baseline 1 模型與既有索引，請稍候……")
+    adapter = A0Adapter(root, config)
+    if adapter.identity["prompt_version"] != "baseline_senior_v2" or adapter.pipeline.prompt_version != "baseline_senior_v2":
+        raise ValueError("loaded Prompt does not match Baseline 1")
+    print("Prompt: baseline_senior_v2；單輪問答，輸入 exit 結束。")
+    while True:
+        try:
+            question = input("您的問題: ").strip()
+            if question.lower() in {"exit", "quit", "q"}:
+                break
+            if not question:
+                continue
+            try:
+                (answer, detail), elapsed = measured(adapter.answer, question)
+                print("回答:", answer)
+                print("字數（含標點及空白）: %d；超過100字: %s；耗時: %.3f 秒" %
+                      (len(answer), "是" if len(answer) > 100 else "否", elapsed))
+                print("Prompt:", adapter.pipeline.prompt_version)
+                for doc in detail["documents"]:
+                    print("來源:", doc["metadata"].get("source_file", doc["metadata"]),
+                          "相似度:", doc["score"])
+            except Exception as exc:
+                print("問答失敗:", exc)
+        except (KeyboardInterrupt, EOFError):
+            break
+    print("再見！")
 
 
 def main():
     """Main function to run the interactive chat."""
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("--config", help="Baseline 1 JSON; use a0_baseline_v2.local.json on GPU")
+    args = parser.parse_args()
+    if args.config:
+        return configured_chat(args.config)
+    from .config import settings
+    from .pipeline import create_pipeline_from_config
     print("=" * 60)
     print("RAG Baseline Interactive Chat")
     print("=" * 60)
