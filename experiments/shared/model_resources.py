@@ -1,7 +1,7 @@
 """Read-only offline model resolution and inference-file identity (no model imports)."""
 from pathlib import Path, PurePosixPath
 
-from experiments.a3_faq_sft.common import DataError, read_json, sha
+from .resource_io import DataError, read_json, sha
 from .identity import fingerprint as digest
 
 

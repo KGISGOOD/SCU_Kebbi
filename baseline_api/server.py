@@ -5,6 +5,8 @@ import argparse
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+import hashlib
 import json
 import logging
 import math
@@ -40,6 +42,13 @@ class ChatResponse(BaseModel):
     success: bool
     error: Optional[str] = None
     request_id: str
+    answer_source: Optional[str] = None
+    faq_top1_score: Optional[float] = None
+    faq_top2_score: Optional[float] = None
+    faq_accepted: Optional[bool] = None
+    faq_rejection_reason: Optional[str] = None
+    faq_question_id: Optional[str] = None
+    latency_seconds: Optional[float] = None
 
 
 def load_settings(config_path):
@@ -48,8 +57,15 @@ def load_settings(config_path):
     config = json.loads(path.read_text(encoding="utf-8-sig"))
     expected = {"model", "bge", "knowledge_index", "device", "precision", "seed",
                 "max_input_tokens", "max_new_tokens", "request_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) != expected:
+    if not isinstance(config, dict) or set(config) - {"prompt_version", "faq"} != expected:
         raise ValueError("use baseline_api/config.example.json schema")
+    from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION, validate_prompt_version
+    validate_prompt_version(config.get("prompt_version", PROMPT_VERSION))
+    if 'faq' in config:
+        from baseline_api.faq import validate_faq_config
+        validate_faq_config(config['faq'])
+        if config.get('prompt_version') != 'baseline_senior_v2':
+            raise ValueError('Baseline 2 requires baseline_senior_v2')
     for key in ("model", "bge", "knowledge_index"):
         if not isinstance(config[key], str) or not config[key].strip():
             raise ValueError("explicit local resource path required: " + key)
@@ -72,8 +88,10 @@ def failure(status, error, request_id, retry=False):
                         headers={"Retry-After": "2"} if retry else None)
 
 
-def create_app(config_path):
+def create_app(config_path, run_dir=None):
     config = load_settings(config_path)
+    from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION
+    selected_prompt = config.get("prompt_version", PROMPT_VERSION)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -82,14 +100,47 @@ def create_app(config_path):
         state.active = None
         state.status = "loading"
         state.closing = False
+        state.records_path = None
+        if run_dir is not None:
+            raw = Path(run_dir).expanduser()
+            output = (raw if raw.is_absolute() else ROOT / raw).resolve()
+            results_root = (ROOT / "experiments/results").resolve()
+            if results_root not in output.parents:
+                raise ValueError("--run-dir must be a NEW child of experiments/results")
+            output.mkdir(parents=True, exist_ok=False)
+            def write_new(name, value):
+                with (output / name).open("x", encoding="utf-8", newline="\n") as stream:
+                    json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False)
+                    stream.write("\n")
+            write_new("run.json", {
+                "schema": "a0_api_session_v1", "created_utc": datetime.now(timezone.utc).isoformat(),
+                "config": config, "prompt_version": selected_prompt,
+                "server_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                "formal_quality_certified": False,
+                "timing_scope": "request admission to inference completion; excludes model loading and record writing",
+                "character_count": "Python len(answer), including punctuation, whitespace and newlines",
+                "record_scope": "inference completion; a timed-out HTTP request may complete later",
+            })
+            state.records_path = output / "results.jsonl"
+            with state.records_path.open("x", encoding="utf-8"):
+                pass
+            LOG.info("API session output=%s", output)
         # One worker, and admission control before submitting: no inference queue.
         state.pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="a0")
 
         async def load_once():
             try:
                 def construct():
-                    from experiments.algorithms.shared.a0_adapter import A0Adapter
-                    return A0Adapter(ROOT, config)
+                    from experiments.shared.a0_adapter import A0Adapter
+                    adapter = A0Adapter(ROOT, config)
+                    if 'faq' in config:
+                        from baseline_api.faq import FAQFallback
+                        adapter = FAQFallback(ROOT, config, adapter)
+                    if adapter.identity["prompt_version"] != selected_prompt or adapter.pipeline.prompt_version != selected_prompt:
+                        raise ValueError("loaded A0 prompt differs from selected API configuration")
+                    if state.records_path is not None:
+                        write_new("identity.json", adapter.identity)
+                    return adapter
                 adapter = await asyncio.get_running_loop().run_in_executor(state.pool, construct)
                 if not state.closing:
                     state.adapter, state.status = adapter, "ready"
@@ -117,7 +168,8 @@ def create_app(config_path):
             # model while an outstanding forward still uses it.
             if state.active is not None and not state.active.done():
                 LOG.warning("Shutdown has outstanding inference; GPU thread may need to finish before process exits")
-            state.pool.shutdown(wait=False, cancel_futures=True)
+            # Admission control leaves no queued requests to cancel.
+            state.pool.shutdown(wait=False)
 
     app = FastAPI(title="資科萬事通 A0 Baseline API", version="1.0", lifespan=lifespan)
 
@@ -134,6 +186,8 @@ def create_app(config_path):
         busy = state.active is not None
         return JSONResponse(status_code=200 if ready else 503,
                             content={"service": "a0_baseline", "status": state.status,
+                                     "prompt_version": selected_prompt,
+                                     "loaded_prompt_version": state.adapter.identity["prompt_version"] if ready else None,
                                      "models_ready": ready, "busy": busy,
                                      "accepting_requests": ready and not busy})
 
@@ -149,16 +203,44 @@ def create_app(config_path):
             return failure(503, "busy", request_id, retry=True)
 
         start = time.perf_counter()
+        started_utc = datetime.now(timezone.utc).isoformat()
+
+        def record_outcome(answer=None, timings=None, error=None):
+            if state.records_path is None:
+                return
+            record = {
+                "request_id": request_id, "started_utc": started_utc, "question": body.question,
+                "prompt_version": state.adapter.identity["prompt_version"],
+                "status": "success" if error is None else "failed",
+                "answer": answer, "answer_char_count": len(answer) if answer is not None else None,
+                "exceeds_100_characters": len(answer) > 100 if answer is not None else None,
+                "elapsed_seconds": time.perf_counter() - start,
+                "timings": timings, "error": str(error) if error is not None else None,
+                "error_type": type(error).__name__ if error is not None else None,
+            }
+            # The sole inference worker writes before completing its future.
+            # Recording failure therefore cannot masquerade as a successful call.
+            with state.records_path.open("a", encoding="utf-8", newline="\n") as stream:
+                stream.write(json.dumps(record, ensure_ascii=False, allow_nan=False) + "\n")
 
         def infer():
             try:
-                answer, timings = state.adapter.answer(body.question)
-            except ValueError as exc:
-                if str(exc).startswith(("query exceeds BGE experiment limit", "full A0 prompt has", "full prompt has")):
-                    raise InputRejected(str(exc)) from exc
+                try:
+                    answer, timings = state.adapter.answer(body.question)
+                except ValueError as exc:
+                    if str(exc).startswith(("query exceeds BGE experiment limit", "full A0 prompt has", "full prompt has")):
+                        raise InputRejected(str(exc)) from exc
+                    raise
+                if not isinstance(answer, str) or not answer.strip():
+                    raise RuntimeError("A0 returned an empty answer")
+                if config.get("prompt_version") == "baseline_senior_v2" and len(answer) > 100:
+                    # Observe compliance only: never slice an answer or drop conditions.
+                    LOG.warning("request=%s answer_length=%s exceeds 100 characters; answer preserved",
+                                request_id, len(answer))
+            except Exception as exc:
+                record_outcome(error=exc)
                 raise
-            if not isinstance(answer, str) or not answer.strip():
-                raise RuntimeError("A0 returned an empty answer")
+            record_outcome(answer=answer, timings=timings)
             return answer, timings
 
         # No await between busy check and submission: admission is atomic on
@@ -170,7 +252,7 @@ def create_app(config_path):
         def finished(result):
             try:
                 _, timings = result.result()
-                LOG.info("request=%s inference_done elapsed=%.3f retrieval=%.3f generation=%.3f input_tokens=%s",
+                LOG.info("request=%s inference_done elapsed=%.3f retrieval=%s generation=%s input_tokens=%s",
                          request_id, time.perf_counter() - start, timings["retrieval_seconds"],
                          timings["generation_seconds"], timings["input_tokens"])
             except asyncio.CancelledError:
@@ -191,12 +273,16 @@ def create_app(config_path):
             LOG.warning("request=%s HTTP timeout; inference remains busy until GPU returns", request_id)
             return failure(504, "inference_timeout", request_id)
         try:
-            answer, _ = future.result()
+            answer, timings = future.result()
         except InputRejected:
             return failure(422, "input_limit_exceeded", request_id)
         except Exception:
             return failure(500, "inference_failed", request_id)
-        return ChatResponse(answer=answer, success=True, request_id=request_id)
+        routing = {key: timings.get(key) for key in ('answer_source', 'faq_top1_score', 'faq_top2_score',
+                   'faq_accepted', 'faq_rejection_reason', 'faq_question_id')}
+        routing['answer_source'] = routing['answer_source'] or 'rag'
+        return ChatResponse(answer=answer, success=True, request_id=request_id,
+                            latency_seconds=time.perf_counter() - start, **routing)
 
     return app
 
@@ -204,13 +290,14 @@ def create_app(config_path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True, help="GPU-local JSON, paths relative to project root")
+    parser.add_argument("--run-dir", help="optional NEW child of experiments/results for identity and per-question records")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     import uvicorn
     # Single process only: multiple workers/reload would duplicate GPU models.
-    uvicorn.run(create_app(args.config), host=args.host, port=args.port, workers=1, reload=False)
+    uvicorn.run(create_app(args.config, args.run_dir), host=args.host, port=args.port, workers=1, reload=False)
 
 
 if __name__ == "__main__":

@@ -128,12 +128,13 @@ class A0Adapter:
         torch.manual_seed(config["seed"])
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(config["seed"])
-        self.pipeline = RAGPipeline(store, self.embedder, llm, top_k=5)
+        prompt_version = prompts.validate_prompt_version(config.get("prompt_version", prompts.PROMPT_VERSION))
+        self.pipeline = RAGPipeline(store, self.embedder, llm, top_k=5, prompt_version=prompt_version)
         self.identity = {
             "schema": "semantic_cache_a0_v2", "context_scope": "single_turn",
             "resources": self.source_hashes,
             "resource_paths": {k: str(v) for k, v in paths.items()},
-            "prompt_version": prompts.PROMPT_VERSION,
+            "prompt_version": prompt_version,
             "code": self.code_hash(),
             "generation": {"do_sample": False, "max_new_tokens": llm.max_new_tokens,
                            "repetition_penalty": 1.0, "seed": config["seed"],
@@ -180,7 +181,8 @@ class A0Adapter:
         self.validate_query(query)
         (docs, scores), retrieval = measured(self.pipeline.retrieve, query)
         def prepare():
-            prompt = build_prompt(create_context_from_documents(docs), query)
+            prompt = build_prompt(create_context_from_documents(docs), query,
+                                  prompt_version=self.pipeline.prompt_version)
             tokens = self.llm.tokenizer(prompt, truncation=False)["input_ids"]
             context_limit = self.llm.model.config.max_position_embeddings
             if len(tokens) > self.llm.strict_max_input_tokens or len(tokens) + self.llm.max_new_tokens > context_limit:

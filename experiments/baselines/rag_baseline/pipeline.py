@@ -11,7 +11,7 @@ from typing import List, Tuple, Optional
 from langchain_core.documents import Document
 
 from .config import settings
-from .prompts import build_prompt, create_context_from_documents
+from .prompts import build_prompt, create_context_from_documents, PROMPT_VERSION, validate_prompt_version
 from experiments.shared.evaluation import timer
 from experiments.shared.embeddings import BGEM3Embedder
 from experiments.shared.vector_store import FAISSVectorStore
@@ -28,6 +28,7 @@ class RAGPipeline:
         embedder: BGEM3Embedder,
         llm_loader: LLMLoader,
         top_k: Optional[int] = None,
+        prompt_version: str = PROMPT_VERSION,
     ):
         """Initialize the RAG pipeline.
 
@@ -38,6 +39,7 @@ class RAGPipeline:
             top_k: Number of documents to retrieve (overrides config).
         """
         self.vector_store = vector_store
+        self.prompt_version = validate_prompt_version(prompt_version)
         self.embedder = embedder
         self.llm_loader = llm_loader
         self.top_k = top_k if top_k is not None else settings.top_k
@@ -83,7 +85,7 @@ class RAGPipeline:
         # Create context from documents
         context = create_context_from_documents(retrieved_docs)
         # Build prompt
-        prompt = build_prompt(context, query)
+        prompt = build_prompt(context, query, prompt_version=self.prompt_version)
         # Generate answer
         answer = self.llm_loader.generate(prompt, **llm_kwargs)
         return answer
