@@ -41,7 +41,7 @@ def file_sha(file):
 def verify_loaded(store, embedder, chunks, raw_documents, model_identity):
     """Reuse A5 structural contract and A4's actual chunk comparison; no LLM."""
     import numpy as np
-    from experiments.a5_rag_finetuned_llm.pipeline import validate_loaded_store
+    from experiments.shared.index_validation import validate_loaded_store
     from experiments.baselines.hybrid_rag_reranker.build_bm25_index import chunk_documents as a4_chunks
     version = store._load_version_info()
     if version is None:
@@ -166,7 +166,7 @@ def main():
     from experiments.shared.embeddings import BGEM3Embedder
     from experiments.shared.vector_store import FAISSVectorStore
     from experiments.shared.model_resources import local_snapshot, inference_identity
-    from experiments.a2_faq_finetuning.common import read_checkpoint_provenance
+    from experiments.shared.index_validation import read_checkpoint_provenance
     model_path = args.embedding_model_path
     if model_path is not None:
         model_path = (model_path if model_path.is_absolute() else root / model_path).resolve()
