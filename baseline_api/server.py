@@ -1,4 +1,4 @@
-"""Independent A0 API; no GPU imports or resource loads until server lifespan."""
+"""Single-worker RAG or FAQ+Cache+RAG API; resources load once in lifespan."""
 from __future__ import annotations
 
 import argparse
@@ -53,6 +53,17 @@ class ChatResponse(BaseModel):
     faq_acceptance_reason: Optional[str] = None
     faq_human_verified: Optional[bool] = None
     faq_score_margin: Optional[float] = None
+    api_mode: Optional[str] = None
+    cache_hit: Optional[bool] = None
+    cache_similarity: Optional[float] = None
+    cache_hit_type: Optional[str] = None
+    cache_reason: Optional[str] = None
+    cache_saved: Optional[bool] = None
+    cache_size: Optional[int] = None
+    answer_verification: Optional[str] = None
+    stage_timings: Optional[dict] = None
+    answer_char_count: Optional[int] = None
+    exceeds_100_characters: Optional[bool] = None
 
 
 def load_settings(config_path):
@@ -61,15 +72,16 @@ def load_settings(config_path):
     config = json.loads(path.read_text(encoding="utf-8-sig"))
     expected = {"model", "bge", "knowledge_index", "device", "precision", "seed",
                 "max_input_tokens", "max_new_tokens", "request_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"prompt_version", "faq"} != expected:
+    if not isinstance(config, dict) or set(config) - {"prompt_version", "faq", "cache"} != expected:
         raise ValueError("use baseline_api/config.example.json schema")
     from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION, validate_prompt_version
     validate_prompt_version(config.get("prompt_version", PROMPT_VERSION))
+    if ('faq' in config) != ('cache' in config):
+        raise ValueError('API supports RAG or integrated FAQ+Cache+RAG only; standalone Baselines remain CLI modes')
     if 'faq' in config:
-        from baseline_api.faq import validate_faq_config
-        validate_faq_config(config['faq'])
-        if config.get('prompt_version') != 'baseline_senior_v2':
-            raise ValueError('Baseline 2 requires baseline_senior_v2')
+        from baseline_api.integrated_chat import load_config
+        if load_config(path) != config:
+            raise ValueError('API config changed during validation')
     for key in ("model", "bge", "knowledge_index"):
         if not isinstance(config[key], str) or not config[key].strip():
             raise ValueError("explicit local resource path required: " + key)
@@ -96,6 +108,7 @@ def create_app(config_path, run_dir=None):
     config = load_settings(config_path)
     from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION
     selected_prompt = config.get("prompt_version", PROMPT_VERSION)
+    api_mode = 'integrated' if 'faq' in config else 'rag'
 
     @asynccontextmanager
     async def lifespan(app):
@@ -118,7 +131,7 @@ def create_app(config_path, run_dir=None):
                     stream.write("\n")
             write_new("run.json", {
                 "schema": "a0_api_session_v1", "created_utc": datetime.now(timezone.utc).isoformat(),
-                "config": config, "prompt_version": selected_prompt,
+                "config": config, "prompt_version": selected_prompt, "api_mode": api_mode,
                 "server_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                 "formal_quality_certified": False,
                 "timing_scope": "request admission to inference completion; excludes model loading and record writing",
@@ -135,21 +148,29 @@ def create_app(config_path, run_dir=None):
         async def load_once():
             try:
                 def construct():
-                    from experiments.shared.a0_adapter import A0Adapter
-                    adapter = A0Adapter(ROOT, config)
-                    if 'faq' in config:
-                        from baseline_api.faq import FAQFallback
-                        adapter = FAQFallback(ROOT, config, adapter)
-                    if adapter.identity["prompt_version"] != selected_prompt or adapter.pipeline.prompt_version != selected_prompt:
-                        raise ValueError("loaded A0 prompt differs from selected API configuration")
-                    if state.records_path is not None:
-                        write_new("identity.json", adapter.identity)
+                    if api_mode == 'integrated':
+                        from baseline_api.integrated_chat import IntegratedQA
+                        adapter = IntegratedQA(ROOT, config)
+                        a0 = adapter.adapter
+                    else:
+                        from experiments.shared.a0_adapter import A0Adapter
+                        adapter = a0 = A0Adapter(ROOT, config)
+                    try:
+                        if a0.identity["prompt_version"] != selected_prompt or a0.pipeline.prompt_version != selected_prompt:
+                            raise ValueError("loaded A0 prompt differs from selected API configuration")
+                        if state.records_path is not None:
+                            write_new("identity.json", adapter.identity)
+                    except Exception:
+                        if hasattr(adapter, 'close'):
+                            adapter.close()
+                        raise
+                    if state.closing and hasattr(adapter, 'close'):
+                        adapter.close()
                     return adapter
                 adapter = await asyncio.get_running_loop().run_in_executor(state.pool, construct)
                 if not state.closing:
                     state.adapter, state.status = adapter, "ready"
-                    LOG.info("A0 ready pid=%s prompt=%s generation=%s",
-                             os.getpid(), adapter.identity["prompt_version"], adapter.identity["generation"])
+                    LOG.info("QA ready pid=%s mode=%s prompt=%s", os.getpid(), api_mode, selected_prompt)
             except asyncio.CancelledError:
                 raise
             except Exception:
@@ -172,10 +193,13 @@ def create_app(config_path, run_dir=None):
             # model while an outstanding forward still uses it.
             if state.active is not None and not state.active.done():
                 LOG.warning("Shutdown has outstanding inference; GPU thread may need to finish before process exits")
+            if state.adapter is not None and hasattr(state.adapter, 'close'):
+                # Serialize resource-handle release after any outstanding inference.
+                state.pool.submit(state.adapter.close)
             # Admission control leaves no queued requests to cancel.
             state.pool.shutdown(wait=False)
 
-    app = FastAPI(title="資科萬事通 A0 Baseline API", version="1.0", lifespan=lifespan)
+    app = FastAPI(title="資科萬事通 QA API", version="1.0", lifespan=lifespan)
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, exc):
@@ -189,9 +213,9 @@ def create_app(config_path, run_dir=None):
         ready = state.status == "ready" and not state.closing
         busy = state.active is not None
         return JSONResponse(status_code=200 if ready else 503,
-                            content={"service": "a0_baseline", "status": state.status,
+                            content={"service": "a0_baseline", "status": state.status, "api_mode": api_mode,
                                      "prompt_version": selected_prompt,
-                                     "loaded_prompt_version": state.adapter.identity["prompt_version"] if ready else None,
+                                     "loaded_prompt_version": ((state.adapter.adapter if api_mode == 'integrated' else state.adapter).identity["prompt_version"]) if ready else None,
                                      "models_ready": ready, "busy": busy,
                                      "accepting_requests": ready and not busy})
 
@@ -214,7 +238,7 @@ def create_app(config_path, run_dir=None):
                 return
             record = {
                 "request_id": request_id, "started_utc": started_utc, "question": body.question,
-                "prompt_version": state.adapter.identity["prompt_version"],
+                "prompt_version": selected_prompt, "api_mode": api_mode,
                 "status": "success" if error is None else "failed",
                 "answer": answer, "answer_char_count": len(answer) if answer is not None else None,
                 "exceeds_100_characters": len(answer) > 100 if answer is not None else None,
@@ -231,6 +255,19 @@ def create_app(config_path, run_dir=None):
             try:
                 try:
                     answer, timings = state.adapter.answer(body.question)
+                    if api_mode == 'integrated':
+                        detail = timings
+                        timings = dict(detail)
+                        timings.update({k: v for k, v in detail['faq'].items() if k != 'answer_source'})
+                        cache = detail['cache']
+                        rag = (cache.get('rag_detail') or {}) if cache is not None else {}
+                        timings.update(cache_hit=cache['cache_hit'] if cache is not None else None,
+                                       cache_similarity=cache['similarity'] if cache is not None else None,
+                                       cache_hit_type=cache['hit_type'] if cache is not None else None,
+                                       cache_reason=cache['reason'] if cache is not None else None,
+                                       cache_saved=cache['saved'] if cache is not None else None,
+                                       retrieval_seconds=rag.get('retrieval_seconds'),
+                                       generation_seconds=rag.get('generation_seconds'), input_tokens=rag.get('input_tokens'))
                 except ValueError as exc:
                     if str(exc).startswith(("query exceeds BGE experiment limit", "full A0 prompt has", "full prompt has")):
                         raise InputRejected(str(exc)) from exc
@@ -285,9 +322,14 @@ def create_app(config_path, run_dir=None):
         routing = {key: timings.get(key) for key in ('answer_source', 'faq_top1_score', 'faq_top2_score',
                    'faq_accepted', 'faq_rejection_reason', 'faq_question_id', 'faq_acceptance_mode',
                    'faq_acceptance_reason', 'faq_human_verified', 'faq_score_margin')}
+        routing.update({key: timings.get(key) for key in ('cache_hit', 'cache_similarity', 'cache_hit_type',
+                       'cache_reason', 'cache_saved', 'cache_size', 'answer_verification')})
         routing['answer_source'] = routing['answer_source'] or 'rag'
         return ChatResponse(answer=answer, success=True, request_id=request_id,
-                            latency_seconds=time.perf_counter() - start, **routing)
+                            latency_seconds=time.perf_counter() - start, api_mode=api_mode,
+                            answer_char_count=len(answer), exceeds_100_characters=len(answer)>100,
+                            stage_timings=timings.get('timings') or {k: timings.get(k) for k in
+                                ('retrieval_seconds', 'prompt_check_seconds', 'generation_seconds')}, **routing)
 
     return app
 
