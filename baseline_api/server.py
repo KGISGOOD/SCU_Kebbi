@@ -49,6 +49,10 @@ class ChatResponse(BaseModel):
     faq_rejection_reason: Optional[str] = None
     faq_question_id: Optional[str] = None
     latency_seconds: Optional[float] = None
+    faq_acceptance_mode: Optional[str] = None
+    faq_acceptance_reason: Optional[str] = None
+    faq_human_verified: Optional[bool] = None
+    faq_score_margin: Optional[float] = None
 
 
 def load_settings(config_path):
@@ -279,7 +283,8 @@ def create_app(config_path, run_dir=None):
         except Exception:
             return failure(500, "inference_failed", request_id)
         routing = {key: timings.get(key) for key in ('answer_source', 'faq_top1_score', 'faq_top2_score',
-                   'faq_accepted', 'faq_rejection_reason', 'faq_question_id')}
+                   'faq_accepted', 'faq_rejection_reason', 'faq_question_id', 'faq_acceptance_mode',
+                   'faq_acceptance_reason', 'faq_human_verified', 'faq_score_margin')}
         routing['answer_source'] = routing['answer_source'] or 'rag'
         return ChatResponse(answer=answer, success=True, request_id=request_id,
                             latency_seconds=time.perf_counter() - start, **routing)

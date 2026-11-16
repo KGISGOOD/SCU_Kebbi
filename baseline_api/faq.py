@@ -1,27 +1,63 @@
 """Conservative FAQ routing around the existing A0; no research runner changes."""
 import math
+import hashlib
+import re
+import unicodedata
 from pathlib import Path
 
 
 def validate_faq_config(config):
-    if not isinstance(config, dict) or set(config) != {'training_bundle', 'threshold', 'threshold_status', 'bge_content_sha256', 'bge_revision'}:
+    if not isinstance(config, dict) or set(config) - {'review_file', 'acceptance_mode', 'min_margin'} != {'faq_file', 'threshold', 'threshold_status', 'bge_content_sha256', 'bge_revision'}:
         raise ValueError('invalid Baseline 2 FAQ configuration')
+    if config.get('acceptance_mode', 'strict') not in ('strict', 'experimental'):
+        raise ValueError('unknown FAQ acceptance_mode')
+    margin = config.get('min_margin', 0.05)
+    if type(margin) not in (int, float) or not math.isfinite(margin) or not 0 <= margin <= 2:
+        raise ValueError('invalid FAQ min_margin')
+    if 'review_file' in config and (not isinstance(config['review_file'], str) or not config['review_file'].strip()):
+        raise ValueError('review_file must be an explicit CSV path')
     value = config['threshold']
     if type(value) not in (int, float) or not math.isfinite(value) or not -1 <= value <= 1:
         raise ValueError('FAQ threshold must be explicit and finite, never null')
     if config['threshold_status'] != 'uncalibrated':
         raise ValueError('this candidate configuration must remain uncalibrated')
-    for key in ('training_bundle', 'bge_content_sha256', 'bge_revision'):
+    for key in ('faq_file', 'bge_content_sha256', 'bge_revision'):
         if not isinstance(config[key], str) or not config[key].strip():
             raise ValueError('missing FAQ ' + key)
 
 
-def acceptance(query, candidate, score, threshold):
+def lexical_intent(text):
+    """Bounded wording aliases, NOT a general semantic equivalence verifier.
+
+    All unrecognized wording, negation, years, scopes and qualifications remain.
+    """
+    text = unicodedata.normalize('NFKC', text).strip()
+    text = re.sub(r'^(?:想請問|請問|我想知道)', '', text)
+    for old, new in [('電子郵件信箱', '電子郵件'), ('電子信箱', '電子郵件'),
+                     ('聯絡信箱', '聯絡電子郵件'), ('幾學分', '多少學分')]:
+        text = text.replace(old, new)
+    return re.sub(r'[\s？?，,。！!]', '', text)
+
+
+def acceptance(query, candidate, score, threshold, *, mode='strict', second_score=None, min_margin=0.05):
     """Exact intent only; no similarity-based certification or inferred conditions."""
     if not math.isfinite(score) or score < threshold:
         return False, 'below_threshold'
     if not candidate or not str(candidate.get('answer') or '').strip():
         return False, 'empty_answer'
+    if mode == 'experimental':
+        if candidate.get('review_status') == 'rejected':
+            return False, 'human_rejected'
+        if second_score is None or not math.isfinite(second_score) or score - second_score < min_margin:
+            return False, 'insufficient_top2_margin'
+        numbers = lambda text: re.findall(r'[0-9]+(?:\.[0-9]+)?', unicodedata.normalize('NFKC', text))
+        if numbers(query) != numbers(candidate['question']):
+            return False, 'numeric_or_year_condition_mismatch'
+        if lexical_intent(query) != lexical_intent(candidate['question']):
+            return False, 'intent_or_conditions_unverified'
+        return True, None
+    if mode != 'strict':
+        raise ValueError('unknown FAQ acceptance mode')
     if query.strip() != candidate['question'].strip():
         return False, 'intent_or_conditions_unverified'
     if candidate.get('review_status') != 'approved':
@@ -33,7 +69,7 @@ def acceptance(query, candidate, score, threshold):
 
 class FAQFallback:
     def __init__(self, root, config, adapter):
-        from experiments.shared.faq_data import load_bundle, read_rows
+        from .faq_review import load_csv_candidates
         from experiments.shared.model_resources import inference_identity
         from experiments.baselines.faq_semantic_matching.matcher import FAQMatcher
         from experiments.shared.vector_store import FAISSVectorStore
@@ -53,13 +89,25 @@ class FAQFallback:
         if model.max_seq_length != 512 or not adapter.embedder.normalize_embeddings:
             raise ValueError('shared BGE requires length 512 and L2 normalization')
         model.eval()
-        bundle = Path(options['training_bundle'])
-        _, manifest, hashes = load_bundle(root, bundle if bundle.is_absolute() else Path(root) / bundle)
-        master = read_rows(Path(root) / manifest['frozen_dir'] / 'qa_master.jsonl')
-        rows = [r for r in master if r['canonical_question_id'] == r['question_id']]
-        if len(master) != 336 or len(rows) != 138 or len({r['intent_group_id'] for r in rows}) != 138:
-            raise ValueError('expected immutable V2 336 rows and 138 unique canonical intents')
+        faq_path = Path(options['faq_file'])
+        faq_path = faq_path if faq_path.is_absolute() else Path(root) / faq_path
+        rows, faq_hash = load_csv_candidates(faq_path)
+        hashes = {str(faq_path): faq_hash}
         canonical = [dict(r, faq_id=r['intent_group_id']) for r in rows]
+        review_identity = None
+        if options.get('review_file'):
+            from .faq_review import read_reviews
+            from experiments.shared.a0_adapter import file_hash
+            review_path = Path(options['review_file'])
+            review_path = review_path if review_path.is_absolute() else Path(root) / review_path
+            review_hash = file_hash(review_path)
+            reviews = read_reviews(review_path, rows)
+            if file_hash(review_path) != review_hash:
+                raise ValueError('FAQ review changed during loading')
+            import json
+            canonical = [dict(r, review_status=reviews[r['intent_group_id']]['decision'],
+                              sources=json.loads(reviews[r['intent_group_id']]['sources'])) for r in canonical]
+            review_identity = {'path': str(review_path), 'sha256': review_hash, 'decisions': reviews}
         matcher = FAQMatcher.__new__(FAQMatcher)
         matcher.faqs, matcher.embedder = canonical, adapter.embedder
         matcher.faq_documents = matcher._faqs_to_documents(canonical)
@@ -68,11 +116,17 @@ class FAQFallback:
         store.build(adapter.embedder.encode([r['question'] for r in canonical]), matcher.faq_documents)
         matcher.vector_store, matcher.index_built = store, True
         self.matcher, self.threshold = matcher, options['threshold']
+        self.acceptance_mode = options.get('acceptance_mode', 'strict')
+        self.min_margin = options.get('min_margin', 0.05)
         self.identity = dict(adapter.identity, faq={
             'candidate_count': 138, 'input_sha256': hashes, 'model': identity,
             'declared_revision': options['bge_revision'], 'threshold': self.threshold,
             'threshold_status': 'uncalibrated', 'policy': 'exact_question_and_approved_answer_v1',
-            'human_approved_candidates': sum(r.get('review_status') == 'approved' for r in rows),
+            'human_approved_candidates': sum(r.get('review_status') == 'approved' for r in canonical),
+            'review': review_identity,
+            'acceptance_mode': self.acceptance_mode, 'min_margin': self.min_margin,
+            'experimental_policy': 'bounded_lexical_aliases_v1_not_semantic_certification',
+            'policy_code_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             'index': 'in_memory_IndexFlatIP_L2', 'shared_embedding': True,
         })
 
@@ -82,10 +136,18 @@ class FAQFallback:
         # match() returns the raw top-1 FAQ even when legacy global threshold rejects it.
         # Ignore its answer/acceptance; our independent policy owns the decision.
         (_, score, candidate, top2, _), seconds = measured(self.matcher.match, query, return_faq=True)
-        accepted, reason = acceptance(query, candidate, score, self.threshold)
+        second_score = top2[1]['similarity_score'] if len(top2) > 1 else None
+        mode = getattr(self, 'acceptance_mode', 'strict')
+        accepted, reason = acceptance(query, candidate, score, self.threshold, mode=mode,
+                                      second_score=second_score, min_margin=getattr(self, 'min_margin', 0.05))
         route = {'answer_source': 'faq' if accepted else 'rag', 'faq_accepted': accepted,
                  'faq_top1_score': score, 'faq_top2_score': top2[1]['similarity_score'] if len(top2) > 1 else None,
                  'faq_rejection_reason': reason, 'faq_question_id': candidate['question_id'] if candidate else None}
+        route.update(faq_acceptance_mode=mode,
+                     faq_acceptance_reason=('experimental_lexical_match_unverified' if mode == 'experimental'
+                                            else 'exact_question_approved_with_evidence') if accepted else None,
+                     faq_human_verified=bool(accepted and mode == 'strict'),
+                     faq_score_margin=score-second_score if second_score is not None else None)
         if accepted:
             answer, detail = candidate['answer'], {'retrieval_seconds': None, 'generation_seconds': None,
                                                  'input_tokens': None, 'faq_sources': candidate['sources']}

@@ -10,7 +10,8 @@
   "request_timeout_seconds": 120,
   "prompt_version": "baseline_senior_v2",
   "faq": {
-    "training_bundle": "experiments/datasets/training_v2/converted",
+    "review_file": "experiments/datasets/faq_csv_review.csv",
+    "faq_file": "experiments/datasets/faq_精簡問答_138筆.csv",
     "threshold": 0.9,
     "threshold_status": "uncalibrated",
     "bge_revision": "5617a9f61b028005a4858fdac845db406aefb181",
