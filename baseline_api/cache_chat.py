@@ -17,8 +17,11 @@ def chat(path):
         raise ValueError('requires Baseline 3 / baseline_senior_v2 without FAQ')
     engine = ReviewedCacheA0(A0Adapter(ROOT, config), config['cache'])
     print('Baseline 3；baseline_senior_v2；Cache門檻尚未校準；單輪問答。')
-    print('輸入 exit 結束；approve-last 可人工核對並保存上一則RAG回答；未批准回答不自動保存。')
-    print('每次請求驗證模型、索引及程式Hash；此成本計入耗時。快取僅本次程序有效。')
+    print('模式:', engine.mode, '自動暫存:', config['cache'].get('auto_write', False))
+    print('輸入 exit 結束；approve-last 為人工確認；Experimental暫存標為unverified，不代表答案正確。')
+    print('快取僅本次程序有效；啟動完整Hash＋Windows唯讀保護，查詢不重算大型權重Hash。')
+    if config['cache']['verify_sources_each_request'] or (engine.guard is not None and not getattr(engine.guard, 'locked', False)):
+        print('目前使用完整Hash逐次驗證（舊設定或平台不支援唯讀保護）；可能較慢。')
     while True:
         try:
             question = input('您的問題: ').strip()
@@ -38,16 +41,21 @@ def chat(path):
                     continue
                 (answer, detail), elapsed = measured(engine.answer, question)
                 print('回答:', answer)
+                print('問題:', question)
                 print('來源:', detail['answer_source'], 'Cache:', 'Hit' if detail['cache_hit'] else 'Miss',
                       '相似度:', detail['similarity'], '原因:', detail['reason'])
+                print('命中類型:', detail['hit_type'], '答案驗證狀態:', detail['answer_verification'])
                 print('耗時: %.3f 秒；字數: %d；超過100字: %s' % (elapsed, len(answer), len(answer) > 100))
                 print('快取筆數:', detail['cache_size'], '本次自動寫入:', detail['saved'])
+                print('寫入狀態:', detail['save_status'])
+                print('階段耗時（秒）:', detail['timings'])
                 for doc in (detail.get('rag_detail') or {}).get('documents', []):
                     print('檢索來源:', doc['metadata'], '\n', doc['content'])
             except Exception as exc:
                 print('失敗:', exc)
         except (EOFError, KeyboardInterrupt):
             break
+    engine.close()
 
 
 def main():

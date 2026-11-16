@@ -15,6 +15,8 @@
     "max_entries": 128,
     "persistent": false,
     "ttl_seconds": 3600,
-    "verify_sources_each_request": true
+    "verify_sources_each_request": false,
+    "acceptance_mode": "strict",
+    "auto_write": false
   }
 }
