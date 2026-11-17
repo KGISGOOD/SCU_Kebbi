@@ -17,76 +17,12 @@ from langchain_core.documents import Document
 from experiments.shared.embeddings import BGEM3Embedder
 from experiments.shared.vector_store import FAISSVectorStore
 from .config import settings
-from .faq_loader import load_all_faq, save_faq_as_jsonl
 
 
 class FAQMatcher:
     """FAQ matcher that uses semantic similarity to find the best matching FAQ."""
 
-    def __init__(self, faq_dataset_path: Optional[str] = None,
-                 faq_vector_store_dir: Optional[str] = None):
-        """Initialize the FAQ matcher.
 
-        Args:
-            faq_dataset_path: Path to the FAQ JSONL dataset.
-            faq_vector_store_dir: Path to the FAQ vector store directory.
-        """
-        # Use settings if not provided
-        self.faq_dataset_path = faq_dataset_path or settings.faq_dataset_path
-        self.faq_vector_store_dir = faq_vector_store_dir or settings.faq_vector_store_dir
-
-        # Load FAQ data
-        self.faqs: List[Dict[str, Any]] = self._load_faqs()
-        self.faq_documents: List[Document] = self._faqs_to_documents(self.faqs)
-
-        # Initialize embedder and vector store
-        self.embedder = BGEM3Embedder(
-            model_name=settings.embedding_model,
-            # Reuse device settings from the RAG baseline config if available, else auto-detect
-            # We'll try to import the RAG baseline settings for device, but if not available, use None
-            device=None,  # We'll let the embedder auto-detect or we can set later
-            batch_size=settings.embedding_batch_size,
-            normalize_embeddings=settings.embedding_normalize,
-        )
-
-        self.vector_store = FAISSVectorStore(
-            embedding_dim=self.embedder.embedding_dim,
-            index_path=self.faq_vector_store_dir,
-            use_hnsw=settings.use_hnsw,
-            hnsw_M=settings.hnsw_M,
-            hnsw_efConstruction=settings.hnsw_efConstruction,
-        )
-
-        # Flag to track if the index has been loaded/built
-        self.index_built = False
-
-    def _load_faqs(self) -> List[Dict[str, Any]]:
-        """Load FAQs from the JSONL dataset file.
-
-        Returns:
-            List of FAQ dictionaries.
-        """
-        if not os.path.exists(self.faq_dataset_path):
-            print(f"FAQ dataset not found at {self.faq_dataset_path}. "
-                  "Please run the faq_loader to generate it first.")
-            return []
-
-        faqs = []
-        try:
-            with open(self.faq_dataset_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    try:
-                        faq = json.loads(line)
-                        faqs.append(faq)
-                    except json.JSONDecodeError as e:
-                        print(f"Error parsing JSON line: {e}")
-            print(f"Loaded {len(faqs)} FAQs from {self.faq_dataset_path}")
-        except Exception as e:
-            print(f"Error loading FAQs from {self.faq_dataset_path}: {e}")
-        return faqs
 
     def _faqs_to_documents(self, faqs: List[Dict[str, Any]]) -> List[Document]:
         """Convert FAQ dictionaries to LangChain Documents for embedding.
@@ -115,52 +51,7 @@ class FAQMatcher:
             documents.append(doc)
         return documents
 
-    def build_index(self) -> None:
-        """Build the FAISS index from the FAQ questions.
 
-        This computes embeddings for all FAQ questions and builds the index.
-        """
-        if not self.faq_documents:
-            print("No FAQ documents to build index from.")
-            return
-
-        print(f"Building FAQ index from {len(self.faq_documents)} FAQs...")
-        start_time = time.time()
-
-        # Compute embeddings for FAQ questions
-        questions = [doc.page_content for doc in self.faq_documents]
-        embeddings = self.embedder.encode(questions)
-
-        # Build index
-        self.vector_store.build(embeddings, self.faq_documents)
-
-        # Save the index
-        self.vector_store.save()
-
-        end_time = time.time()
-        print(f"FAQ index built and saved in {end_time - start_time:.2f} seconds.")
-        self.index_built = True
-
-    def load_index(self) -> bool:
-        """Load the FAISS index from disk.
-
-        Returns:
-            True if index loaded successfully, False otherwise.
-        """
-        try:
-            success = self.vector_store.load()
-            if success:
-                print(f"Loaded FAQ index from {self.faq_vector_store_dir}")
-                self.index_built = True
-                return True
-            else:
-                print(f"No existing FAQ index found at {self.faq_vector_store_dir}")
-                self.index_built = False
-                return False
-        except Exception as e:
-            print(f"Error loading FAQ index: {e}")
-            self.index_built = False
-            return False
 
     def match(self, question: str,
               return_faq: bool = False, *, query_vector=None) -> Tuple[Optional[str], float,

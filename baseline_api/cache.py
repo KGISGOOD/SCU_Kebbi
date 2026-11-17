@@ -94,10 +94,10 @@ class ResourceGuard:
         files = set()
         for directory in self.adapter.paths.values():
             files.update(p.resolve() for p in Path(directory).rglob('*') if p.is_file())
-        for folder in ('experiments/algorithms', 'experiments/baselines/rag_baseline', 'experiments/shared'):
+        for folder in ('experiments/algorithms', 'experiments/baselines/rag_baseline',
+                       'experiments/baselines/faq_semantic_matching', 'experiments/shared', 'baseline_api'):
             files.update(p.resolve() for p in (self.adapter.root / folder).rglob('*.py'))
         files.add(Path(__file__).resolve())
-        files.add(Path(__file__).with_name('cache_chat.py').resolve())
         files.update(Path(p) for p in self.extra_hashes)
         return {str(p): (p.stat().st_size, p.stat().st_mtime_ns, p.stat().st_ino) for p in files}
 

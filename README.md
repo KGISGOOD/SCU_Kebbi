@@ -41,7 +41,7 @@ experiments/
 畢業專題_爬蟲/type1、type2/       # 原始知識來源
 ```
 
-`shared/index_chunk_reference.py` 保留從舊 A4 建置器逐字抽取的分塊參考函式，供 Dense Index 完整性檢查使用，不是 Hybrid RAG 推論。FAQ Matcher 仍 import `config.py` 與 `faq_loader.py`，因此保留；V6 由 `FAQFallback` 注入 CSV 與共用 Embedding，不走舊 JSONL constructor。SD 的 `prompt_lookup.py` 是引擎條件式依賴；V6 不啟用 Prompt Lookup。
+`shared/index_chunk_reference.py` 保留從舊 A4 建置器逐字抽取的分塊參考函式，供 Dense Index 完整性檢查使用，不是 Hybrid RAG 推論。FAQ Matcher 由 `FAQFallback` 注入 CSV 與共用 Embedding；舊 JSONL 載入器及磁碟索引入口已移除。SD 的 `prompt_lookup.py` 是引擎條件式依賴；V6 不啟用 Prompt Lookup。
 
 ## 模型、環境與安裝
 
@@ -82,7 +82,7 @@ FAQ 不需要另跑舊版建置器。啟動 V6 時，`FAQFallback` 讀取兩欄 
 python -m baseline_api.faq_review --check-only
 ```
 
-保留 `畢業專題_爬蟲/type1/`、`type2/` 的原始檔案與相對路徑。其餘爬蟲蒐集程式不被 V6 載入，暫作來源追溯保留，部署服務只需要這兩個知識資料目錄。
+保留 `畢業專題_爬蟲/type1/`、`type2/` 的原始檔案與相對路徑。無關爬蟲及舊研究入口已移除，部署服務只使用這兩個知識資料目錄。
 
 ## 本機設定與啟動
 
