@@ -19,3 +19,7 @@ experiments/benchmark_804/config.local.json
 /experiments/evaluation/config*.local.json
 /experiments/results/
 /experiments/configs/*.local.json
+
+/experiments/vector_stores/
+
+/experiments/vector_stores/
