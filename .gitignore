@@ -11,15 +11,16 @@ venv/
 *.log
 
 experiments/models/
-experiments/benchmark_804/config.local.json
 
 # Machine-local algorithm resource paths; keep example configs tracked.
-/experiments/algorithms/**/config*.local.json
-/experiments/research_tools/run_all.local.json
-/experiments/evaluation/config*.local.json
 /experiments/results/
 /experiments/configs/*.local.json
+*.local.json
 
 /experiments/vector_stores/
 
-/experiments/vector_stores/
+# Local base models: never commit model checkpoints.
+/LOCAL_MODELS/
+*.safetensors
+pytorch_model*.bin
+*.faiss

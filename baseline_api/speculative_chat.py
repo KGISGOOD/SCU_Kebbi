@@ -1,4 +1,4 @@
-"""V5/V6 terminal client; shared routing and Target-verified generation."""
+"""V6 terminal client; shared routing and Target-verified generation."""
 import argparse
 from datetime import datetime, timezone
 import json
@@ -7,7 +7,7 @@ import time
 import uuid
 
 from .server import load_settings, ROOT
-from .speculative import SpeculativeA0, validate_speculative
+from .speculative import validate_speculative
 
 
 def main():
@@ -25,11 +25,8 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     engine = None
     try:
-        if 'faq' in config:
-            from .integrated_chat import IntegratedQA
-            engine = IntegratedQA(ROOT, config)
-        else:
-            engine = SpeculativeA0(ROOT, config)
+        from .integrated_chat import IntegratedQA
+        engine = IntegratedQA(ROOT, config)
         with (output / 'session.json').open('x', encoding='utf-8') as stream:
             json.dump({'config': config, 'identity': engine.identity,
                        'formal_quality_certified': False}, stream, ensure_ascii=False, indent=2)

@@ -1,4 +1,4 @@
-"""Single-worker RAG or FAQ+Cache+RAG API; resources load once in lifespan."""
+"""Single-worker V6 FAQ+Cache+RAG+SD API; resources load once in lifespan."""
 from __future__ import annotations
 
 import argparse
@@ -165,19 +165,13 @@ def load_settings(config_path):
     config = json.loads(path.read_text(encoding="utf-8-sig"))
     expected = {"model", "bge", "knowledge_index", "device", "precision", "seed",
                 "max_input_tokens", "max_new_tokens", "request_timeout_seconds"}
-    if not isinstance(config, dict) or set(config) - {"prompt_version", "faq", "cache", "speculative"} != expected:
-        raise ValueError("use baseline_api/config.example.json schema")
+    if not isinstance(config, dict) or set(config) != expected | {"prompt_version", "faq", "cache", "speculative"}:
+        raise ValueError("V6 requires the complete integrated_baseline_v1.experimental.speculative.json schema")
     from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION, validate_prompt_version
     validate_prompt_version(config.get("prompt_version", PROMPT_VERSION))
-    if ('faq' in config) != ('cache' in config):
-        raise ValueError('API supports RAG or integrated FAQ+Cache+RAG only; standalone Baselines remain CLI modes')
-    if 'faq' in config:
-        from baseline_api.integrated_chat import load_config
-        if load_config(path) != config:
-            raise ValueError('API config changed during validation')
-    if 'speculative' in config:
-        from baseline_api.speculative import validate_speculative
-        validate_speculative(config)
+    from baseline_api.integrated_chat import load_config
+    if load_config(path) != config:
+        raise ValueError('API config changed during validation')
     for key in ("model", "bge", "knowledge_index"):
         if not isinstance(config[key], str) or not config[key].strip():
             raise ValueError("explicit local resource path required: " + key)
@@ -204,7 +198,7 @@ def create_app(config_path, run_dir=None):
     config = load_settings(config_path)
     from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION
     selected_prompt = config.get("prompt_version", PROMPT_VERSION)
-    api_mode = ('integrated' if 'faq' in config else 'rag') + ('_speculative' if 'speculative' in config else '')
+    api_mode = 'integrated_speculative'
 
     @asynccontextmanager
     async def lifespan(app):
@@ -214,8 +208,7 @@ def create_app(config_path, run_dir=None):
         state.status = "loading"
         state.closing = False
         state.records_path = None
-        state.v6_history = (V6History(ROOT / 'experiments/results/api_logs/v6_chat_history.csv')
-                            if api_mode == 'integrated_speculative' else None)
+        state.v6_history = V6History(ROOT / 'experiments/results/api_logs/v6_chat_history.csv')
         if run_dir is not None:
             raw = Path(run_dir).expanduser()
             output = (raw if raw.is_absolute() else ROOT / raw).resolve()
@@ -246,16 +239,9 @@ def create_app(config_path, run_dir=None):
         async def load_once():
             try:
                 def construct():
-                    if api_mode.startswith('integrated'):
-                        from baseline_api.integrated_chat import IntegratedQA
-                        adapter = IntegratedQA(ROOT, config)
-                        a0 = adapter.adapter
-                    elif 'speculative' in config:
-                        from baseline_api.speculative import SpeculativeA0
-                        adapter = a0 = SpeculativeA0(ROOT, config)
-                    else:
-                        from experiments.shared.a0_adapter import A0Adapter
-                        adapter = a0 = A0Adapter(ROOT, config)
+                    from baseline_api.integrated_chat import IntegratedQA
+                    adapter = IntegratedQA(ROOT, config)
+                    a0 = adapter.adapter
                     try:
                         if a0.identity["prompt_version"] != selected_prompt or a0.pipeline.prompt_version != selected_prompt:
                             raise ValueError("loaded A0 prompt differs from selected API configuration")
@@ -316,7 +302,7 @@ def create_app(config_path, run_dir=None):
         return JSONResponse(status_code=200 if ready else 503,
                             content={"service": "a0_baseline", "status": state.status, "api_mode": api_mode,
                                      "prompt_version": selected_prompt,
-                                     "loaded_prompt_version": ((state.adapter.adapter if api_mode.startswith('integrated') else state.adapter).identity["prompt_version"]) if ready else None,
+                                     "loaded_prompt_version": state.adapter.adapter.identity["prompt_version"] if ready else None,
                                      "models_ready": ready, "busy": busy,
                                      "accepting_requests": ready and not busy})
 
@@ -357,19 +343,18 @@ def create_app(config_path, run_dir=None):
             try:
                 try:
                     answer, timings = state.adapter.answer(body.question)
-                    if api_mode.startswith('integrated'):
-                        detail = timings
-                        timings = dict(detail)
-                        timings.update({k: v for k, v in detail['faq'].items() if k != 'answer_source'})
-                        cache = detail['cache']
-                        rag = (cache.get('rag_detail') or {}) if cache is not None else {}
-                        timings.update(cache_hit=cache['cache_hit'] if cache is not None else None,
-                                       cache_similarity=cache['similarity'] if cache is not None else None,
-                                       cache_hit_type=cache['hit_type'] if cache is not None else None,
-                                       cache_reason=cache['reason'] if cache is not None else None,
-                                       cache_saved=cache['saved'] if cache is not None else None,
-                                       retrieval_seconds=rag.get('retrieval_seconds'),
-                                       generation_seconds=rag.get('generation_seconds'), input_tokens=rag.get('input_tokens'))
+                    detail = timings
+                    timings = dict(detail)
+                    timings.update({k: v for k, v in detail['faq'].items() if k != 'answer_source'})
+                    cache = detail['cache']
+                    rag = (cache.get('rag_detail') or {}) if cache is not None else {}
+                    timings.update(cache_hit=cache['cache_hit'] if cache is not None else None,
+                                   cache_similarity=cache['similarity'] if cache is not None else None,
+                                   cache_hit_type=cache['hit_type'] if cache is not None else None,
+                                   cache_reason=cache['reason'] if cache is not None else None,
+                                   cache_saved=cache['saved'] if cache is not None else None,
+                                   retrieval_seconds=rag.get('retrieval_seconds'),
+                                   generation_seconds=rag.get('generation_seconds'), input_tokens=rag.get('input_tokens'))
                 except ValueError as exc:
                     if str(exc).startswith(("query exceeds BGE experiment limit", "full A0 prompt has", "full prompt has")):
                         raise InputRejected(str(exc)) from exc

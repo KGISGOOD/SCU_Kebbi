@@ -22,7 +22,7 @@ def validate_speculative(config):
     if config.get('device') != 'cuda' or config.get('precision') not in ('fp16', 'bf16', 'fp32'):
         raise ValueError('SD candidate requires explicit CUDA and floating precision; no fallback')
     if config.get('prompt_version') != 'baseline_senior_v2':
-        raise ValueError('V5/V6 require baseline_senior_v2; sampling is not exposed')
+        raise ValueError('V6 require baseline_senior_v2; sampling is not exposed')
 
 
 def unused_statistics():
@@ -65,7 +65,7 @@ class SpeculativeA0:
 
     def generate(self, prompt, **overrides):
         if overrides:
-            raise ValueError('V5/V6 use fixed greedy settings; per-call overrides are not supported')
+            raise ValueError('V6 use fixed greedy settings; per-call overrides are not supported')
         start = time.perf_counter()
         inputs = self.engine.tokenizer(prompt, return_tensors='pt', truncation=False)
         count = inputs['input_ids'].shape[1]

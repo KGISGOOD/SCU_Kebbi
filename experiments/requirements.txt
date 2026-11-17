@@ -3,7 +3,6 @@
 torch>=2.2,<3
 transformers==5.16.1
 sentence-transformers==6.1.0
-peft==0.20.0
 faiss-cpu>=1.7.4,<2
 numpy>=1.24,<3
 langchain-core>=0.1,<2
@@ -11,5 +10,4 @@ accelerate>=0.26
 huggingface-hub>=0.20
 packaging>=23
 tqdm>=4.65
-jieba>=0.42.1
-# XLSX reports use the standard library. No model downloads are performed.
+langchain-text-splitters>=0.2,<2

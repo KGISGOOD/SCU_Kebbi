@@ -42,7 +42,7 @@ def verify_loaded(store, embedder, chunks, raw_documents, model_identity):
     """Reuse A5 structural contract and A4's actual chunk comparison; no LLM."""
     import numpy as np
     from experiments.shared.index_validation import validate_loaded_store
-    from experiments.baselines.hybrid_rag_reranker.build_bm25_index import chunk_documents as a4_chunks
+    from experiments.shared.index_chunk_reference import chunk_documents as a4_chunks
     version = store._load_version_info()
     if version is None:
         raise ValueError("Dense index version.json missing/invalid; do not fabricate a version receipt")
