@@ -3,16 +3,19 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import csv
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import hashlib
+import io
 import json
 import logging
 import math
 import os
 from pathlib import Path
 import time
+import threading
 from typing import Optional
 import uuid
 
@@ -24,6 +27,95 @@ from pydantic import BaseModel, Field, StrictStr
 
 ROOT = Path(__file__).resolve().parents[1]
 LOG = logging.getLogger("baseline_api")
+
+V6_CSV_COLUMNS = ['問題', '答案', '回答來源', 'Embedding 耗時（秒）', 'FAQ 耗時（秒）',
+                  'Cache 耗時（秒）', 'RAG 檢索耗時（秒）', 'SD 生成耗時（秒）',
+                  'Greedy 驗證耗時（秒）', '資源驗證耗時（秒）', '總耗時（秒）', 'Output Tokens']
+_CSV_LOCK = threading.Lock()
+
+
+class V6History:
+    """Append-only Excel CSV, serialized across threads and service processes."""
+    def __init__(self, path):
+        self.path = Path(path)
+        self.written = set()
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._write(None, None)
+
+    def _write(self, request_id, row):
+        with _CSV_LOCK, self.path.open('a+b') as stream:
+            stream.seek(0)
+            if os.name == 'nt':
+                import msvcrt
+                msvcrt.locking(stream.fileno(), msvcrt.LK_LOCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+            try:
+                if request_id is not None and request_id in self.written:
+                    return
+                stream.seek(0)
+                if stream.read(3) not in (b'', b'\xef\xbb\xbf'):
+                    raise ValueError('V6 CSV must be UTF-8 with BOM; existing file preserved')
+                stream.seek(0)
+                if row is None:
+                    # Validate existing records at startup, not just their column names.
+                    data = stream.read().decode('utf-8-sig')
+                    rows = list(csv.reader(io.StringIO(data, newline=''), strict=True))
+                    if rows and (rows[0] != V6_CSV_COLUMNS or any(len(r) != len(V6_CSV_COLUMNS) for r in rows[1:])):
+                        raise ValueError('incompatible V6 CSV schema/records; existing file preserved')
+                else:
+                    header = next(csv.reader([stream.readline().decode('utf-8-sig')], strict=True), [])
+                    if header != V6_CSV_COLUMNS:
+                        raise ValueError('V6 CSV header changed; append refused')
+                stream.seek(0, os.SEEK_END)
+                offset = stream.tell()
+                if offset:
+                    stream.seek(-1, os.SEEK_END)
+                    if stream.read(1) != b'\n':
+                        raise ValueError('V6 CSV has an incomplete final record; append refused')
+                buffer = io.StringIO(newline='')
+                writer = csv.writer(buffer)
+                if not offset:
+                    writer.writerow(V6_CSV_COLUMNS)
+                if row is not None:
+                    writer.writerow(row)
+                payload = (b'\xef\xbb\xbf' if not offset else b'') + buffer.getvalue().encode('utf-8')
+                try:
+                    if payload:
+                        stream.write(payload)
+                        stream.flush()
+                        os.fsync(stream.fileno())
+                except Exception:
+                    stream.truncate(offset)
+                    raise
+                if request_id is not None:
+                    self.written.add(request_id)
+            finally:
+                stream.seek(0)
+                if os.name == 'nt':
+                    msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+
+    def append(self, request_id, question, answer, detail, total):
+        stages = detail['timings']
+        source = detail['answer_source']
+        sd = detail.get('speculative') or {}
+        rag = (detail.get('cache') or {}).get('rag_detail') or {}
+        cache_seconds = stages.get('cache_lookup_seconds') if detail.get('cache') is not None else None
+        if cache_seconds is not None and stages.get('cache_write_seconds') is not None:
+            cache_seconds += stages['cache_write_seconds']  # Disjoint existing measurements, not RAG time.
+        row = [question, answer, {'faq': 'FAQ', 'cache': 'Cache', 'rag': 'RAG + SD'}[source],
+               stages.get('embedding_seconds'), stages.get('faq_seconds'),
+               cache_seconds,
+               rag.get('retrieval_seconds') if source == 'rag' else None,
+               sd.get('generation_seconds') if sd.get('used') else None,
+               sd.get('greedy_verification_seconds') if sd.get('used') else None,
+               stages.get('resource_validation_seconds'), total,
+               sd.get('output_token_count') if sd.get('used') else None]
+        self._write(request_id, row)
+        return row
 
 
 class InputRejected(ValueError):
@@ -122,6 +214,8 @@ def create_app(config_path, run_dir=None):
         state.status = "loading"
         state.closing = False
         state.records_path = None
+        state.v6_history = (V6History(ROOT / 'experiments/results/api_logs/v6_chat_history.csv')
+                            if api_mode == 'integrated_speculative' else None)
         if run_dir is not None:
             raw = Path(run_dir).expanduser()
             output = (raw if raw.is_absolute() else ROOT / raw).resolve()
@@ -333,6 +427,15 @@ def create_app(config_path, run_dir=None):
         routing.update({key: timings.get(key) for key in ('cache_hit', 'cache_similarity', 'cache_hit_type',
                        'cache_reason', 'cache_saved', 'cache_size', 'answer_verification')})
         routing['answer_source'] = routing['answer_source'] or 'rag'
+        if state.v6_history is not None:
+            # Reuse the completed engine measurement; do not time the stages again.
+            try:
+                row = state.v6_history.append(request_id, body.question, answer, timings, timings['total_seconds'])
+            except Exception:
+                LOG.exception('request=%s V6 CSV write failed; recording not successful', request_id)
+                return failure(500, 'csv_recording_failed', request_id)
+            LOG.info('\n問題: %s\n答案: %s\n回答來源: %s\n各階段耗時（秒）: %s\n總耗時（秒）: %s\nOutput Tokens: %s',
+                     row[0], row[1], row[2], dict(zip(V6_CSV_COLUMNS[3:10], row[3:10])), row[10], row[11])
         return ChatResponse(answer=answer, success=True, request_id=request_id,
                             latency_seconds=time.perf_counter() - start, api_mode=api_mode,
                             answer_char_count=len(answer), exceeds_100_characters=len(answer)>100,
