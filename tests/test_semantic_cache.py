@@ -26,9 +26,10 @@ def vector(i=0):
 
 class Adapter:
     def __init__(self):
-        self.identity = {'prompt_version': 'baseline_senior_v2'}
+        version = json.loads(CONFIG.read_text(encoding='utf-8'))['prompt_version']
+        self.identity = {'prompt_version': version}
         self.config = {'speculative': {}}
-        self.pipeline = N(prompt_version='baseline_senior_v2')
+        self.pipeline = N(prompt_version=version)
         self.embedder = N(embedding_dim=256)
         self.calls = 0
         self.output = 'CPU fixture answer'

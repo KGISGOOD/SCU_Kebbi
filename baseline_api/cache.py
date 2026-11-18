@@ -118,8 +118,8 @@ class ResourceGuard:
 class ReviewedCacheA0:
     def __init__(self, adapter, options, *, resource_guard=None):
         validate_options(options)
-        if adapter.pipeline.prompt_version != 'baseline_senior_v2':
-            raise ValueError('Baseline 3 requires baseline_senior_v2')
+        from experiments.baselines.rag_baseline.prompts import validate_senior_prompt_version
+        validate_senior_prompt_version(adapter.pipeline.prompt_version)
         self.adapter, self.options = adapter, dict(options)
         self.mode = options.get('acceptance_mode', 'strict')
         self.identity = {'adapter': adapter.identity, 'policy': self.options}

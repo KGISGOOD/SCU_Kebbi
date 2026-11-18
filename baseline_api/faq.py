@@ -78,8 +78,8 @@ class FAQFallback:
         self.pipeline = adapter.pipeline
         options = config['faq']
         validate_faq_config(options)
-        if self.pipeline.prompt_version != 'baseline_senior_v2':
-            raise ValueError('Baseline 2 requires baseline_senior_v2')
+        from experiments.baselines.rag_baseline.prompts import validate_senior_prompt_version
+        validate_senior_prompt_version(self.pipeline.prompt_version)
         identity = inference_identity(adapter.paths['bge'], sentence_model=True)
         if identity['content_sha256'] != options['bge_content_sha256']:
             raise ValueError('FAQ must use the pinned original A1 BGE-M3 identity')

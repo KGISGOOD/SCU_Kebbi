@@ -60,13 +60,13 @@ class FallbackTests(unittest.TestCase):
         self.wrapper.engine = N(tokenizer=tokenizer, target=N(config=N(max_position_embeddings=20000)),
                                 draft=N(config=N(max_position_embeddings=20000)), draft_path='CPU Draft', generate=generate)
         def answer(q, **kw):
-            prompt = build_prompt('CPU evidence', q, prompt_version=SENIOR_PROMPT_VERSION, tokenizer=tokenizer)
+            prompt = build_prompt('CPU evidence', q, prompt_version=self.config['prompt_version'], tokenizer=tokenizer)
             result = self.wrapper.generate(prompt)
             return result, {'documents': [{'content': 'CPU evidence', 'metadata': {'source': 'fixture'}}],
                             'retrieval_seconds': .01, 'generation_seconds': .3, 'input_tokens': 3}
         self.wrapper.base = N(paths={'model': 'CPU Target'}, answer=answer, embed=lambda q: np.array([[1., 0.]], dtype=np.float32),
-                              embedder=N(embedding_dim=2), pipeline=N(prompt_version=SENIOR_PROMPT_VERSION),
-                              identity={'prompt_version': SENIOR_PROMPT_VERSION})
+                              embedder=N(embedding_dim=2), pipeline=N(prompt_version=self.config['prompt_version']),
+                              identity={'prompt_version': self.config['prompt_version']})
         self.wrapper.identity = self.wrapper.base.identity
         self.guard = N(verify=lambda: None, close=lambda: None)
         self.cache = ReviewedCacheA0(self.wrapper, self.config['cache'], resource_guard=self.guard)

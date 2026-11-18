@@ -96,7 +96,7 @@ Copy-Item experiments/configs/integrated_baseline_v1.experimental.speculative.js
 
 編輯 local 的 `model`、`bge`、`knowledge_index`、`speculative.draft_model` 指向本機資源，路徑可相對於專案根目錄。保留以下參數：
 
-- Prompt：`baseline_senior_v2`。
+- Prompt：新版範本使用 `baseline_senior_v3`；如需重現舊版，明確設為 `baseline_senior_v2`，原文仍保留。GPU 的既有 local 設定不會自動跟隨範本更新。切換需在既有測試結束後重啟服務，勿將 V3 接續為 V2 的同一輪結果。
 - FAQ：Experimental、threshold 0.9、min_margin 0.05。
 - Cache：Experimental、自動寫入、threshold 0.9、容量128、TTL3600秒、不持久化。
 - Draft tokens：4；`verify_greedy=true`，不可停用 Token 一致性 Guard。

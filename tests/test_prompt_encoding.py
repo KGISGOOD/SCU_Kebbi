@@ -1,5 +1,8 @@
 """CPU prompt-contract tests; tokenizer/model stand-ins, no GPU or model files."""
 import ast
+import json
+import tempfile
+import time
 from pathlib import Path
 import subprocess
 from types import SimpleNamespace as N
@@ -79,6 +82,44 @@ class PromptTests(unittest.TestCase):
         for text in ['<BOS><BOS>bad', 'no bos']:
             with self.assertRaises(ValueError):
                 prompts.encode_prompt(tokenizer, text)
+
+    def test_v2_v3_selection_preserves_roles_and_bos(self):
+        for version, system in [(prompts.SENIOR_PROMPT_VERSION, prompts.SENIOR_SYSTEM_PROMPT),
+                                (prompts.SENIOR_V3_PROMPT_VERSION, prompts.SENIOR_V3_SYSTEM_PROMPT)]:
+            tokenizer = Tokenizer()
+            rendered = prompts.build_prompt('CONTEXT', 'QUESTION', prompt_version=version, tokenizer=tokenizer)
+            self.assertEqual(tokenizer.messages, prompts.build_messages('CONTEXT', 'QUESTION', prompt_version=version))
+            self.assertEqual(tokenizer.messages[0], {'role': 'system', 'content': system})
+            self.assertEqual(tokenizer.messages[1]['content'], prompts.SENIOR_USER_TEMPLATE.format(context='CONTEXT', question='QUESTION'))
+            self.assertEqual(prompts.encode_prompt(tokenizer, rendered)['input_ids'], [1, 2, 3])
+            self.assertEqual(tokenizer.render_calls, 1)
+        with self.assertRaises(ValueError):
+            prompts.validate_senior_prompt_version('baseline_basic_v1')
+        with self.assertRaises(ValueError):
+            prompts.validate_prompt_version('unknown')
+
+    def test_api_health_displays_selected_and_loaded_v2_v3(self):
+        from fastapi.testclient import TestClient
+        from baseline_api import server
+        base = json.loads((ROOT/'experiments/configs/integrated_baseline_v1.experimental.speculative.json').read_text(encoding='utf-8'))
+        for version in prompts.SENIOR_PROMPT_VERSIONS:
+            with tempfile.TemporaryDirectory() as directory:
+                folder = Path(directory)
+                config = dict(base, prompt_version=version)
+                path = folder/'config.json'
+                path.write_text(json.dumps(config), encoding='utf-8')
+                adapter = N(identity={'prompt_version': version}, pipeline=N(prompt_version=version))
+                engine = N(adapter=adapter, identity={}, close=lambda: None)
+                with patch.object(server, 'ROOT', folder), patch('baseline_api.integrated_chat.IntegratedQA', return_value=engine):
+                    with TestClient(server.create_app(path)) as client:
+                        for _ in range(300):
+                            health = client.get('/health')
+                            if health.status_code == 200:
+                                break
+                            time.sleep(.01)
+                        self.assertEqual(health.status_code, 200)
+                        self.assertEqual(health.json()['prompt_version'], version)
+                        self.assertEqual(health.json()['loaded_prompt_version'], version)
 
     def test_a0_renders_once_and_pipeline_does_not_retemplate(self):
         # Execute the actual Pipeline class without importing heavyweight model packages.

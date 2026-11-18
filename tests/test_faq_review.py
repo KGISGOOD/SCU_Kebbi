@@ -76,8 +76,8 @@ class FAQReviewTests(unittest.TestCase):
                       parameters=lambda: [N(dtype=fake_dtype, is_floating_point=lambda: True)])
             def encode(self, texts):
                 return np.eye(138, dtype=np.float32)
-        adapter = N(identity={'prompt_version': 'baseline_senior_v2'}, paths={'bge': Path('CPU_FAKE_BGE')},
-                    pipeline=N(prompt_version='baseline_senior_v2'), embedder=Embedder(), validate_query=lambda q: None)
+        adapter = N(identity={'prompt_version': CONFIG['prompt_version']}, paths={'bge': Path('CPU_FAKE_BGE')},
+                    pipeline=N(prompt_version=CONFIG['prompt_version']), embedder=Embedder(), validate_query=lambda q: None)
         # No model loader is called. Keep CSV/Review checks, Matcher and FAISS real.
         with patch.dict('sys.modules', {'torch': N(float32=fake_dtype, cuda=N(is_available=lambda: False)),
                          'experiments.shared.embeddings': N(BGEM3Embedder=object)}), \
