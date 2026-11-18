@@ -126,7 +126,7 @@ class SDEngine:
         self.identity["diagnostics_schema"] = "sd_token_difference_v1"
 
     def prepare(self, scenario):
-        from experiments.baselines.rag_baseline.prompts import build_prompt, create_context_from_documents
+        from experiments.baselines.rag_baseline.prompts import build_prompt, create_context_from_documents, encode_prompt
         sync()
         start = time.perf_counter()
         query = scenario["query"]
@@ -136,10 +136,10 @@ class SDEngine:
             raise ValueError("SD comparison requires exactly five existing A0 retrieval documents")
         def construct():
             prompt = build_prompt(create_context_from_documents(docs), query,
-                                  prompt_version=self.adapter.pipeline.prompt_version)
+                                  prompt_version=self.adapter.pipeline.prompt_version, tokenizer=self.tokenizer)
             # Same tokenizer call/default special-token policy as A0, except
             # truncation is forbidden and checked before generation.
-            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=False)
+            inputs = encode_prompt(self.tokenizer, prompt, return_tensors="pt")
             count = inputs["input_ids"].shape[1]
             limits = [self.target.config.max_position_embeddings]
             if self.draft is not None:

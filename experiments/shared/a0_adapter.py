@@ -177,7 +177,7 @@ class A0Adapter:
         return self.embedder.encode(query)
 
     def answer(self, query, *, query_vector=None):
-        from experiments.baselines.rag_baseline.prompts import build_prompt, create_context_from_documents
+        from experiments.baselines.rag_baseline.prompts import build_prompt, create_context_from_documents, encode_prompt
         self.validate_query(query)
         if query_vector is None:
             (docs, scores), retrieval = measured(self.pipeline.retrieve, query)
@@ -185,15 +185,15 @@ class A0Adapter:
             (docs, scores), retrieval = measured(self.pipeline.retrieve, query, query_vector=query_vector)
         def prepare():
             prompt = build_prompt(create_context_from_documents(docs), query,
-                                  prompt_version=self.pipeline.prompt_version)
-            tokens = self.llm.tokenizer(prompt, truncation=False)["input_ids"]
+                                  prompt_version=self.pipeline.prompt_version, tokenizer=self.llm.tokenizer)
+            tokens = encode_prompt(self.llm.tokenizer, prompt)["input_ids"]
             context_limit = self.llm.model.config.max_position_embeddings
             if len(tokens) > self.llm.strict_max_input_tokens or len(tokens) + self.llm.max_new_tokens > context_limit:
                 raise ValueError(f"full A0 prompt has {len(tokens)} tokens; input limit={self.llm.strict_max_input_tokens}, "
                                  f"max_new_tokens={self.llm.max_new_tokens}, model context={context_limit}; no truncation allowed")
-            return len(tokens)
-        input_tokens, preparation = measured(prepare)
-        answer, generation = measured(self.pipeline.generate_answer, query, docs)
+            return prompt, len(tokens)
+        (prompt, input_tokens), preparation = measured(prepare)
+        answer, generation = measured(self.pipeline.generate_answer, query, docs, prepared_prompt=prompt)
         return answer, {"retrieval_seconds": retrieval, "prompt_check_seconds": preparation,
                         "generation_seconds": generation, "input_tokens": input_tokens,
                         "documents": [{"rank": i, "score": float(score),

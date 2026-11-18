@@ -37,13 +37,36 @@ def validate_prompt_version(version: str) -> str:
     return version
 
 
-def build_prompt(context: str, question: str, *, prompt_version: str = PROMPT_VERSION) -> str:
+def build_prompt(context: str, question: str, *, prompt_version: str = PROMPT_VERSION, tokenizer=None) -> str:
     """Explicit per-instance selection; legacy serialized prompt stays identical."""
     validate_prompt_version(prompt_version)
     if prompt_version == PROMPT_VERSION:
         return _build_legacy_prompt(context, question)
-    user_prompt = SENIOR_USER_TEMPLATE.format(context=context, question=question)
-    return f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{SENIOR_SYSTEM_PROMPT}<|eot_id|><|start_header_id|>user<|end_header_id|>\n{user_prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+    if tokenizer is None or not getattr(tokenizer, 'chat_template', None):
+        raise ValueError('baseline_senior_v2 requires the Target tokenizer chat_template; no manual fallback')
+    return tokenizer.apply_chat_template(build_messages(context, question), tokenize=False,
+                                         add_generation_prompt=True)
+
+
+def build_messages(context: str, question: str):
+    return [{'role': 'system', 'content': SENIOR_SYSTEM_PROMPT},
+            {'role': 'user', 'content': SENIOR_USER_TEMPLATE.format(context=context, question=question)}]
+
+
+def encode_prompt(tokenizer, prompt, **kwargs):
+    """Encode an already-rendered chat exactly once, never prepend another BOS."""
+    inputs = tokenizer(prompt, add_special_tokens=False, truncation=False, **kwargs)
+    ids = inputs['input_ids']
+    if hasattr(ids, 'tolist'):
+        ids = ids.tolist()
+    if ids and isinstance(ids[0], list):
+        if len(ids) != 1:
+            raise ValueError('V6 requires one prompt')
+        ids = ids[0]
+    bos = tokenizer.bos_token_id
+    if bos is None or not ids or ids[0] != bos or ids.count(bos) != 1:
+        raise ValueError('V6 chat must contain exactly one BOS at the beginning')
+    return inputs
 
 
 def _build_legacy_prompt(context: str, question: str) -> str:

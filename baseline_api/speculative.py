@@ -67,7 +67,8 @@ class SpeculativeA0:
         if overrides:
             raise ValueError('V6 use fixed greedy settings; per-call overrides are not supported')
         start = time.perf_counter()
-        inputs = self.engine.tokenizer(prompt, return_tensors='pt', truncation=False)
+        from experiments.baselines.rag_baseline.prompts import encode_prompt
+        inputs = encode_prompt(self.engine.tokenizer, prompt, return_tensors='pt')
         count = inputs['input_ids'].shape[1]
         limit = min(self.engine.target.config.max_position_embeddings,
                     self.engine.draft.config.max_position_embeddings)

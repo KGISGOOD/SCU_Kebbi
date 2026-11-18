@@ -71,6 +71,7 @@ class RAGPipeline:
         self,
         query: str,
         retrieved_docs: List[Document],
+        *, prepared_prompt=None,
         **llm_kwargs,
     ) -> str:
         """Generate answer from query and retrieved documents.
@@ -86,7 +87,9 @@ class RAGPipeline:
         # Create context from documents
         context = create_context_from_documents(retrieved_docs)
         # Build prompt
-        prompt = build_prompt(context, query, prompt_version=self.prompt_version)
+        prompt = (prepared_prompt if prepared_prompt is not None else
+                  build_prompt(context, query, prompt_version=self.prompt_version,
+                               tokenizer=self.llm_loader.tokenizer))
         # Generate answer
         answer = self.llm_loader.generate(prompt, **llm_kwargs)
         return answer
