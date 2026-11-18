@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class OutputAndQuestionTests(unittest.TestCase):
     def test_fixed_counts_bom_and_one_column(self):
         plan = runner.questions(ROOT/'tests/questions')
-        self.assertEqual(len(plan), 120)
+        self.assertEqual(len(plan), 200)
         for category, name, count in runner.FILES:
             path = ROOT/'tests/questions'/name
             self.assertTrue(path.read_bytes().startswith(b'\xef\xbb\xbf'))
@@ -30,14 +30,20 @@ class OutputAndQuestionTests(unittest.TestCase):
             self.assertEqual(reader.fieldnames, ['問題', '答案'])
             faq = list(reader)
         self.assertEqual(len(faq), 138)
-        a, b = references[:25], references[25:50]
-        for standard, paraphrase in zip(a, b):
+        a = [r for r in references if r['category'] == 'A']
+        b = [r for r in references if r['category'] == 'B']
+        self.assertEqual((len(a), len(b)), (35, 35))
+        for standard in a:
             original = faq[standard['faq_row']-1]
             self.assertEqual(standard['question'], original['問題'])
             self.assertEqual(standard['reference_answer'], original['答案'])
-            self.assertEqual(standard['reference_question'], paraphrase['reference_question'])
-            self.assertEqual(standard['reference_answer'], paraphrase['reference_answer'])
-            self.assertNotEqual(standard['question'], paraphrase['question'])
+        for paraphrase in b:
+            if 'faq_row' in paraphrase:
+                original = faq[paraphrase['faq_row']-1]
+                self.assertEqual(paraphrase['reference_question'], original['問題'])
+                self.assertEqual(paraphrase['reference_answer'], original['答案'])
+            else:
+                self.assertTrue(paraphrase['reference_review_required'])
 
     def test_changed_faq_snapshot_is_rejected_before_requests(self):
         with tempfile.TemporaryDirectory() as folder:

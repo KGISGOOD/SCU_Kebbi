@@ -60,7 +60,7 @@ class RunnerTests(unittest.TestCase):
     def test_actual_question_counts_and_order(self):
         directory = runner.ROOT/'tests/questions'
         plan = runner.questions(directory)
-        self.assertEqual(len(plan), 120)
+        self.assertEqual(len(plan), 200)
         expected = []
         for category, name, count in runner.FILES:
             rows = runner.read_csv(directory/name, ['問題'])
@@ -68,6 +68,40 @@ class RunnerTests(unittest.TestCase):
             expected.extend((category, row[0]) for row in rows)
             self.assertEqual(len(runner.questions(directory, category)), count)
         self.assertEqual(plan, expected)
+
+    def test_csv_format_errors_are_distinct(self):
+        path = self.root/'invalid.csv'
+        cases = [
+            (b'question\nhello\n', '缺少 UTF-8 BOM'),
+            ('\ufeff問題\n完整問題'.encode('utf-8'), '缺少結尾換行符號'),
+            ('\ufeff問題\n"未結束的問題\n'.encode('utf-8'), '資料不完整或語法錯誤'),
+            ('\ufeff問題\n問題,多餘欄位\n'.encode('utf-8'), '資料不完整或欄位數不符'),
+            ('\ufeff錯誤欄位\n問題\n'.encode('utf-8'), '欄位名稱不相容'),
+            (b'\xef\xbb\xbf\xff\n', '不是有效的 UTF-8'),
+        ]
+        for content, error in cases:
+            with self.subTest(error=error):
+                path.write_bytes(content)
+                with self.assertRaisesRegex(ValueError, error):
+                    runner.read_csv(path, ['問題'])
+
+    def test_complete_multiline_and_duplicate_questions_preserved(self):
+        path = self.root/'valid.csv'
+        rows = [['問題'], ['相同問題'], ['相同問題'], ['含逗號,引號"及\n換行的完整問題']]
+        with path.open('w', encoding='utf-8-sig', newline='') as stream:
+            csv.writer(stream).writerows(rows)
+        before = path.read_bytes()
+        self.assertEqual(runner.read_csv(path, ['問題']), rows[1:])
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_200_question_expectations_preserve_b_duplicates_and_order(self):
+        directory = runner.ROOT/'tests/questions'
+        plan = runner.questions(directory)
+        references = runner.expectations(directory)
+        self.assertEqual([(r['category'], r['question']) for r in references], plan)
+        b = [q for category, q in plan if category == 'B']
+        self.assertEqual(len(b), 35)
+        self.assertEqual(len(b)-len(set(b)), 8)
 
     def test_header_matches_real_api_and_13_columns(self):
         from baseline_api.server import V6_CSV_COLUMNS

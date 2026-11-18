@@ -15,9 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from baseline_api.timing_output import seconds_text, timing_json
-FILES = [('A', 'A_standard.csv', 25), ('B', 'B_similar_same.csv', 25),
-         ('C', 'C_similar_different.csv', 25), ('D', 'D_no_answer.csv', 15),
-         ('E', 'E_unrelated.csv', 10), ('F', 'F_ambiguous.csv', 20)]
+FILES = [('A', 'A_standard.csv', 35), ('B', 'B_similar_same.csv', 35),
+         ('C', 'C_similar_different.csv', 35), ('D', 'D_no_answer.csv', 35),
+         ('E', 'E_unrelated.csv', 30), ('F', 'F_ambiguous.csv', 30)]
 HISTORY_HEADER = ['問題', '答案', '回答來源', 'Embedding 耗時（秒）', 'FAQ 耗時（秒）',
                   'Cache 耗時（秒）', 'RAG 檢索耗時（秒）', 'SD 生成耗時（秒）',
                   'Greedy 驗證耗時（秒）', '資源驗證耗時（秒）', '總耗時（秒）', 'Output Tokens']
@@ -50,11 +50,23 @@ def questions(directory, category=None):
 def read_csv(path, header):
     with Path(path).open('rb') as f:
         raw = f.read()
-    if not raw.startswith(b'\xef\xbb\xbf') or not raw.endswith(b'\n'):
-        raise ValueError('CSV 缺少 BOM 或末列不完整: ' + str(path))
-    rows = list(csv.reader(io.StringIO(raw.decode('utf-8-sig'), newline=''), strict=True))
-    if not rows or rows[0] != header or any(len(r) != len(header) for r in rows[1:]):
-        raise ValueError('CSV 欄位不相容: ' + str(path))
+    if not raw.startswith(b'\xef\xbb\xbf'):
+        raise ValueError('CSV 缺少 UTF-8 BOM: ' + str(path))
+    try:
+        text = raw.decode('utf-8-sig')
+    except UnicodeDecodeError as exc:
+        raise ValueError('CSV 不是有效的 UTF-8 編碼: ' + str(path)) from exc
+    try:
+        rows = list(csv.reader(io.StringIO(text, newline=''), strict=True))
+    except csv.Error as exc:
+        raise ValueError('CSV 資料不完整或語法錯誤: %s (%s)' % (path, exc)) from exc
+    if not rows or rows[0] != header:
+        raise ValueError('CSV 欄位名稱不相容: ' + str(path))
+    for index, row in enumerate(rows[1:], 2):
+        if len(row) != len(header):
+            raise ValueError('CSV 資料不完整或欄位數不符: %s (第 %d 筆紀錄)' % (path, index))
+    if not raw.endswith(b'\n'):
+        raise ValueError('CSV 缺少結尾換行符號（資料可解析，但尚未符合完整寫入格式）: ' + str(path))
     return rows[1:]
 
 

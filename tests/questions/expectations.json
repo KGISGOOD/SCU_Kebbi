@@ -255,6 +255,298 @@
       "expected_source": "faq"
     },
     {
+      "category": "A",
+      "question": "國文必修有幾學分？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "國文必修有幾學分？",
+      "reference_answer": "國文必修總共4學分。",
+      "faq_row": 4,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "外文必修要修幾學分？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "外文必修要修幾學分？",
+      "reference_answer": "外文必修總共8學分。",
+      "faq_row": 5,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "畢業前要參加幾場藝文活動？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "畢業前要參加幾場藝文活動？",
+      "reference_answer": "畢業前至少要參加4場校內藝文活動，才能符合美育活動的畢業要求。",
+      "faq_row": 10,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "體育要修幾學期？有學分嗎？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "體育要修幾學期？有學分嗎？",
+      "reference_answer": "體育是必修課，大一和大二上下學期都要修，總共4學期，每學期都是0學分。",
+      "faq_row": 11,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "人工智慧導論什麼時候修？有幾學分？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "人工智慧導論什麼時候修？有幾學分？",
+      "reference_answer": "人工智慧導論安排在大四上學期，是3學分的必修課。",
+      "faq_row": 12,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "巨量資料概論什麼時候修？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "巨量資料概論什麼時候修？",
+      "reference_answer": "巨量資料概論安排在大一上學期，是3學分的必修課。",
+      "faq_row": 14,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "機率與統計要修幾學分？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "機率與統計要修幾學分？",
+      "reference_answer": "機率與統計總共6學分，安排在大二上下學期，各3學分。",
+      "faq_row": 15,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "資料庫導論什麼時候修？有幾學分？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "資料庫導論什麼時候修？有幾學分？",
+      "reference_answer": "資料庫導論安排在大一下學期，是3學分的必修課。",
+      "faq_row": 32,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "修完跨領域學程會拿到證書嗎？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "修完跨領域學程會拿到證書嗎？",
+      "reference_answer": "會，只要完成規定的課程與學分，且成績及格，學校就會核發學程證明書。",
+      "faq_row": 66,
+      "expected_source": "faq"
+    },
+    {
+      "category": "A",
+      "question": "資科系主要有哪些發展方向？",
+      "expected_behavior": "預期FAQ固定答案；未命中保留實際拒絕原因，不降低門檻。",
+      "review_status": "functional_test_candidate",
+      "reference_question": "資科系主要有哪些發展方向？",
+      "reference_answer": "資科系主要有智慧應用、服務科學和金融科技三大發展方向。",
+      "faq_row": 106,
+      "expected_source": "faq"
+    },
+    {
+      "category": "B",
+      "question": "做AI或深度學習時，系上有伺服器可以用嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "做AI或深度學習時，系上有伺服器可以用嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "做人工智慧或深度學習時，有系裡的伺服器可以借用算力嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "如果課程要用公有雲，像AWS這類服務有沒有額度補助？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "如果課程要用公有雲，像AWS這類服務有沒有額度補助？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "AWS、GCP、Azure 這些雲端服務的運算額度，系上會幫學生補助嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "高中完全沒有寫過程式，進來會不會跟不上？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "高中完全沒有寫過程式，進來會不會跟不上？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "高中階段完全是程式新手，入學後的課程會不會讓我跟不上？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "畢業後如果不當資料工程師，還可以做什麼職務？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "畢業後如果不當資料工程師，還可以做什麼職務？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "不走資料工程師這條路，從本系畢業還有哪些工作職稱可以選？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "系上有沒有五年一貫（學碩士連讀）機制？名額多嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "想用五年一貫把大學和碩士連著讀，系上有這個管道嗎？名額多不多？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "大學微積分跟高中數學差在哪裡？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "大學微積分跟高中數學差在哪裡？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "以前接觸的是高中數學，換成微積分時，最不一樣的地方會是什麼？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "學校附近生活方便嗎？治安和交通怎麼樣？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "學校附近生活方便嗎？治安和交通怎麼樣？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "想了解校園周邊的日常生活、治安以及交通，這三方面的情況如何？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "系學會平常有哪些活動，新生也有迎新的安排嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "系學會平常有哪些活動，新生也有迎新的安排嗎？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
+      "category": "B",
+      "question": "想知道本系學會的年度活動內容，裡面是否包含新生專屬的迎新？",
+      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
+      "review_status": "functional_test_candidate",
+      "reference_review_required": true,
+      "expected_source": "not_required"
+    },
+    {
       "category": "B",
       "question": "讀資科系要累積多少學分才能畢業？",
       "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
@@ -262,26 +554,6 @@
       "reference_question": "資科系畢業要修幾學分？",
       "reference_answer": "畢業總共需要128學分，包括81學分必修和47學分選修。",
       "faq_row": 1,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "資科的必修學分總數是多少？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "資科系必修總共幾學分？",
-      "reference_answer": "必修總共81學分。",
-      "faq_row": 2,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "資科系畢業的選修學分要求是多少？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "資科系選修要修幾學分？",
-      "reference_answer": "選修總共47學分，其中最多可以承認16學分的外系課程。",
-      "faq_row": 3,
       "expected_source": "not_required"
     },
     {
@@ -316,116 +588,6 @@
     },
     {
       "category": "B",
-      "question": "企業實習這門課能讓學生自行加選嗎？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "企業實習課可以自己加選嗎？",
-      "reference_answer": "不能自己加選。要先參加說明會、應徵實習並完成合約和保險，錄取後再由系辦統一加選。",
-      "faq_row": 13,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "住松勁樓一個學期的住宿費要多少？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "松勁樓住宿費一學期多少錢？",
-      "reference_answer": "松勁樓八人雅房每人每學期住宿費是10,200元，網路費、保證金和冷氣電費另外計算，實際費用以最新公告為準。",
-      "faq_row": 16,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "學校裡的宿舍要繳多少保證金？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "校內宿舍的保證金是多少？",
-      "reference_answer": "校內宿舍保證金是每人每學年1,000元，實際金額以最新公告為準。",
-      "faq_row": 22,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "校外學舍要付多少保證金？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "校外學舍的保證金是多少？",
-      "reference_answer": "校外學舍保證金是每人每學年3,000元，實際金額以最新公告為準。",
-      "faq_row": 23,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "智慧創新AI學習中心跟哪一家公司合作？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "智慧創新AI學習中心是和哪家公司合作的？",
-      "reference_answer": "智慧創新AI學習中心是東吳大學和NVIDIA，也就是輝達，共同合作成立的。",
-      "faq_row": 28,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "想了解NVIDIA DLI，它是什麼？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "NVIDIA DLI是什麼？",
-      "reference_answer": "DLI是Deep Learning Institute的縮寫，是NVIDIA提供的深度學習相關教育與訓練資源。",
-      "faq_row": 29,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "NLP實驗室的主要研究方向是什麼？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "NLP Lab主要研究什麼？",
-      "reference_answer": "NLP Lab主要研究自然語言處理，包括網路文章情緒分析、法律文件分析、專利分析和股票市場預測。",
-      "faq_row": 30,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "抵免學分跟免修課程有什麼不同？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "學分抵免和免修有什麼差別？",
-      "reference_answer": "學分抵免是把以前修過的學分經審核後算進畢業學分；免修則是不必修那門課，但不會因此取得學分。",
-      "faq_row": 37,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "想辦學分抵免，應該什麼時候提出申請？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "學分抵免要什麼時候申請？",
-      "reference_answer": "轉學生通常在入學輔導時辦理，其他學生要在加退選截止前申請，原則上只有一次機會，記得留意期限。",
-      "faq_row": 44,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "文華獎學金分成哪些類別？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "文華獎學金有哪些種類？",
-      "reference_answer": "學生可以申請的主要有學業表現優良、競賽表現優良和研究表現優良三種獎學金。",
-      "faq_row": 48,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "學分學程與微學程最低學分各是多少？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "學分學程和微學程各要修幾學分？",
-      "reference_answer": "學分學程至少要修15學分，微學程至少6學分，而且有一部分學分必須來自主修以外的課程。",
-      "faq_row": 62,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
       "question": "去企業實習是不是一定會有薪水跟保險？",
       "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
       "review_status": "functional_test_candidate",
@@ -446,22 +608,12 @@
     },
     {
       "category": "B",
-      "question": "畢業專題何時開始申請，何時開始製作？",
+      "question": "學分學程與微學程最低學分各是多少？",
       "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
       "review_status": "functional_test_candidate",
-      "reference_question": "畢業專題什麼時候開始申請和製作？",
-      "reference_answer": "通常大三下學期開始申請，主要在升大四的暑假和大四上學期進行製作。",
-      "faq_row": 78,
-      "expected_source": "not_required"
-    },
-    {
-      "category": "B",
-      "question": "畢業專題每組需要幾人，能選擇不申請嗎？",
-      "expected_behavior": "與對應FAQ資訊需求相同，允許依安全規則走FAQ、Cache或RAG，不強求命中。",
-      "review_status": "functional_test_candidate",
-      "reference_question": "畢業專題一組要幾個人？可以不申請嗎？",
-      "reference_answer": "一般是3到5人一組，而且要先完成申請才能修課，特殊情況需要由系上協助安排。",
-      "faq_row": 80,
+      "reference_question": "學分學程和微學程各要修幾學分？",
+      "reference_answer": "學分學程至少要修15學分，微學程至少6學分，而且有一部分學分必須來自主修以外的課程。",
+      "faq_row": 62,
       "expected_source": "not_required"
     },
     {
@@ -506,18 +658,6 @@
     },
     {
       "category": "C",
-      "question": "做AI或深度學習時，系上有伺服器可以用嗎？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "如果課程要用公有雲，像AWS這類服務有沒有額度補助？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
       "question": "大四想去企業實習，應該如何準備？",
       "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
       "review_status": "functional_test_candidate"
@@ -525,114 +665,6 @@
     {
       "category": "C",
       "question": "大三想去企業實習，應該如何準備？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "讀四年期間，每學期學雜費大概多少，有哪些獎助管道？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "優秀新生獎學金要符合什麼資格？拿到後能免學雜費嗎？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "畢業專題什麼時候開始？老師要自己找嗎？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "畢專是分組還是一個人做？題目怎麼決定？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "資料科學系畢業後，工作三到五年的薪水大概多少？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "如果大學一畢業就去工作，起薪大概多少？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "系上專任老師多嗎？他們主要研究哪些領域？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "老師本身有沒有在業界工作的經驗？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "系上有五年一貫嗎？大概有多少名額？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "本系學生申請研究所時，推甄和筆試哪種錄取較多？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "微積分和高中數學最大的差別在哪裡？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "系上有沒有擋修規定？如果微積分被當會影響大二修課嗎？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "出國交換會不會導致學生必須延期畢業（延畢）？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "目前還能申請的交換學校有哪些？請勿把歷年名單當即時開放名單。",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "大一新生一定能抽到學校宿舍嗎？周邊租屋方便嗎？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "系學會平常有哪些活動，新生也有迎新的安排嗎？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "目前資科系最多能承認多少外系選修學分？",
-      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "C",
-      "question": "我可以選外系的課嗎？修到的學分能算畢業學分嗎？",
       "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
       "review_status": "functional_test_candidate"
     },
@@ -650,7 +682,187 @@
     },
     {
       "category": "C",
-      "question": "今年的學雜費是否和去年一樣？",
+      "question": "現在系上每台 AI 伺服器還有幾 GB 顯存可用？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "系上有沒有提供做深度學習或 AI 的伺服器運算資源？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我問的是校內能使用的 AI 運算伺服器，不是外部公有雲補助。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我需要的是 AWS 或 GCP 額度協助，不是在問系上伺服器。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我問的是大學畢業就工作行不行，不是五年連讀有多少名額。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我想確認連讀碩士的制度和名額，不是在問每個人是否都必須升學。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我擔心的是微積分沒過會卡住後面的選課，不是兩個階段的數學差在哪。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我問的是微積分和高中數學的差別，不是被當後能不能選別的課。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "這次只想了解優秀新生獎學金資格與能否免學費，不是一般學期費用。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "請區分一般就學費用與優秀新生獎學金的申請、減免條件。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "如果只在大三實習，能直接套用大四整年全職實習的學分規定嗎？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "請說明大四整年全職實習能否算學分，不只列合作廠商。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我想知道何時開始專題、怎麼找老師，還不是在決定組員與題目。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "專題的開始年級我先不問，我要了解組隊方式和選題流程。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我問的是畢業三到五年的薪資發展，不是第一份工作的起薪，請不要混用。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "如果大學一畢業就去工作，起薪大概多少？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "目前還能申請的交換學校有哪些？請勿把歷年名單當即時開放名單。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "想知道學生到海外交換的管道是否多，以及學校合作的姊妹校名單。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "請把常見就業企業與畢業三到五年後的薪資發展分開介紹。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "本系畢業生有哪些常見的就業企業？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "外系課可以選，不代表一定計入畢業學分；兩件事分別怎麼確認？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我可以選外系的課嗎？修到的學分能算畢業學分嗎？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "現在東吳資料科學系畢業至少需要多少學分？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我看到112學年度入學的畢業學分資料，這份是適用哪些學生的？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "如果是今年才入學的同學，也能直接看同一份嗎？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我看的是112入學那份畢業學分文件。",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "系上的公有雲補助，跟校內AI伺服器有什麼不同？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "我改問買筆電，一定需要高階 GPU 嗎？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "畢業想考公誤員或國營，這科系有對得上的類科ㄇ？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "如果不考公職，學長姐常去哪幾家企業？",
+      "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "C",
+      "question": "出國交換會不會導致學生必須延期畢業（延畢）？",
       "expected_behavior": "分辨相近問題的資訊需求及條件，不重用不適用答案；無證據時說明無法確認。",
       "review_status": "functional_test_candidate"
     },
@@ -745,6 +957,126 @@
       "review_status": "functional_test_candidate"
     },
     {
+      "category": "D",
+      "question": "校內 AI 伺服器今天的借用規則有更新嗎？請先辨認文件日期。",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "這學期實際開放申請的實習缺額有哪些，資料是否仍有效？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "這一學年的新生宿舍申請期限是哪天？不能用去年的期限代替。",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "最新這一梯專題分組的截止時間在哪份公告？請核對適用年度。",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "今年面試形式是否有調整？需要哪份當年度公告才能確認？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "今年東吳資料科學系個人申請的學測、備審資料和面試各占幾成？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "今年文華獎學金的實際申請截止日期是哪一天？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "現在外雙溪校區圖書館週末有開放嗎？開放時間是什麼？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "我是東吳資科系的學生，你能直接告訴我目前還差幾學分才能畢業嗎？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "你能保證我明年推甄會錄取哪所研究所嗎？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "沒有我的成績與申請年度，能直接判定我一定免學雜費嗎？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "沒有提供我的職務和公司，你能算出我畢業五年後確切的月薪嗎？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "能查到今年實際有多少人申請優秀新生獎學金，以及我排名第幾嗎？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "請替我保證一位老師今天晚上一定能即時回覆訊息。",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "沒有提供宿舍抽籤結果，能直接知道我被分到哪張床嗎？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "還沒提供組員和研究方向，請直接告訴我組別編號與最終題目。",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "新學年的擋修表是否更新？請核對公告學年度再談微積分後續課程。",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "最近一屆推甄與筆試的實際錄取率有公布嗎？舊FAQ能代表最新一屆嗎？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "目前東吳資料科學系有哪些專任老師？哪些老師研究AI相關領域？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "D",
+      "question": "現在新入學的資料科學系大學生適用什麼畢業學分規定？",
+      "expected_behavior": "缺乏可靠或即時證據時明確說明無法確認，不猜測。",
+      "review_status": "functional_test_candidate"
+    },
+    {
       "category": "E",
       "question": "怎麼讓白飯煮得粒粒分明？",
       "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
@@ -805,9 +1137,123 @@
       "review_status": "functional_test_candidate"
     },
     {
-      "category": "F",
-      "question": "我要修幾學分才能畢業？",
-      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "category": "E",
+      "question": "我家的狗今天為什麼不想吃飯？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "今天這場足球賽最後比分是多少？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "番茄炒蛋要怎麼做才好吃？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "幫我安排東京迪士尼三天兩夜的行程。",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "昨天NBA金州勇士隊的比賽比分是多少？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "臺北此刻的降雨機率是多少？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "今晚台北會不會下雨？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "台北現在的即時降雨機率是多少？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "台北明天的逐時降雨機率是多少？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "今晚台北每個小時的即時降雨機率是多少？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "請介紹三種適合室內種植的香草植物。",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "手機電池續航力下降時應該怎麼保養？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "幫我推薦適合週末看的動畫電影。",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "想學做義大利麵，醬汁怎麼調？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "可以幫我編一個奇幻小說的角色背景嗎？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "週末想爬山，有哪些登山裝備要準備？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "幫我規劃一週的居家健身菜單。",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "海豚是怎麼在水裡睡覺的？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "可以教我摺一隻紙鶴嗎？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "E",
+      "question": "我想學會下西洋棋，先從哪裡開始？",
+      "expected_behavior": "禮貌拒答並引導回東吳資科相關服務，不回答無關問題。",
       "review_status": "functional_test_candidate"
     },
     {
@@ -890,12 +1336,6 @@
     },
     {
       "category": "F",
-      "question": "如果先不看獎學金，每學期學雜費大概多少？",
-      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
-      "review_status": "functional_test_candidate"
-    },
-    {
-      "category": "F",
       "question": "你說的那個待遇範圍，每個人都一樣嗎？",
       "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
       "review_status": "functional_test_candidate"
@@ -921,6 +1361,78 @@
     {
       "category": "F",
       "question": "這樣應該提前多久開始準備？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "那進大學後，這一科主要多了什麼？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "那組員跟題目通常怎麼決定？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "那剛剛說的實習機會，全部都有薪水嗎？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "那如果沒過，是所有課都不能選嗎？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "如果我不走那個管道，大學畢業就去工作可以嗎？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "那個新生獎學金要符合哪些條件才能申請？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "你說的那個時間點是大幾？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "那我也是那個學年度入學，查畢業要求可以先看這份嗎？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "回到第一個問題，我說的沒過是哪一科？請先釐清再回答。",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "前面那份資訊能知道每位老師的研究領域嗎？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "那個費用是要看哪個入學年度的資料？",
+      "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
+      "review_status": "functional_test_candidate"
+    },
+    {
+      "category": "F",
+      "question": "剛說的第一種是校內機器嗎？",
       "expected_behavior": "指涉或必要條件不足時先澄清，不假設對話歷史。",
       "review_status": "functional_test_candidate"
     }
