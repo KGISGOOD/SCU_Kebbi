@@ -54,8 +54,10 @@ def read_reviews(path, candidates):
     decisions = {}
     for row in rows:
         key = row['faq_id']
-        if key not in originals or key in decisions:
-            raise ValueError('unknown/duplicate FAQ review ID: ' + key)
+        if key not in originals:
+            raise ValueError('unknown FAQ review ID (FAQ content/version may have changed): ' + key)
+        if key in decisions:
+            raise ValueError('duplicate FAQ review ID: ' + key)
         original = originals[key]
         editable_sources = original.get('source_kind') == 'two_column_csv'
         if any(row.get(k) != v for k, v in display(original).items() if not (editable_sources and k == 'sources')):

@@ -1,0 +1,2366 @@
+{
+  "faq_file": "experiments\\datasets\\faq_精簡問答_138筆.csv",
+  "faq_sha256": "c684249e122f3743fced24592a80e97fa0da496b8d343d88472e0871c53dc8f5",
+  "old_review_sha256": "21f44d4d791554a2f179ba497d71ceac5de64b411b9ae57ac9caf1721c76e64b",
+  "reason": "all 138 content-based IDs changed; no exact question or question/answer matches; no positional or semantic mapping used",
+  "counts": {
+    "faq": 138,
+    "old_review": 138,
+    "new_review": 138,
+    "unknown_old_ids": 138,
+    "duplicate_old_ids": 0,
+    "reliably_matched": 0,
+    "approved_transferred": 0,
+    "needs_review": 138
+  },
+  "old_review_records": [
+    {
+      "faq_id": "FAQ_466b13e0ea30ac98ac73325a2590fcb6276ef2ef5da7ae686d18fffc968ebc6b",
+      "question": "我是112學年度入學的資科系學生，畢業總學分的門檻是多少？",
+      "answer": "適用112學年度一年級入學新生的課程表規定，畢業總學分為128學分；其他入學年度不能直接套用這個數字。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "8e08df8241af0d6b562414ec9fcf321f47ea6f565d61f5dc0f6e75de3a518403",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_d44905c896ea0ac538df71c58e6d80b1f63955f72097c1989f105937ffa02cc0",
+      "question": "112學年度入學的資科系，必修一共要修多少學分？",
+      "answer": "112學年度一年級入學適用的課程表列有81學分必修。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "a299b5af96922dd5c5bd0c4ca8420e9d08ae86ae183b24d9410a16d01a2e0a05",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_0b8e48225bb47e627be79e630a3ba57540ce5c9d848746371641a91a065cf8df",
+      "question": "112學年度入學的資科系學生，選修總共要修幾學分？",
+      "answer": "112學年度一年級入學適用的課程表列有47學分選修；這是選修總數，不能解讀成全部都可用外系課程認列。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "5d6b7044b944d454a76bb49c0fdb43393ac20806c7fd43bff6affb7c65e40fdc",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_7f047c2100688ea2ef04df77b5eee8c3cadbf4828a8f571e55bf5702b5ecb902",
+      "question": "112學年度入學的國文必修要修幾學分？",
+      "answer": "112學年度一年級入學適用的國文必修共4學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "2a1f1432ed2eecdcc73b118b824ec8720f93f1bdf9831b13e28ba7db1c17bc2b",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_5b2861752073f357c6f2ac6034e3740cdc8e7f5c9d434cccae2b758517e1c9f3",
+      "question": "112學年度入學的外文必修合計幾學分？",
+      "answer": "112學年度一年級入學適用的外文必修共8學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "a1922b0757002ce9b198226606f15e0aad8efd3ee5397203c49980cacbc8f5cc",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_178c9222b7358914fb5b2935c40689ffe74a62c17a663ff6dca56df2013f621b",
+      "question": "112學年度入學的共同必修外文能選哪些語言？選課有什麼語言限制？",
+      "answer": "112學年度入學適用規定：外文可選英、日、德、韓文；大一與大二可選同一或不同語文，但不得重複修讀。外語學院學生不得選主修語文，外籍生及僑生原則上不得選母語或僑居地語文。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "292a820707203bb1768a15a15186d451281dafa1088c9b8dc73dbd0f2968c8fd",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_f412cc7763754ec4c3c602de8b197b548973f6bdc2be293e4660f32c804a794d",
+      "question": "112學年度入學的微積分有幾學分，安排在哪些學期？",
+      "answer": "112學年度入學適用的微積分共6學分，安排在第一學年，上、下學期各3學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "5a9542f8a2289626e20576635c404a2424fa8fd1a19a45c9cce1d4e14f6d2ed6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_935028bb7ee6da1729f6ab48c25d880d20be83c9adf91bef9bc7edb7e531652c",
+      "question": "112學年度入學的線性代數排在哪一學期，有幾學分？",
+      "answer": "112學年度入學適用的線性代數為3學分，安排在第一學年下學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "1ea595260b73377c040ee40ff28411f8930b7a0be63ecd9ac4771e1f7f5de28f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_ec6518641fd7ed776dac7f998e9f7a1240d58148a6711a368e91e03b0f942f84",
+      "question": "112學年度入學的資科系，哪些課程及格能認抵資訊能力畢業標準？",
+      "answer": "112學年度入學適用文件規定，最遲須在延長修業年限內修畢計算機概論與程式設計（一），兩門必修各3學分且成績及格，作為資訊能力畢業標準的認抵。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "ae53e01f30ec0cfcff679efcf42742606f774392a1d30d034f7088933a3a12c6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_5980625a38810153d7a1702ae8876a625c953a1b6965e8f03afff343adfac4c7",
+      "question": "112學年度入學的美育活動，畢業前需要參加幾場、最晚何時完成？",
+      "answer": "112學年度入學適用文件規定，最遲須在延長修業年限內參與至少4場校內藝文活動；未通過這項美育活動標準不得畢業。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "47a87a8c65ce1dd57d903d38c50b3cb19a24971d10d947cb0139fad3ba318c53",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_5e019c5db939015b51100b3ff2882dfe90cde62529815ea2d116d6e76abc717b",
+      "question": "112學年度入學的體育要上幾學期，有畢業學分嗎？",
+      "answer": "112學年度入學適用的體育是必修，第一、第二學年的上下學期都要修，共4學期，每學期為0學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "938844d30375ac7c7c53c2279588316d9b48a842273ebba9cd1ff81ab047de08",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_de10ebd18b7c04b2208222187d6ed53435598eaf5a6172ff482ffa2ba28b15f7",
+      "question": "112學年度入學課程表的人工智慧導論安排在何時，幾學分？",
+      "answer": "112學年度入學適用的人工智慧導論是3學分必修，安排在第四學年上學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "f92e30237e1edb0179d46e79f9f66152dee05985e953138e2d03a6d7f28a9c37",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_4e8e8fba0a17c046b06fb65c3973be3801aac9353d9774820ea846ed2d9b702c",
+      "question": "115學年度企業實習（一）（二）可以自己加選嗎？要先完成什麼？",
+      "answer": "115學年度企業實習（一）（二）不可自行加選。須參加行前說明會、查看職缺並投履歷；錄取後完成三方合約與實習保險，再由系辦於開學後統一加選。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "1cc8b60ff558e1121edf908e0024c8081f348b45c862c6415df30ab821ce231f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_61df60cfb9e5da8af7f902a225720ec9ff31eb04bbe9f6c97cebbae6c4aba9cc",
+      "question": "112學年度入學的巨量資料概論在哪一學期修，幾學分？",
+      "answer": "112學年度入學適用的巨量資料概論是3學分必修，安排在第一學年上學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "3bea4071134632753c35ab2b461fdc5ed5351dec2d75e466e8fb5344dc39d116",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_fbbe88702cd262fbcf4d4ed1fe7c08cda3849a8fe4a802433e18a5cd28de150e",
+      "question": "112學年度入學的機率與統計共幾學分，排在哪一年？",
+      "answer": "112學年度入學適用的機率與統計共6學分，安排在第二學年，上下學期各3學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "d98a62c05718a017a3855a904e94f8b050aae1f213341d03d5dda58cdd3b0b4a",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_5f90adfd92a2b7b46def4a1287b0a6eb3f73031775a41fbb99a0b1c23717ffba",
+      "question": "115學年度松勁樓八人雅房，一個人每學期住宿費多少？",
+      "answer": "115學年度松勁樓男生八人雅房的住宿費為每人每學期10,200元；網路費、保證金與冷氣電費另計。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "1df28747007838900bd22e3b8c12bc30819955a62b03671ca6ad93e7824f1210",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_4bd736cf1abd136e2ce48a9bda437334a67e931acbd99bf7df458c2c87682535",
+      "question": "115學年度泉思學舍兩人套房，每人每學期住宿費是多少？",
+      "answer": "115學年度泉思學舍兩人套房的住宿費為每人每學期37,500元；WIFI、保證金及用電費用另計，另外申請有線網路也須另付費。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "d18111757c7647b8c7a704b4abf569cb42810011dc8ecc4cdc5150760ec7a848",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_fc2a4fc713b04281ff86ae386d31e285582a4ccbb85fe4ac5389e8ae3a68f18f",
+      "question": "115學年度榕華樓五人雅房，每人的網路費一學期多少？",
+      "answer": "115學年度榕華樓女生五人雅房的網路費為每人每學期1,200元。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "d55b484a113b0ab954aa1bbd23a7ec7888234bdec378b3e58b9e5aed56d0729b",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_2bd086a329802a21cf72f4f9a88b45e25c0a82773ae2d60c046618018d1de853",
+      "question": "115學年度柚芳樓八人雅房，網路費每人每學期多少？",
+      "answer": "115學年度柚芳樓女生八人雅房的網路費為每人每學期800元。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "d6c4cc452fc5fea250e47e071581086e3a5f2fb05036c47d3a5fa463fc98319f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_e1f562fe1ca3d485e6f28d4bedf4e642b22973cb112c352f5994b73e8b992255",
+      "question": "115學年度第一學期，松勁樓可以住宿的起訖時間是什麼？",
+      "answer": "115學年度第一學期，松勁樓住宿期間為115年9月12日上午9點至116年1月17日下午4點。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "e55e317ac18044f964b37b0a41394d7105bfdf3164aab391e739b4d158b77de2",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_4f37ae6e98ee6506675cc9f596a4fe23ce3e5463a6354b7a3f3aedf8e0fdf2d6",
+      "question": "115學年度第一學期，泉思學舍住宿的起訖日期和時間是什麼？",
+      "answer": "115學年度第一學期，泉思學舍住宿期間為115年9月8日上午9點至116年1月31日中午12點。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "9353b008589c4a51e3357d74aacbfbf1988ffd34af4a61977a587b2cc3e78e08",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_c7cc61f3ef7a2469663e374395a70d354c71b105e1df3226ecdcf774e6846aba",
+      "question": "115學年度校內宿舍的保證金是多少，按學期還是學年繳？",
+      "answer": "115學年度校內宿舍的保證金為每人每學年1,000元。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "370e4f3507e22c6e8ce1229e0026a14e96132f93c29ab149ae8ea94daacd4aec",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_45931bc72a18f7041804347d003c426a73b5406f4b011e4ef20d34729b6f7cf0",
+      "question": "115學年度校外學舍的保證金，每人要繳多少、多久繳一次？",
+      "answer": "115學年度校外學舍的保證金為每人每學年3,000元。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "d85601678447520b69c65eaefeb69f864d6df1d034c5fc7212c3343ec4c788b1",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_003fcf7b7aeb8c925fd2da9bdc79fea230bbaa0c7e1fd0e507f5d338f1024625",
+      "question": "115學年度有容學舍的兩人套房，每人每學期住宿費多少？",
+      "answer": "115學年度有容學舍兩人套房的住宿費為每人每學期54,220元；網路與用電費用另計，保證金按學年另繳。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "ba6d5bae3500204ea8916c0108090fb8dc86de1785b8bbe61f5d4dc6bd287dd5",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_3cfd6b0209b23e357527902c2ba21b61672bac9aa2d296ece41960dc6bd85bbd",
+      "question": "115學年度住有容學舍四人套房，一個人每學期住宿費多少？",
+      "answer": "115學年度有容學舍四人套房的住宿費為每人每學期38,200元；網路與用電費用另計，保證金按學年另繳。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "adbc607d952b51ec2807895272677360e7e0d1ae1bf098a674345fc6590afd99",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_a3094ab854493ad6ec4b48744e858b305c65af8fc45e36450bc13581a84fcfcf",
+      "question": "114學年度的專題成果發表會，拿到第一名的作品叫什麼？",
+      "answer": "114學年度專題成果發表會的第一名作品是「整合技術指標與市場情緒之虛擬貨幣交易輔助平台」。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "ae23944c7274c0ff1a853585d2d8d66e10ff898e618104ece51e70ead68ea23f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_bee4efe6881306091f9a85e184968d8980a407085caafd2e5e825e655b84ec77",
+      "question": "113學年度專題成果發表會的第二名作品叫什麼名字？",
+      "answer": "113學年度專題成果發表會的第二名作品是「晚安小甜心」。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "282acdb435c0052bad22518101ab831b31aeda41a792cef0367d349220776c87",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_67e5020d59e2edd5437b165537d3a6e8fff98d9cca496f53256dccfa8fe1d671",
+      "question": "智慧創新AI學習中心是東吳和哪家企業一起成立的？",
+      "answer": "智慧創新AI學習中心由東吳大學與NVIDIA（輝達）合作成立。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "04d5dfdd189a7fbe951e04b3078dd6c4cd52c07a4944afa585e15f34a987e1ed",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_9a54f924445a79618f744d3071c004e97a36e2c060397ff38556d77d8be1074e",
+      "question": "系上提到的NVIDIA DLI，英文全名是什麼？",
+      "answer": "DLI是Deep Learning Institute的縮寫；系上課程介紹使用的名稱是NVIDIA Deep Learning Institute。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "24800247c629c376764fecf48999821b487db66ab41dd4745a879d7e7fbc88a9",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_114171516117dd627aa186fb94c0a3baf94e9839b2d78cccdf15fd842fc9a38e",
+      "question": "系上NLP Lab的文字分析研究，有哪些具體題目？",
+      "answer": "NLP Lab介紹列出的研究課題包括網路文章情緒分析、法律文件分析、專利分析及股票市場預測。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "5ca6620edefa7f7a6de5b0b8f59971adbf3680aad0a537fe7a3871cd5e44a0c6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_129a3f6f56079cf8c71c870638eec1201a5e972532d8056d0dedf92e424254ab",
+      "question": "MESC Lab的多媒體研究會處理哪些類型的資料？",
+      "answer": "MESC Lab的介紹指出，研究會處理文字、聲音及影像視訊等多媒體資料。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "6da702a149e9d6f40300299ad441fc7089f0f2ea8a4cb379023ea6366afe579b",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_d6b01107654ae964c7fdc556dbfc7629b4295060160dad38c563ca2b175b2eb5",
+      "question": "112學年度入學的資料庫導論要修幾學分，安排在哪學期？",
+      "answer": "112學年度入學適用的資料庫導論是3學分必修，安排在第一學年下學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "3e7c5513e4f2e98ae74c1b24368cd93e62a014c872292da90c3e1bb648ecff69",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_b7979f5c9377f467d4fce0eddeade399a85342c77ff622bb007500298e16c248",
+      "question": "112學年度入學的國文和外文，各有幾學分，分別怎麼安排學期？",
+      "answer": "112學年度入學適用的國文共4學分，第一學年上下學期各2學分；外文共8學分，外文（一）在第一學年、外文（二）在第二學年，兩年都是上下學期各2學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "a960c6b62b355d3e01af3a9b8e249d71bdc3a0d9ece8a776f859cf6a767703fc",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_ef2f549153b53e198ecf2f7916f9a4ac1b8092a4f5adf93321954fe240a4b50e",
+      "question": "112學年度入學的學生，資訊能力和美育活動分別要怎樣才算通過？",
+      "answer": "依112學年度入學適用文件，資訊能力須最遲在延長修業年限內，將計算機概論與程式設計（一）兩門各3學分必修修畢且及格，作為認抵；美育活動則須在延長修業年限內參與至少4場校內藝文活動，未通過不得畢業。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "4fa6e6457c3971b8812d87cddaadf7b0d720b2d6c35b0a6a82a643868ae0c68c",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_d3f1f763e472882133ad4bcb33cd29bd33abcce187aae7a06e72ec1f1e919b9b",
+      "question": "比較115學年度的松勁樓八人雅房和泉思學舍兩人套房，每人每學期的住宿費、網路費各多少？",
+      "answer": "115學年度每人每學期：松勁樓八人雅房住宿費10,200元、網路800元；泉思學舍兩人套房住宿費37,500元、Wi-Fi 900元，有線網路另付900元。保證金及電費另計。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "edd566a3403992194dd6b5d5d77414464d6e2ea5bbd32767b7050640ca7d1980",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_581e8e425a3673e4dfc68d5d273910de7b490cf2630f0c1acafc2c3974b4727c",
+      "question": "我看到智慧創新AI學習中心和NVIDIA DLI兩個名稱，它們都和輝達有關嗎？DLI的英文全名是什麼？",
+      "answer": "有關。智慧創新AI學習中心由東吳與NVIDIA（輝達）合作成立；系上介紹的NVIDIA DLI國際專業課程，DLI全名是Deep Learning Institute。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "42413d5f918aa9f9f1dddfdda3b38990fea0ce8ba0ee67e56ca99bdd71da7165",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_dbdbfc6d464a64bc2042fecf3023786cd59b04876f3c51a07ed572cf2bb3e031",
+      "question": "依抵免學分作業要點，抵免和免修差在哪裡？",
+      "answer": "依抵免學分作業要點，抵免是審核通過後取得該科目學分，計入畢業學分；免修則是不必修該科目，但不計入畢業學分，仍須選修其他科目補足。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "6f48dfd2b96b2a79d89974d15c9fc423cac7ab2311fbfe6519c979139fd87c23",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_6a8154bc2a7c362a4476179b9520cc166d0c8ad37afdb68f5f3962a9b4678f59",
+      "question": "依抵免學分作業要點，哪些學生可以申請抵免或免修？",
+      "answer": "依抵免學分作業要點，轉系、轉學、輔系、雙主修、跨領域學程、雙聯學制學生，重新入學新生、選讀生或退學生考取正式生，以及依法先修學分或得免修者可申請，仍須經審核。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "0cb1c211c4b19fdc032f499e6ed891009488caa46e5d26d5ec53fe394ef338ee",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_049222c7ed5a82b495c20a3004bf95f7e81f8fcb960860dbfe43dfe256819bb2",
+      "question": "抵免學分作業要點允許申請哪些類別的學分？",
+      "answer": "依作業要點，抵免範圍包括必修學分，含共同及通識科目；選修學分，含相關科目；輔系學分，含轉系或轉學互換主、輔系的情況；以及雙主修與跨領域學程學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "9efb0764b65cf31ad3c9cd372d44546e2a343a0244cb4aa95bb11f7a4234057f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_bc685efd99d3390b2a0587aa522a523a9b25f881ad1922f00d72a811969f3731",
+      "question": "依抵免學分作業要點，課名不同還能申請抵免嗎？",
+      "answer": "依作業要點，科目名稱及內容相同、名稱不同但內容相同，或名稱與內容不同但性質相同，都列為抵免原則；仍須經審核，不能只憑課名自行認定抵免。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "dfb2fb632315bfbc3ce495c94d6df08a8b88fb76e118979f611f7344f97d6e0c",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_73a7a3442e6d933d835d68eb3f81c2765e2a613a0768efad086f038ebea5823c",
+      "question": "依抵免學分作業要點，入學前修過的專業科目有年限限制嗎？",
+      "answer": "入學前修習及格的專業科目，至入學時已超過十年者，依作業要點不得抵免；但碩士在職專班不受這項限制。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "d6341601b32be5c3e9d7a073cfe084111870d93ae31888fce29192b8b7e931ab",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_9d23f25260e5b3715d48adf500cc38bd22d5e7fd324a04340400132062edc7dd",
+      "question": "依抵免學分作業要點，用較多學分的課抵較少學分的課怎麼登記？",
+      "answer": "依作業要點，以多抵少時，抵免後以少學分登記。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "7b3ced7c9c2960b9e0bec45b987382d8739a41a5b71398ebc93e1c1cc84ba7e6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_53f27d1de2c30bdd6ff57f727ea83fc6ee995c7e4f9de86aa45307e0767ef65d",
+      "question": "依抵免學分作業要點，用較少學分的課抵較多學分的課怎麼處理？",
+      "answer": "依作業要點，以少抵多若不能補修剩餘學分，就不予列抵；若可以補修，原則上補修下學期。原科目停開時，由學系主任另選性質相近的科目代替。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "7b8342ade80d5bb84718574a26a038f192a37767e3646312cc251210b531cb03",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_e7b0588dc9ecf1c5bfe493b3f47920ffd137b4e07ae4c5e8e8bc3b0d2d1bbbcc",
+      "question": "依抵免學分作業要點，轉學新生與其他學生何時申請抵免？",
+      "answer": "轉學新生應在轉學生入學輔導時辦理；其他符合資格的學生，應於加退選截止日前提出。均以辦理一次為原則，逾期不受理；日後轉系或核准輔系、雙主修、跨領域學程等特殊情形申請追抵，仍受第三條限制。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "4108726e2c5121e0586480868f46c9dc5ec2522397cc85bf4b8223b45a268140",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_003f4a0c498b1bdd2ddbee4a95aa9fe3d43f77b9216db5c933c4dd36485d12c4",
+      "question": "依抵免學分作業要點，申請要附什麼證明、交給誰？",
+      "answer": "依作業要點，申請抵免應繳附原校成績證明，向學系主任及教務處提出申請。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "19299ccf0f43d821cbbf5c2859aaf0f7adf957fd43662ec7209979cbaaba743e",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_06e6f5e3f3434a3077551b8938301ec0ae85d7d975f2fc23782f83137f610dda",
+      "question": "依抵免學分作業要點，誰負責審查和複核？",
+      "answer": "依作業要點，由各該系負責審查，教務處負責複核。體育及軍訓科目的抵免，須分別在行事曆所定開課日起一週內，到體育室及軍訓室辦理完竣。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "2c8bd32349ddf239070651b77fd8cd4f810e25250a853465b1a3a668139678e6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_421a5e9586d6e3d0b6b2ed0e4d386bdf2c22b7a6791150a129833ad08985a6a0",
+      "question": "依抵免學分作業要點，境外大學修過的課能申請抵免嗎？",
+      "answer": "曾在符合教育部採認規定的境外大學校院修讀且及格的科目學分，可依作業要點相關規定酌情抵免，並非所有境外學分都自動採計。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "1dd19d8033918e64b1d9a9f5576323cdb94a8f2463fbd899ef8fefad5fa0b630",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_35ad5ab71ce05e28d69c031d665bb509f63079af8565f33b2c43592d31684f93",
+      "question": "依文華獎學金辦法，學生可以申請哪些獎項？",
+      "answer": "依文華獎學金辦法，學生獎項有學業表現優良、競賽表現優良及研究表現優良獎學金。教師另有學術研究及指導競賽獎勵，不是學生獎項。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "f23edef9bbb93802129dad1fd255b7bf34e50f5882a8c66bebc0d0122de9e25f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_2c19ea370ebcca52f6bdf552423b15a18ac7eab079af08f35cc51cdf03b39ec5",
+      "question": "文華學業表現優良獎學金，學士班和碩士班金額各是多少？",
+      "answer": "依文華獎學金辦法，學業表現優良獎學金，學士班每人一萬元，碩士班每人二萬元。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "fa0adab48ce62ea91e6a2c9780dffe02e43ab2636fcb676c375e61dc59d94e0f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_722f5a8ccd80801d12dae925cbf71afbf59ba11121d80860f28e221373e8afeb",
+      "question": "文華獎學金的競賽獎和研究獎，金額怎麼決定？",
+      "answer": "依文華獎學金辦法，競賽表現優良獎學金依競賽類型與難度決定；研究表現優良獎學金依研討會或投稿期刊決定，這兩類沒有在該條列出固定金額。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "b5b8d1b5e7db5f858e4b3845c74434798f0be0e4a6a8ba35dfcaa27b14bcd913",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_2a8e1e868a4f3bf855b22291eec482915abe18b3b3d067b848f0d5b67350fa16",
+      "question": "文華獎學金辦法規定多久頒發一次，名額怎麼定？",
+      "answer": "依辦法，每學年上學期頒發一次，名額視當年財源而定；學生總獎學金最高以二萬元、專任教師總獎勵金最高以五萬元為原則。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "4a8f52d7158c1d5b0ad115a3de240c82870168747841397bf96dfa0212a21016",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_34ef79a2d3e33174625e1c580ab652c41510334b5d57fa3a7417ee3f6c56cbc5",
+      "question": "依文華獎學金辦法，競賽表現優良獎的申請資格是什麼？",
+      "answer": "申請對象為本學院各學制學生，須參加與資料科學相關領域的公開競賽，且成績優良、名列前茅或表現優異；不是參賽就一定獲獎。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "819040ce486a7c89158faaa0c18afb459f8903b9431637fd649d6c5c00554e38",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_9abde127160c9a4147ffa1b547a9ad6d574de05487688a4560c82d3beab43a8e",
+      "question": "依文華獎學金辦法，研究表現優良獎接受哪些研究發表？",
+      "answer": "依辦法，對象為本學院各學制學生，須參加與資料科學相關領域的公開研討會，或投稿具有審稿制度的相關期刊。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "b16d4652131d0476d0423b7fb92ff486c517be30f26456814569deb8c4b03737",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_a0ac0041ba1ada29ce41abb14e1eee1245142efc16a00101630f627fa60e0f56",
+      "question": "文華獎學金辦法的一般申請期限是什麼時候？",
+      "answer": "辦法訂為每年十月底前申請。這是辦法的一般期限；該份文件未載發布日期，不能據此保證特定年度已開放受理。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "7b3a0194b2b71ea3b09d5349a611ea50927bb9685c46f463c7871b6347977467",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_f45b57b131a980a6b7e260ed081136ed5804ced7856e73a4b6246eb8f287dc56",
+      "question": "依文華獎學金辦法，申請學業表現優良獎要準備什麼？",
+      "answer": "依辦法，須備妥申請書及歷年成績單。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "471c9b71f3d083f9d7eb11743e69f6547671fbf9b1ca16d86938ca55a67fecf3",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_f63628c84ba875fa94a375869e7b6517e71546183ac9d282ec4927e6bd4855de",
+      "question": "依文華獎學金辦法，競賽表現優良獎要附什麼文件？",
+      "answer": "須備妥申請書，以及上年度十月一日至次年度九月三十日間參與競賽的相關證明，並敘明事由與成果。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "5b1b859becc58a869b7f7a1156863219d7ac1ac697b381669edc08aa0804b80a",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_40796e76a40c7fec1a54e3324fbb5e7f6ae21960f80c54af8a795a42e3e72db4",
+      "question": "依文華獎學金辦法，研究表現優良獎要交哪些資料？",
+      "answer": "須備妥申請書，上年度十月一日至次年度九月三十日間的研究發表相關證明，並附上研討會或投稿論文。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "b13f53418b6b060cc57a720ea20a5a21550e2e2a33ccb328e03c27dee9bd0409",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_f5686f1ab36cfebe6ae221fa0dc983cf8142a515f8767df860c3e5cdecc7d66e",
+      "question": "文華獎學金申請後由誰審查和核定？",
+      "answer": "依辦法，由本院獎學金委員會審查並推薦，再由學院暨學系聯席會議核定得獎名單。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "488b223b7bf74df7cf4c70c62bf3435d3f92485c181fff743bff87b167dcc0fd",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_b33096a21e7a57e29032de8ad15730f74c54b31ccd55c4013908efe974e8abba",
+      "question": "跨科際智慧應用學程的介紹列了哪些跨域主題？",
+      "answer": "介紹列有數位行銷、外語科技、商業數位及人工智能法律四項跨域特色課程主題。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "3b620c8fed504d733f10c8c84ee9837171cf4c9fca16aaeb625a98e391305703",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_6fb09e9eda1186059d9acc8c017bf721fbdb13b3bbf6f33243e218ea1cf90a53",
+      "question": "依跨領域學程辦法，學士班何時、向誰申請，核准後從幾年級開始加修？",
+      "answer": "符合各院系學程條件的學士班學生，應依行事曆時間向教務處註冊課務組申請，逾期不受理；經核准後，得自二年級起開始加修。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "89373d29b5e82f4f66499ba1c3520ee47b39f697dccae10916fe9766b81c82df",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_784d69424670e063791e7ee575058792066a99e1a00f1f486f07beb69810e80f",
+      "question": "依跨領域學程辦法，研究生或他校學生可以修讀嗎？",
+      "answer": "本校研究生或他校學生，經核准後也可以修讀跨領域學程。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "0243e2182cb26591670609e258ea72e223cc232fa7433befb9ac75cfe4ed6c3d",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_51730c3fbb6a638a9102802a762f61786d5b28339b1e5e458e5d8224f693f671",
+      "question": "依跨領域學程辦法，學分學程與微學程各至少修幾學分？",
+      "answer": "依辦法，學分學程至少十五學分，微學程至少六學分。修習學程科目學分中，至少二分之一不屬於主學系、加修雙主修及輔系的必修科目。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "a8455e81e5459d366553020761a3b3a3823fb6f24b81b80a42f4e7060d0db521",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_4f461ba7c5c485dde1a42513dd1373d5160184d5b4ccd4c6f877f973307e7559",
+      "question": "依跨領域學程辦法，正常修業期間修另行開班課程要另付費嗎？",
+      "answer": "依辦法，規定修業年限內修習另行開班的課程，應依學校收費標準繳納學分費等相關費用；不能一概認定額外課程都免收費。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "42a87236197b3c4c2b002c97d00b5751bfa04fa55f9b88a207373d2a76ffa9cf",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_5404fca2a26903b9e1298bb4633e5c598c6f7ecb4b1ca54bdcb91d5a8a7b15ed",
+      "question": "依跨領域學程辦法，想放棄學程要找誰，修過的課與費用怎麼辦？",
+      "answer": "可向教務處註冊課務組申請放棄。已及格科目可依各學系規定抵為外系選修、併計主學系最低畢業學分；應繳的學分費，已繳不退，未繳仍須補繳。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "83fba634af12b804b23acf350a04a105f65bc94cee164670afbf0fff924a3bce",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_d92f4ec06b8fa24173cfc697003c1f0673673892ff5f0bc9efbbc9b961c44ba6",
+      "question": "依跨領域學程辦法，主學系與學程科目互抵有什麼上限？",
+      "answer": "主學系必、選修可抵學程科目，學程科目可抵主學系選修；互抵以該學程專業必、選修總學分的二分之一為上限，至多十學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "bda0b29094ac349df8af773f380aba127ad16043eaccccf2f5a9637b8b683d2e",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_8b5dc24b7c1da95023681ff845142e9f84f74ef1208c0534eb1a83440917158f",
+      "question": "修完跨領域學程後，依辦法會拿到什麼證明？",
+      "answer": "修滿規定科目與學分且成績及格者，畢業生名冊及歷年成績表應載明學程名稱，並另行核發學程證明書。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "45381e378da9cd162655ea2220eaf8dc1cfb447f8338ed484e7b2b27fa3e7f33",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_c806d5fa9fbad19f9e3bb55f43a4614ac6ec6789012023455479d7d6800217a2",
+      "question": "依企業實習問答，自行找的職缺如何申請帶學分實習？",
+      "answer": "須在規定期限前提交實習自洽申請書。企業須政府登記有案，職缺與系上專業相關，經系上審核通過，配合簽訂實習合約，由企業主管及系上專任實習老師共同評核成績；實習須在學期間，時數至少160小時。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "433b2838b359ba84315c39933364dedb21f0be9413a8a59df5f16a55c1a1a057",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_0d3c55ea40f5ba49a73dc23deeb3d9df199a09962218da26f8c264cea39a1758",
+      "question": "依企業實習修課說明，簽合約前要確認哪些薪資與保險事項？",
+      "answer": "簽約前應確認實習職務、薪資有無、勞健保及勞退相關保險有無與負擔單位，以及雙方權利義務。說明要求逐項確認，不能直接保證所有職缺都有薪資或同樣的保險安排。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "3f293a1cc772fd3506c76218ad8c154a02575f5bb3cce3329201e4277a058d40",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_8245f058c5b54c4e90d0328095ba2006aec675d1484452e3d6fb568f79602723",
+      "question": "依企業實習修課說明，三方合約由誰簽、應約定什麼？",
+      "answer": "由實習單位、系上及學生簽訂三方合約書，約定課程名稱、學分、期間、時數、項目、保險、輔導、考核方式，以及實習機構與學生發生爭議時的處理機制。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "b16921d3f1d01ddf3dc56a0bccf0140e7979a8fa12ca85a6562a0beae03876b5",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_f990f41ea99cacae2671b4e55b7f7cb1477e613b228f3de2d9036866fa751408",
+      "question": "依企業實習修課說明，實習課要交哪些資料才能保留學分？",
+      "answer": "須依每學期期限交齊期中適應表、期中與期末實習週誌、實習影片、成果報告、實習證明表，以及學生對合作機構的滿意度意見調查表；未繳交完畢視為放棄學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "09f4d4a18624c7b201646564798fa490306a1ea7eb4427a7b46eedc5760ad724",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_2a42679cff413920a13ba97e0c0b64dd64a145657c2688787b5455f0cd9ae729",
+      "question": "依企業實習問答，學校與實習公司的保險安排怎麼說？",
+      "answer": "問答表示學校會替同學投保，也會向實習公司爭取勞健保；「爭取」不等於每家公司都已承諾提供，實際安排須確認合約。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "478f89a64606001a6ab38eebf6ad99562f58ac451a3d891f87bdcea27a315003",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_aff74a17af153b52033f918dbc73df48d44e5b9e761fea9f4dbb5dbdb740be40",
+      "question": "實習超過160小時，學分和額外時數的保障怎麼算？請依企業實習問答回答。",
+      "answer": "依問答，超過160小時仍只有2學分；超過的時數仍可依合約向企業索取薪資與相關保障，學校也提供課程輔導及支持。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "8e7b2a9d4e1c4f6cd7873332c4f113791bfaa8dfceb2f47235c119fa8c82a3b4",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_8efb6eff03b42cdca6ed59d997cce309c3dfcafebfcd961aad3f7a8250ec5aa8",
+      "question": "只有寒暑假實習能修系上實習課嗎？請依企業實習問答說明。",
+      "answer": "只在寒暑假實習不能修系上的單學期實習課。須在學期中實習滿160小時；若從寒暑假開始並持續到學期末，可選修。純寒暑假實習可另參考生涯發展中心的全校性實習課程公告。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "649b0e9b9c7ce945ddda42ea0a307d33e919d4c7b0cf42d02e708a749c27dd00",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_6617203a5daa9ab3db98b2fba40315c68908f86db983c848acefab978dd6ceca",
+      "question": "實習遇到困難可以自行中途停止嗎？請依企業實習問答回答。",
+      "answer": "可中途停止，但須由指導老師與企業主管協商同意，不能自行終止；停止實習即為放棄學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "2df6e18b5701cd1944613952b7328c5eef4be7b3be7983cb74aac708cf169362",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_2af7bb676e026523a0f35b25cc728c715d6512f8de514b7285d50eea3dcfabb2",
+      "question": "企業實習問答建議從哪些管道找職缺？",
+      "answer": "列有104、518、1111等人力平台，各公司徵才網頁、PTT及Dcard、東吳人就業實習平台，以及台灣就業服務處；列出管道不代表每個職缺都已通過系上課程審核。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "9af2b166071443bbcfb99d1b64941602e7ff254bf4fb3a00e0873865e2deded5",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_abb284e45a655141f4191d540f7c23c1a704a88fb1b592ca8050c92f2425c0f7",
+      "question": "整年實習可以選修系上實習課嗎？請依企業實習問答回答。",
+      "answer": "問答表示可以選修，合約簽訂與課程選修方式相同，詳細辦理方式須洽承辦人；不能僅憑實習一年就認定自動取得學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "b86285a1e066890e07bd2b800f8ded7acc91da2f76b702891fc76252c8e0ae65",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_c7d6814688bbd4326ce676dd3150af7e9c6fe05376960deb2cda848eda67e508",
+      "question": "依專題實作修課規定，什麼年級及修課條件才能修專題？",
+      "answer": "須為本校學士班四年級、延修生，或計畫出國交換的三年級學生；程式設計（一）、程式設計（二）、資料庫導論之中，至少一科須及格。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "6aedd60255046f102c483526ce40d45f60d527b4ac716bf9a249ae08d2708b87",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_97a125fc6284be99fd0cb0ab26fd9eea4279bada17aaeb26e6c44f55d630a752",
+      "question": "依專題實作規定，什麼時候申請和製作專題？",
+      "answer": "申請時程為大三下學期；製作時程是大三升大四的暑假，以及大四上學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "ad310afd8ed6deedc14127741fdbb513b2fc7b9162d2443d2489f0e186a0fe10",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_a1f3337ee6cb9324453ab52215079ff3140cd29600d0645dfa1cb25f6fc62822",
+      "question": "依專題實作規定，成果發表安排在什麼時候？",
+      "answer": "依修課規定，專題成果在大四上學期期末發表。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "e1104a4d7d57625644c105bd48487b0fb1bacbaf70f66ef6b2ec151719be8e71",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_6b1069e8fc7e1f0a14e583e4b4994f03e08ba455188a5d8ac65752a2d2c8fe6d",
+      "question": "依專題實作規定，一組要幾人，沒申請能修嗎？",
+      "answer": "一般分組須三至五人，未提出申請不得修課。申請國科會大專學生研究計畫者，須在專題申請表填寫計畫名稱，且計畫核定通過，才可個人進行；其他特殊情況由系上協助安排。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "e46fe7ec120bda29838c80c1ae0b2b048ee3c9a8b41bbb2fa47ce7c80a08d58c",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_8383c1c5325ba3847a63c93ada4175f6edab38f8c4b5b6b72efe015e296511f2",
+      "question": "申請國科會大專學生研究計畫，就能一個人做系上專題嗎？",
+      "answer": "須在專題申請表填寫計畫名稱，且計畫核定通過，才可個人進行；其餘組員維持原編制與原專題題目。其他特殊情況由系上協助安排。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "c22ac53f6c6fd4fce607c14dc86a2eda6edb9b139473ddd2dd9d7bceb7ded227",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_cb9c6bcde1d75e81c9b2cbdc2acb07495cc722d393a4f9887d9710e373fe489d",
+      "question": "依專題問答，海報的尺寸、內容及手繪規定是什麼？",
+      "answer": "海報須為A1，包含學年度、專題名稱、指導教師及組員姓名，呈現方式不限。可以手繪，但仍須提供電子檔，可拍照上傳。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "967b0aa46f25e5d9b073dce488184c9081f521af15b43571da4b86c7841b8dc6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_d3d7c3fb4e4f38018343cdbec3c492f3aa614830aa328abbf8d81250aaf64a63",
+      "question": "專題影片需要多長、什麼格式及哪些內容？",
+      "answer": "須繳交5至10分鐘的影片，格式為mp4，內容須有學年度、專題名稱、指導教師及組員姓名，呈現方式不限。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "09643eef70fe027c76827f76a8c2608af004601a848c9accebcb3dfaec16d942",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_dc2ab1caed5d2b8f294b9220a28efbd709b70af7caec5baf3b44eb6032225261",
+      "question": "專題成果發表有組員因考試或報告缺席，問答規定怎麼處理？",
+      "answer": "應盡量全員到齊；若因考試、報告等原因缺席，由其他組員現場向評審說明即可，不必請假。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "e256a8f99573bab1412c9d4f57488814b21d62e2980f6cbad749bf008e2a0720",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_0837856a1d52e0488416d0743c91f91b7f521dd0204e7b56925e023b8a420cd9",
+      "question": "依學士班問答，想從原班改修另一班要怎麼做？",
+      "answer": "應在加退選時段，於系統退選原班課程、加選另一班。非必要請盡量不換班，避免兩班人數差距過大影響教學。但全學年課程下學期仍應修原班，不得任意換班；有特殊規定者依其規定。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "4e7ec7f1dff259ce9b3d648dfd3bc3dd60e9a35e6c078635306565b97fffea16",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_57c6558d8c413360ead5a07cf229bb95ba5584f422e27c791f2b9f9d71a448d2",
+      "question": "依學士班問答，學士班學生可以修進修學制課程嗎？",
+      "answer": "依學士班問答，學士班學生不可以修習進修學制課程。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "8d5eb4cc400f8a3bd6e915b88703c8f708055d8215388b055fb7d365c1dcee55",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_bc46e424866b4fb042f07bec5cd491cac62d29d6ed5eedc58257952abfa3a334",
+      "question": "必選修科目表上的選修課每年一定開嗎？",
+      "answer": "不一定。選修課是否開課，視學院發展及各學年度開課情形決定，學分表列出不表示每年都開。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "0b5580022004b2932d8884094f5717d875b62442fc2f08c3b816f4e690893872",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_fe8a5642b10a9f8bbe88fcc65cea9c1933adc2a32f75bd9973089ccc1da28fb1",
+      "question": "全學年課程下學期可以任意換班嗎？請依學士班問答回答。",
+      "answer": "全學年課程下學期仍應修原班，不得任意換班；有特殊規定者依其規定。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "83ad0ea4f5b9e56f40dc0a883987ae0b553d5627377ce30a0c50ad8151d49053",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_12fc82250014009e31d1ed4ab427beea14b401bbe20867db40991373f93b6824",
+      "question": "全學年課程只修一學期或其中一學期不及格，依學士班問答會承認學分嗎？",
+      "answer": "全學年課程僅修一學期，或有一學期成績不及格，依該問答都不承認其學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "beb8f68981f60e9b04f0ca108cdfb421f2ba688280b9fe9fe44425a2618bedd4",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_76a762ffaee80dd1ae3b4bbb8886951d0cc6e454f6bfb6e4c44873dd025954ff",
+      "question": "跨域實驗室介紹裡，AIIA Lab主要做什麼？",
+      "answer": "AIIA Lab透過軟體套件及感測器實作，提供實踐場域，培養跨領域的人工智慧創新應用。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "9824021ff388449a08be363cf192c36b6626ffca2fc0f8882ac221badfe66ae6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_c36089f275f4c3c757dd60d52abc9633e582dd598555a58b81dac6b57aa39c2c",
+      "question": "CHB Lab在跨域實驗室介紹中研究什麼？",
+      "answer": "CHB Lab運用計算科學探討人的互動、注意力與行為量化，強調跨學科學習。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "7f02558955b5199d9d5a811dcefbbfc9a690cc02090873032541653f4881520e",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_110e90d34236cf7a864674dc1b919664f9ae9230c9e037f06b76f2f3e5442bfc",
+      "question": "社會科學與醫療大數據實驗室的研究重點是什麼？",
+      "answer": "介紹著重發展自動化、智慧化的醫療健康模式，以因應高齡化社會；也以實證資料探索行為科學模型，作為預防醫學介入的研究基礎。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "9ed106fbde5eeda13eaa89d5baefb634531baa7115625c3dcf591a7b652761f7",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_8224514349b41c32079eb8b4d71fbe1518ced0a852aacebe0b4100526743bb2e",
+      "question": "UCAN Lab在跨域實驗室介紹中有哪些研究方向？",
+      "answer": "UCAN Lab以資料驅動供應鏈管理、碳權交易等應用，研究雲端、邊緣運算與物聯網的網路基礎及通訊協定，也涉及區塊鏈擴容、資料隱私與資源使用最佳化。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "6ed4fd8e5434bebfa44bb7d48255b1ca8623a3423010f4035b9403d6382f5173",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_5c06b3baa0b32e3163dc9a44273e58f21c30038862896b06ae0b988bae6f8994",
+      "question": "D Lab的商業應用方向是什麼？",
+      "answer": "D Lab結合商業應用，介紹列有社群與輿情分析、數位轉型，以及數據戰情室打造。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "0e62d6593f5816bb3f92964a49ad623fcc60e1bec89b0ad8495b21360e0fbbc3",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_7e6cbbc56b550b27a367f28c0d3ba3d6c491f78795ad12cec7850795516fb1ec",
+      "question": "資料科學系系學會主要協助同學哪些事情？",
+      "answer": "系學會作為學生與系所間的溝通橋樑，傳達意見，規劃學術及康樂活動、增進同學交流，並協助新生適應大學生活。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "8cd979a802d3808ac5c8e00e88a171fb82c74d92437c9e66480bfadf21f2c93b",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_032dd7c78d182d287ad30e9e4e2e2917ffeb975f26a35f0c197ca1b6df7c288d",
+      "question": "AWS Educate Team SCU社群介紹列了哪些服務？",
+      "answer": "介紹列有工作坊活動、課程導入服務、YouTube微課程及諮詢小組，由東吳巨資學生團隊維持營運。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "6cef8557078f9bc71498da820390938418d8201c5f52f8487377313e79827c10",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_ede83bf3ccda7c1db4154eb280cd2cb5146a42790b16bd99571ebb5054fefa96",
+      "question": "112學年度入學的資科新生，程式設計二何時修、幾學分、有什麼先修條件？",
+      "answer": "適用112學年度一年級入學新生的課程表中，程式設計（二）是大一下學期必修3學分，含輔導，程式設計（一）須60分以上。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "97f8c513d68937ff07b8a38ded0aa415cb42563aa07b76eebb8bac4eaf7c4c43",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_89f388b921c0f776afeffb42cd35ccdb1fa88be71aa8c83276b8b39482a04306",
+      "question": "112入學課程表中，資料分析軟體與資料工程分別何時修、幾學分？",
+      "answer": "適用112學年度一年級入學新生的課程表中，資料分析軟體為大二上學期必修3學分，資料工程為大二下學期必修3學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "e8e4cb18dff62550f9f8e5f384e5eed01e852dcee160a92f8f3a62e3ae21dcc5",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_c6039e9d01bbd940a8b32ed09ef0f74aa12ba585eb86412910c558a1e490593c",
+      "question": "112入學課程表中，資料探勘導論與機器學習導論各在哪學期修、幾學分？",
+      "answer": "適用112學年度一年級入學新生的課程表中，資料探勘導論在大三上學期，機器學習導論在大三下學期，兩門各為必修3學分。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "a9dfec77e52ff7276461f440d6f7290d51148302a3760cbdd4947d76d83bf8c9",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_080384e6662bd569df98b28dcca36aabf824b3f56286cab7eab550aac40d7d26",
+      "question": "112入學課程表的數位自主學習要修幾學分、何時選？",
+      "answer": "適用112學年度一年級入學新生的課程表將數位自主學習列為必修2學分，在修業期限內配合選課時間自主選課修讀。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "43ff00b24d4a96dc5537c4bf061bc13a996c358a5a1d5374d312c1e9955fe891",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_145ab40361853e64c5d91f3c674c9b7782f45b49169a05b671cefd65767188f5",
+      "question": "智慧創新AI學習中心介紹列了哪些技術與實作資源？",
+      "answer": "中心介紹結合人工智慧、虛擬人與VR元宇宙技術，透過NVIDIA GPU平台及AI資源支援深度學習、生成式AI與多媒體互動實作。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "ee1da43099a32089e90a858e76fa33b4f3a6c9fced2179c71f439c24a2d97c4f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_a6399e1fc75062833ec7249b325035c36210c97a13230ec91b84945b0f16da37",
+      "question": "借用智慧創新AI學習中心場地要提前多久？",
+      "answer": "場地借用頁面要求在活動3日前申請借用；該介紹未載更新日期，實際可借時段仍須另行確認。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "cf182769bf6ce27672867bed971faa59ad4446ae9caddf17101ce7c45902d887",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_e5323c9e0253c8dd5274d867ec133db1026e9441b90a27aca8e9f6b293ce9f4c",
+      "question": "東吳USR在114至116年的四項重點目標是什麼？",
+      "answer": "114至116年期程的重點目標為提升場域在地連結、落實人才培育、推動永續發展，以及發展具校務特色的大學社會責任。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "e0a489c8a27c8eac206cfae511afd9912f41b7b80bdff79dac49efb3744ae6f5",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_30fc0de7c8c58fe538147f0321af023dfa6c5083a46791c2685336eb376afc66",
+      "question": "課程介紹中的問題導向培訓，主要對象和方式是什麼？",
+      "answer": "問題導向培訓以大一新生為設計對象，透過課程及小型專案、問題或情境培養資料分析基礎，包含內部培訓、對外合作課程及工作坊。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "fcaf2546c84f7b6a95d5ae355f4d9917ff8e209ed6ddcf40c3ab008828660b0f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_16b26d2aaf66ce7d5147e62789f7c2cfa5f366283a40d76dd56141c4e00752d7",
+      "question": "課程介紹中的專案導向學習怎麼連結業界？",
+      "answer": "專案導向學習把業界資源與專案帶入課堂，接觸實際產業問題，透過解題培養資料分析及問題解決能力，並帶領學生參與競賽。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "0cc90c792a4864dbfcf6896eb1dc7cfc71143eb46d09df5e67bd4bb2d42d5465",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_2aa4ec33ca41c1cf69f64aa0c3887448f69372c239e87e9a5140cefdacbc12e7",
+      "question": "招生介紹把資料科學系的應用領域分成哪三個方向？",
+      "answer": "學士班招生介紹將應用領域分成智慧應用、服務科學及金融科技三大方向，供學生選擇發展。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "bfe55f61ae2946e85bd8d966b6e9c4679e0bcb4507e0e2aefc938f7a9902cdcb",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_b1d52786da46dfd512dc82849b2b6c0f315677eb33eea9f7e121231511632259",
+      "question": "學士班招生介紹的智慧應用方向包含哪些內容？",
+      "answer": "智慧應用領域列有資料庫、資料分析與處理、資料工程、雲端運算、資料採礦、人工智慧、機器學習及多媒體資料處理等。這是領域介紹，並非當年度開課清單。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "f20f7b812ac09d9e6716d3521e7e5c6feff2ee49f09dd1b8181263d5b45e4f86",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_592d6dd09e2bbb44752af404d5b14cfdcebeb2e9efe5f8e12bd0b2020b1ddc49",
+      "question": "學士班招生介紹的服務科學方向包含哪些內容？",
+      "answer": "服務科學領域列有服務設計思考、大數據行銷、社群媒體行銷、行為資料科學、使用者經驗、網路行銷企劃及廣告投放分析等。這是領域介紹，並非當年度開課清單。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "22f4b77c187b245258731dfa7383750f460607ee6e90e69787787f9f01ca6110",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_9953ceb727e26b9bd467c296d2f7ae7d03d0d297076767fbea6c871512a01e2b",
+      "question": "學士班招生介紹的金融科技方向包含哪些內容？",
+      "answer": "金融科技領域列有金融科技、金融創新、智能交易、風險管理及金融計算等。這是領域介紹，並非當年度開課清單。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "9f1e17fb5919b7efe3d3c34dcce82191fc757cf52956b9e98dbf1f23125705ed",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_dd2479827f55be38169a376063c2a5cc584b68143984a1f45e0896761d553ea8",
+      "question": "哪裡可以找到學士班招生頁面列的申請入學備審準備指引？",
+      "answer": "招生頁面列有「大學申請入學備審資料準備指引專區」，網址是 https://sites.google.com/gm.scu.edu.tw/entrance 。這份介紹未列特定年度的完整審查規定。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "8c49390645b02e36623273b4c8a7514610d3474b2a5fe1713d5b79d2b2517741",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_f929d5ee2bfd24487a911028b14031c08af0e3290f13dcfc8591263051500278",
+      "question": "企業夥伴介紹中的課程合作，主要協助企業做什麼？",
+      "answer": "課程合作方案著重企業人才的持續數位應用與學習能力，審視企業發展歷程及創新需求，為企業量身規劃相關培訓，培養數據競爭力。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "cabed83a7639b5dab7d7a77dee4b53bf9ac21bafd79a25ebacf13f33734c5880",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_3aba6757e915429e3c1b5792aca2b3088032b1ffd21c4c7c4c947b705d5c44ba",
+      "question": "企業夥伴介紹的數位轉型顧問服務涵蓋哪些事情？",
+      "answer": "介紹列有金融、醫療、商業應用與社群等資料科學領域的教師及顧問團隊，協助討論資訊技術解析、團隊建置與營運策略等數位轉型議題。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "2ecfe689a614cf2b9ca5b60fc238199ba1e407eaa54dc74fc297b51cbf8c855c",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_b40a516247d2388a49d576262e27ea95557621deb7b79c879c3f6a7ffc398640",
+      "question": "企業夥伴頁面的訂閱制人工智能服務包括什麼？",
+      "answer": "企業夥伴介紹將訂閱制人工智能服務列為AI技術諮詢與AI解決方案；沒有提供方案費用或成效保證。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "1660611552b35fa57c00ce079933c4f5f91b3d9e36ba91ea1617f077fe10e99f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_deff836c3414c8f1f5fd01eb12f02cc9f3ca0e86499fa09ecf92832b2ccb2cb3",
+      "question": "系友專區介紹的校友服務平台，畢業後提供哪些學習支援？",
+      "answer": "系友專區介紹結合業界資深講師、新技術與產業趨勢的校友服務平台，讓已在業界服務的校友取得分析技術及新技術應用的學習、交流資源。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "39ea6e97cfd5cc5af14abfe860e6b7ce72bca969864a2987c3b27e13a964a0de",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_57a700f26a476dbf21ebd4fb38c3a309c3d22582146017e588e4d768a8e49c49",
+      "question": "系友專區的線上學習交流平台，除了持續學習還強調什麼？",
+      "answer": "系友專區的線上平台介紹強調結集各界校友經驗，建立協作關係、聯繫網絡與集體分享，讓持續學習結合校友合作交流。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "3a14026d11df9e3ea8a70b239136518ee4e732c23ac32854062d346ef0da29d7",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_303787b815671ae1315cd37196add2326f1f662193310f073bed39a8b6ee07cb",
+      "question": "關於我們的介紹，提到課程貫穿哪五個大領域？",
+      "answer": "關於我們的介紹列出數理統計、方案設計、人工智能、數據科學及跨域應用五個大領域，並搭配問題導向課程設計與頂石課程。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "9c7bbfa30598e155d16a568f5b351d18bfbd4320e0dc8a606c9254a623ad1601",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_d33672c813fcc8832913c234ef020d257a73f5bb18898f76e6f660c1db66229a",
+      "question": "關於我們介紹的跨域選修模組，結合哪些領域來鼓勵第二專長？",
+      "answer": "介紹提到跨域選修模組融合人文、商業、統計、行銷及心理等領域，鼓勵發展第二專長；沒有保證修讀任何模組就取得特定資格。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "1507c979a081a0856d5ab995ce88124fb9888fa24ddcca57b71720fdc2373dc3",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_df33c9e7ee8dd098e0b0b95576e0f72726d197b2ab4691fbbc510abfd7742f36",
+      "question": "宣傳單中的智慧分析與AI系統模組，主要培養哪些技術能力？",
+      "answer": "該模組列有機器學習、深度學習、大型語言模型與生成式AI，以及Python、PyTorch、TensorFlow和模型部署、應用整合等技術能力。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "d22392588cbda121def2c4f5240ed7bdb507b65c4fd69d792a3b7df45a354269",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_69f63291472dd4031c7f6db5f5f04646fa0ffc33aa510e6194877189893c2e38",
+      "question": "宣傳單中的雲端系統與資料工程模組，主要培養哪些技術能力？",
+      "answer": "該模組列有資料管線與自動化排程、現代後端系統開發、軟體工程與容器化部署，以及雲端運算與架構規劃。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "fcc85ebc6ff6a448fa04cb574a606de138203a7ff97c58fb3c4562e1bdb13e14",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_40bcbb73bad65e30fa8d17f8b75dc5530eaea684fb45a02f21f9cb4dbb2a63a4",
+      "question": "宣傳單中的智慧商務與資料分析模組，主要培養哪些技術能力？",
+      "answer": "該模組列有程式設計、資料處理技術、金融建模與時間序列分析，以及資料視覺化與決策分析。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "2e26f0c6eca30562cbdb8566dea3bf2c95c0905a737dae2916adba3fdc209b77",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_e9906f5958069b0bfeb4fa45f5ed6ba33cc0a0b046632a328055c2f7d6699462",
+      "question": "宣傳單列出的生理感測與沉浸式互動設備有哪些，可用於哪些研究？",
+      "answer": "宣傳單列有腦波儀、膚電反應、動作捕捉、智慧手環感測裝置，以及VR、AR與眼動儀等設備，供數據蒐集分析，應用於社會工作設計、使用者介面、運動及醫療保健研究。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "a8ed137c182478e277c2bac2ae00b694acdbf11ba1e0a9f3582031ee7f8f80f7",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_9335746156d53ff3de647a77d2e94bce27305422111be7d71a056e20ded7e8eb",
+      "question": "東吳巨資學院在2025年與SJSU簽的是哪種合作課程？",
+      "answer": "國際交換介紹記載，2025年東吳巨資學院與美國聖荷西州立大學的資訊、資料與社會學院，簽署學士生先修碩士班課程，也稱Accelerated Master’s Program、AMP合作協議。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "eab809686d8c1cb4c43f6cff1d32c92dd4dfa1d2d7d076fdfc38c6e8b5057d55",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_b041c3f7caa3d3e2b6026eb0a44bac884251de45a9fa742b533c334ed3f13508",
+      "question": "國際交換介紹中的SJSU先修碩士合作，如何銜接學士與研究所？",
+      "answer": "合作機制讓學生在學士階段先修部分碩士課程，再銜接SJSU研究所學程；這不是直接保證錄取、免除申請條件或必然縮短到特定年數。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "2c70a580cb97aa0519df6ef44194fc5c38626e0dfb3873f4eec0898c6730764b",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_a0bf0d8a4aa6f3e46be78f90262133d0b5f11f8f33947dd73980841c0c3c6b41",
+      "question": "國際交換介紹中的SJSU IDS，整合哪些領域並強調什麼教育理念？",
+      "answer": "介紹說明IDS整合資工、資料科學、資訊科學及統計，強調Technology × Society × Ethics，也就是科技、社會與倫理的結合。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "0efd37e014c6b24d66573b9d7fab3f15de6a1af6a310bc0b9d5cf3c370b114c0",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_9974a8a7ce25b3163a72d18eba862ba2f37f87b7c14379dd99f92aa9fb047f38",
+      "question": "依團隊陣容介紹，宋浩老師列出的授課科目是什麼？",
+      "answer": "團隊陣容的兼任教師介紹，將宋浩老師的授課科目列為機器學習；頁面未註明適用學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "337d27a41642d2f06689bcd463229e4fe484549ac1389230bb13b5c8a6503b9e",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_820dc6b7a28940238b2541569bfc693d1e255c7f1d98964a068f8358e3f0ae39",
+      "question": "依團隊陣容介紹，劉豐泰老師列出的授課科目是什麼？",
+      "answer": "團隊陣容的兼任教師介紹，將劉豐泰老師的授課科目列為資料庫管理與實務；頁面未註明適用學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "fac93da7ed84307b0f1433edbbe087247c3d2115db58db74b78cca67d79775c0",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_7bcc1bcd767589c0713ac64ce930b3be504b509fc90304fd140b56311c5623ae",
+      "question": "依團隊陣容介紹，蕭宇程老師列出的授課科目是什麼？",
+      "answer": "團隊陣容的兼任教師介紹，將蕭宇程老師的授課科目列為區塊鏈；頁面未註明適用學期。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "2c4412831e28de8ba19a767eeb83e4b0cd6f439a1552cdfccb2fa5c4747fd950",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_b77bdabedf61a922e46b18ee867784cf91633593b2f8bf59e0e43ec78e2cf491",
+      "question": "高中生園地介紹的DONKEY CAR自走車，學生會練習哪些開發步驟？",
+      "answer": "介紹以機器學習結合影像辨識，帶學生組裝自走車及撰寫程式，實作訓練資料蒐集與處理、模型選擇與調整、實機訓練及測試驗證。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "6b57e01d99701f3a30aa240bd36880d5ce3ddd65f0ecaf2e23071e318be925e6",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_9418ba2d09a6c4279f22e03e66148908ea94538e0fc9063def5a1caea46ca1ac",
+      "question": "高中生園地的HAKKA震撼音浪作品，處理什麼語音轉換需求？",
+      "answer": "作品介紹以機器學習訓練音檔與客語文字，透過語音辨識讀取客語語音，並翻譯成國語文字輸出，作為語言學習應用。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "aaa381aa132bd1c82a3aa4340d05a7f232a57636a8a4539fe08c54a8a83922b7",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_0dac7215162d42f4d3df2f53b99778754652fcb0c13498d4579f5467c9549c38",
+      "question": "高中生園地的智能探索圖書館作品，怎麼運用AR？",
+      "answer": "介紹將擴增實境AR結合真實環境與虛擬資訊，建立圖書館導覽系統，目標是提升學生使用圖書館資源的效率與學習成效；這是作品目的，並非經驗證的成效數字。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "1026ba66b56fc0a6a64f55d79994c056494942e2e30d728bbb60a1416f3193ef",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_710db4cb4590ec3862b7f7dfb66f0097c2508504f8a93bcba23aa7e44377387b",
+      "question": "高中生園地的空座位管理及供電作品，怎麼判斷是否供電？",
+      "answer": "介紹結合感測器定時監測與YOLO影像辨識，在空間人數達到一定比例時自動供電，作為空教室供電管理的實作；未載明該比例數值。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "b181cf2865914d654f0751f3b0a97f1b39dda67b1bb315a5b7e8b8bdf4a74a87",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_cae3673779370dc9e43b38e8b3695250df3e28e2c9e4e329f4f0355e540c3a76",
+      "question": "依輔系及雙主修頁面，想以外系必修課對應本院課程，要同時符合哪些條件？",
+      "answer": "頁面要求課程名稱完全相同，學分高於或等於本院課程；若本院有演習課，他系課程也須有演習課。有疑慮時應提供授課大綱並註明擬抵科目，由系辦報請主任審核，不能自行認定可抵。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "01b84647f5f30475165a99f5bc0286c331b01987b6e668b76c7ed461b7243bf2",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_4e15ed84e654bf62962caa326ce4aba242a7a5aefcbc17c2925cd034a30a6a46",
+      "question": "資料科學系112學年度是否恢復招收雙主修和輔系，公告指向哪裡查條件？",
+      "answer": "112學年度公告指出，資科系恢復招收雙主修及輔系。條件請至申請系統查詢：https://api.sys.scu.edu.tw/academic/ 。目前受理狀態須另行確認。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "c443458007a23af23d58ec235a20ca215cc97cedcc1595755fe7035965efcb33",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_2912b3cb1653000c80129c7da73be024b21cfdf0d4105c3db21b27221d65eec9",
+      "question": "圖書館服務資訊列的外雙溪總館，借還書、非書與參考諮詢分別打哪些分機？",
+      "answer": "服務資訊列外雙溪總館電話為02-28819471；借還圖書櫃台分機5136或5137，非書服務5139，參考諮詢、館際合作與期刊服務5138。文件未載聯絡資料更新日期，這不是開館時間承諾。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "cc8074393b882d18040e02833962c09ed44396c9e4821db016643ab011ccd3ec",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_34b1e9e01f19fe2571977ba04c9eda3967f0513bb9edda452202d10f83e3c43e",
+      "question": "圖書館服務資訊列的城中分館，借還書、參考、期刊及非書服務分別打哪些分機？",
+      "answer": "服務資訊列城中分館電話為02-23111531；借還圖書2449，參考諮詢與館際合作2445或2446，期刊2442，非書服務2443或2444。文件未載聯絡資料更新日期，這不是開館時間承諾。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "c60c2ebb4e03edd5ebd2e78c4bf1857608a1b3055b97afb2590cd02f1a1a868f",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_090630028f789f20513cbc4840fc2edd1ff801c48ca0f59af05746d0b2fc4da0",
+      "question": "資料科學系首頁列的系辦位置和電話分機是什麼？",
+      "answer": "首頁列系辦位於台北市士林區臨溪路70號，東吳大學外雙溪校區哲生樓；電話02-2881-9471轉5934至5937。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "803f7e29a61c22bab18d53d42f73b5d6128159fee07b2a68c0d78c3d2ed51e77",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_ed1cad01e219f0c70389caaef6c809b2b6722db47301b5665286b80ca17f2288",
+      "question": "高中生園地列的教育部圓夢助學網，可以查哪一類獎助資訊？",
+      "answer": "教育部圓夢助學網彙整中央、地方政府及民間團體的獎助學金資訊，網址：https://www.edu.tw/helpdreams/Default.aspx 。申請資格仍以各獎項公告為準。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "85d5ca837e68326b53ae001a18c08cedccfba919cc21d0464c62f3a5b487a5b7",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    },
+    {
+      "faq_id": "FAQ_c1db0b9a8936adc0f7439eaa2e3c5257d8e9fbb9484f5be1b474a2626d291546",
+      "question": "資料科學系首頁說明的辦學核心思想，視野、熱情、行動與影響力怎麼連結？",
+      "answer": "首頁的辦學核心思想以視野優先、熱情為核心、行動為導向，並以創造影響力來培養未來數據人才。這是辦學理念的描述，不是學生個別成果保證。",
+      "sources": "[]",
+      "original_review_status": "needs_review",
+      "candidate_sha256": "b9d30b1c5f3fcd281dae8471bde085258d063e88c1caf278912ba37f833e6af1",
+      "decision": "needs_review",
+      "reviewer": "",
+      "reviewed_at": "",
+      "evidence": ""
+    }
+  ],
+  "new_records": [
+    {
+      "faq_id": "FAQ_e500c18bf2c49769e6b7dd51fcaaec9ad0814e2f014865b90ab44199d3d44788",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_f8b785ff81f961c5d739e9d88866dd2d9c528d6411bfa7e2ac4bd32720549ae3",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_77ed35224b13b3e97ec76e770a1c21c4817755d2d871b2d991e448e12763e86b",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_b52585ac1932a18d2845bc6cc0ee2d0808a0b0084e1f008a0c0d4620c6a9fdca",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_833f7fe580037cf2cf79090ac831fda5676ae9fabe72ac7681dbbe04dcb7d421",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_5d71fc6a9cb68ba82f58c65aaea79d3efc08f152d0ebec8c9a6a3364f976b5c5",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_43ef73189e73eeca4d3e6703f0817bb5c80d1fe4e1b5783c91d8985a2b1a7748",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_e07282eb02f0d57a2f13942cedaa7b85b7d97bf61bf5fd905a90c778dd2117f2",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_a2239d993d5b7d2f490d63eecee8da839753f8a7947e1c471e2d46591662b4a5",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_e6be0123be29df0ab521d12a9a29aeb66f738014d8bc73c44fc610350028d62b",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_9ceb2d2cf392a53d570bd50804f0229127289090f1aea093377e8867cf0eb4f8",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_dc85e5dfef3a18eb8e803a3a056df0b98326f3981b5a4f16a074e8ad5e7fe59c",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_211bebdd2f1655f6676dba64fc0d862ad71af5d7fc78b2293aa4e389763f13d8",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_44764f84a63b879b1ec1aad0079f15b37bd68a7e0fa036f86a1ae8cd00b89722",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_fd1852581c3431b5849ec4da4aa1a430ab53078648dbd5d74a97f2a8aaafa31b",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_1d8d84eb8467e17cc61468ba90ddc8a403b66a3a510d9044605be83856fc2f39",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_d4b932707d60c33cdcc6191046149e12affcca5dfac7ca6114548c4749c4fe00",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c22a221b0131ef2ba1dbdea321ef7f017883b73bcd6470f7c4bde51865a13d40",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_62a59f27601f00399286e9c3b737576c2da67137eb401d2abc625b9822e16f7d",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_28717d05077b9878f6a3b5ebf0b40b789615272f4fd9e1f69449983542a6ef7c",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c04e218311e182a51fafb50fb925fbbe2a89f0c5ee7cbcbfa5610bac7d62becf",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_2c11697ab5c1d1ea62ad722e558020c04fbae6c413fbd9523169c391fe5891fe",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_b89efa7aa99af69dacaf518097feebe7c8ccc74473d26ddaa742ecdad3f137a6",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_91f31a0d6f603c5849c34c1b813065ba06a10e913c8381c0510a0682d03a5edd",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_55ae3ea481dbbb3a5693a5219737c55a24c41dc6be420872c128bce6c061d45d",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_7e19ed9057acbc20afb8ac9f87bcacd7630291f6acbea628136267147afc9d68",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_0fa65effbb42bb5392b465a1d3ca336dee3ace110a0c2098603d0891fc128913",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_11baa2533546701cf24bdba22839b0aae96b82d3855832441c835a788be34ed2",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c3682f062a5baf0c59f19df1e0d559db3da391c061c69b81e79bb2034873e7ca",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_cc64dbd951fc5ae84ae0a0e958ef0e30c0d41a76ee998f4a4a3c4407a3922eaa",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_916903c79c855135be74708f3b788a34373616daf6f81658865aec950ba1770e",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c18f47a8c3bf2b8db2e123549b1be06f47f5f529239eaed207de5bf111475cef",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_8fe41636f1d6e8778eb3fd0c9a13e61022ac268c7e23d6675879883594e82c88",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_7fee4b97b968fa1f7f6f0940e0a2537554b18e9f2577bd8ee83067c5a63b5f67",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_ad7a9311b435521028e57e3b23e22fd594b1ed97bd5728043c8bb92be6193607",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_f3222150dca42b5d55f9d8af64b80fb64d3aa011a1209930fda6d5ff38e19675",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_2de55d32fa07c2cc54c0e35c5b82cc0981fc1371c1088ff56d4ff033b4c533fd",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_833354b0a4824b206d1027eb49f9a43592e723bf0129189e015f135758bffabe",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_b58f3d18bdb1b7098ff7df663424835048ea9e7d470a421a046f6a11f8536774",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_616c8f368901539800485e6373be30d7cade8bc6ae1054c51017d733dad10498",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_53848b5729d427252df17800701b413ad11d1099c997ec7e9ce6ac91adf9faaa",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_9d6d749759f6d0a6a8eab1ce946fbbbee1b9ba4c1d95cdf9027237863624199e",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_75dce61d406bdb6197580810256de012288f7c1f4c847683c8dc6994cdc1cbc1",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4a07359f41bfa2d3663b29eed07a44b2d9b425f8450ec60f5dbfccf45544f210",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_f3db6cc0bf702d6c47c6cba067a35e7c8ae22acf1278a394d90e5a60443098dc",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_6259685ccc2bc47a0a838d261e6b8daa301b24186c1160e71a4e353b9a05f339",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_a37b11a99221b509f7e49969cb615eb24c8c5ba4022a608e35568db2f4e4a4dc",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_73cb5c977109e31832fbf1f3869bac66be1f590744e55f2c04825bef82b332b6",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_dcd462b6729e2c0e0bdbb5ebf722facb6ce2a81e777a1e701effbd7d35a4f891",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_60f1f316565d2a58f0024be563395b64d1d5c8c902d5a0dff6ad55c2126915e4",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_534a7695c152a0519af7fa3224954f6a43b3cdcfa827c937ac0511d083417441",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_9f0aec38f88636bc85ff7f77ced38cbe9f9dc49853ac7dedd39c8b2be9fa5667",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_34cd8e6f1d66bbd6e3b3a80ed0324b8bf4f6b52511ea52651b491517ebe12666",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_67587bc4a99bcbc6afa6822c4c954e029b82a16a69fcddbedd98b6a05d7acdac",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_04e35e6b051013c63d337aa8606cda8f12084a4c1760291d882a14f5bd5f5c89",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4cd10e49740dcd53f160a757980e3f78386a9f68a52daa9b5d46a7db501a872c",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_7cf5f7132a77300f48902ff59d4157c0b2cdab4af1b5287f4a3aec371bd641f7",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_7702679fab1cf018d04b9b0b3087d1fb72e22d8234a115c21ffd8ec9818a2ab1",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4fa67dbf3fe6adc23d4791bca1cef69806f83d093e1186c55d59a17f5e3b18a6",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4d111f35d6ab66976a814d06b4a961d45ee8f825e585bae2def6dae6501feae6",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_f1e692fee09c90957e4b708ce5d9db78ee2d108864873a29dc9e1f44372b0143",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_ca68bac6af68ad085db6b74590aa90dbeceb8318e3cae5fe04bcd7a85d039015",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_ea1048ddb12fae71032dc345cae0ccbac60fba7e60d6f1957711640ff4681ff4",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_430c2f4e7301e501bac7df44384e65df2374d0dd9d58040c24ba915cb8ede7c9",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_a2418fce2d4cc088f5c6948eb2ad15419a27b0c6c2019d6d4398e2a06ca9e6e7",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_f38e1753ef725564def33cb7161ac2a5cde3eb97293cd28aff0ba386d13328e8",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_3a7da523a1119eed297b01a591c8c3cde8d48ff2f2f211e2d1f17e86e6cbeed7",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4fb5631ef2eca753295ef0bd743073ed31e9e84967dec5243f1d746ea5aa8ecd",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_5464db4f9d7728616d81c6b4ba4d39e740e0c693eb136be8090e847d23b825db",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_52c69be8c47079295f06a3a4e86b051c91d8c12bee1066421a6e9abe5921cfa1",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_495125198619700d33f5009e243c8fbfd042dc4ad449c6cb4bb863d268057c9c",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_737f7021f9a26d539ca365352d28750688446ab6d55e8a7b9b0bc76ebe39ff74",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c5d1170102e7778eb66d98cbe47bfe2f43bbaf235bebd246ca77fd38ecd24ee5",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_ee4c2a3b72c2e9c1119cdca5364afe2e0420a81c0fc32536fec9879cf1818053",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_e5a4da987a75bcc75ec5fa2eb4e7dcd4d88a1c9080792d6bf9b305a3eb995ce9",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4e5caeab359e7afb814d8f3ff7177d64b586995438bd1539926418c0dc78f88c",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_2ef9a86750414148e2ea2b3fd226e8b309d9adcd5c713029216dff6b8f7a4d2f",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c87bebd2b13577e1889168d509545b17579a8da74acd2529f962eb16bd1cab12",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_0ed30f6fb3aa6b5026662738f53b94f6c21135f29e15c7f8c02621fb4f5a69ec",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_3491d1b620a7976fc1d9afdea0bde05e0cf2bce54b9ebbfac311b5beacca9d9d",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_76ea0e4c4420954faeea5a0225b27efdb7622b19af8c9b7def0b25607d8e7544",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_16d1b69d9e54342e3ce7372433af52cc648f11db4e01dc27c597286d6acb6793",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_7d0e19d1ed787e9ef7e9c393bb97f84fb19e916bf8df9ffd1d4389bf1063364f",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_89f10a2cdd742c2e35e3841cb59ac1e411c9b8631825265de209c4ae7e5e9867",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c8f15a8fb744b8e3a148338864736600453eaf058bc4719420edc71c79c814f4",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_3b910d4c152301ff44e478b24ce0fc4cf399f0a54d8e05420ce33398ea55b3cc",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_63ccd7845e32910b30a8d506acecc00bbd8df103ca4152d1ed1efb4785f7ae79",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_0c14e8aa6f281e63a4581df4bb2fdade05cd93c19f3ff279d160cefd576b6e51",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_760004c82fc1f944d4ba5b96cb85fb67593e9974ccfc4d60682d77d140c18bdc",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c38b6a13c9148ea92064033ee5b372349014eaa0a4406c5993ed99f30ac99f1e",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_0b478d6c5b61666852dfcb3a1daef52d45ca873be5dab58b64c18830452d236a",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_cd0f895368f27c604c20aed4bfb83e18c5795d63663e20e0113c7575f72bc701",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_fffd51e4732fdd3a6af801f6ce29bf590d5ff9a2b3c54bddd135cdb006809166",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_03063e421f50c7a033584e725264d4236973dcc3405cc83e0a031c8ffb0620fb",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_91cff9d9fec2414f3c4b13770d125ba6d0b689d6edec70f218b437184d8210cf",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_52f24aa56f5c4c435429d60a6744952044d72937f3c22d691cd1dbb51fde96ac",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_165acbbf9f4d85ad72297d28dcab9b32a6eb78c8023625e04ad1a4c28bc43bae",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_08b4d5442b5c966efb0c9b85e2d4b82ba61e1fb71172eee7b1707bbbbac91ba7",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_268bc9dbd945b0d0dfe9d3e61947f04ae1ffaec115814702c73f7477da3cf6d0",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_1e6dfe32f493160a0044be78816f6b5d284b2b6be9ec922aeac58d8a6652b781",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_2f26022642146a5b924508a7d049417a48f00a2b1ba6320660df1cda4765668c",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_d28c723d083024754fc8e6be36239154b8bc15d12f3085a560cf6557782ddd10",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_d51a0147374a6c1fb41495f73978186f2426bcb32fb609715bbeba8420cb4fa4",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_57609f751a93022df19ce055c1c434f00281a43c519b2df3bad6f59e6103b43a",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_bab1f6a4f773ba58fc4c3dfc29cc10fcdde440a9589ccaae88a0dfe996b63e04",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_f6dc0f1e22bbdae0f43a086359d7970df4033747c4701e92e984619e875293c4",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_2b77bc53959ea831db2e937db3908f41ad44c61d9c39bea3aef5d5fad64cc9db",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_feff3f91fc1cf561137c2eb8256e48717c5d9fad21711f2d48a680923a91f55d",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4d63cc3cafe9c8445c4e70dd462bc35f08aadf515aa666e2df32b2f7f4d5a3d3",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c1d18edd7dbece8844bacc8d2f06a9557ff6b93ac7fe2b02cccaf9a01ac8f5a2",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_d689997c729a19ccc4f7925ab364bff5e7682d6f4865f30e658ba60af5e6a24c",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_09844496ac0463de92eeb426d1fb982d10d62900f146f5b70c236cd18dbb9e16",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_40cd5d31a0b5753b2c13bdfeeed27808e2daf400114816f35554c2a6a4e1def2",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_5a95ea41e5be98b4e297286fb1ca3a2127a76086175df081982372a079a25989",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_60881efb21449f3a99e77e0f5b68a226c654a80b157f8ad71d04e5ceb8fbe89d",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_452a3400c7222bb2fec9b849e2720603c038463e0eb953403e8dc4f1950d5e65",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_8f494fe999c2efc7e67cc79af5080dd1a678e162b0ddea41e99884f436a96a71",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_72830f1cadef1c1c2b7d7a7c739dca82e99f966e2fe0a24fcdc05d1679458894",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_547e843b3e8f655114ce9528d93a76f3c579437e7d9bdc0ed1c802e436b0496f",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_f91bd766f251f04dea95f336797db140b0ee1e140a966d12266c49e4f13a4a75",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4cad7a32f59656b1a2190dd570b6d2be8f5bb9cb9378ded3278015f74cbfbd1d",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_924a936458fc70ccfb8792919c55e3e33dd9b0cd34a7e494dd930f78e54c129e",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_cbbb7d89d4bece0a45fd7dcca22b7abe0e36a116656229519028e9ea41f9bbca",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_b9bc27a2c49eba84f253003601d45d92ea63296339a5b17ad5d5b018876ca149",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_5028e1804782977d901218427178e4b5db7a48c08187a8327928e49fe30ec28a",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_1daf7863ed40991b6cb9487e2efbefc339b7c69cd7e7af898d54ae34df344d21",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_4f1b68e3dd9af752b46c46b7ad553c04eaa410babcf45fa41606502fdd242c96",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_cf253d71b1e63f140e26f8086d8773191ad4cc6a5aa06fdf981082e77d352a42",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_3224d7b6c88e1142f3b84510aefaf31f9af4d51c44e8e32ccf7e8155c3c01508",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_c621536b1eb270e5d5b24e1b92210f9a275b281dffc4aec8c11dbef0900b2bfe",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_cc85d0da36b5445029caa6128cc3f8181389854955068d34794f510d17fa9dce",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_36d6465f02f12e8cba43cd1d7299955684c0856a26ae4259f2b773fa092da369",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_92eb564ac193385006b99a60b9b819935e4a8561e4195991463e58d4c3dbc878",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_447c64379800e9afbb02401dbed6fd981007df566745ec923a4e09e342a05734",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_b38b145ced74c9c99a7e74296ac2884b51658d6bfdb7a933b0d400c42d1362d2",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_9ae7594bf59cf3e968de4ad8ce965159eb13e1c35e9921cdaa65f200cb6529ac",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_040e07257477235729e032aad41f723eaea178638302dd4da58367d0ee5d98d6",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    },
+    {
+      "faq_id": "FAQ_3668a36757834d682dc30ba857fd223293fda10409495f03974f096b0fae877a",
+      "decision": "needs_review",
+      "mapping": "unmatched_needs_review"
+    }
+  ]
+}
