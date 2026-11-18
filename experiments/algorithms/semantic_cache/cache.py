@@ -1,6 +1,6 @@
-"""Append-only answer cache. FAISS labels are stable IDs, never LRU positions.
+"""Answer cache. FAISS labels are stable IDs, never LRU positions.
 
-Single-threaded and in-memory only. No persistence, eviction or KV cache.
+Single-threaded, in-memory; lifecycle policy is owned by ReviewedCacheA0.
 """
 from __future__ import annotations
 
@@ -37,6 +37,7 @@ class AnswerCache:
         self.dimension = dimension
         self.entries, self.exact = {}, {}
         self.labels = {}  # explicit FAISS int64 label -> stable cache_id
+        self.next_label = 0  # Never reuse a surviving label after deletion.
         self.index = None
         self.valid = True
         if mode == "semantic":
@@ -110,7 +111,7 @@ class AnswerCache:
         entry = Entry(cache_id, query, answer, self.namespace)
         if self.index is not None:
             import numpy as np
-            label = len(self.labels)
+            label = self.next_label
             array = self.vector(vector)
             try:
                 self.index.add_with_ids(array, np.asarray([label], dtype=np.int64))
@@ -118,7 +119,27 @@ class AnswerCache:
                 self.valid = False  # never serve an index that may have partially mutated
                 raise
             self.labels[label] = cache_id
+            self.next_label += 1
         self.entries[cache_id] = entry
         self.exact[key] = cache_id
         self.check_consistency()
         return cache_id
+
+    def remove(self, cache_id):
+        """Remove the vector first; fail closed if an index mutation is uncertain."""
+        self.check_consistency()
+        entry = self.entries[cache_id]
+        if self.index is not None:
+            import numpy as np
+            label = next(label for label, key in self.labels.items() if key == cache_id)
+            try:
+                removed = self.index.remove_ids(np.asarray([label], dtype=np.int64))
+                if removed != 1:
+                    raise RuntimeError('FAISS did not remove exactly one Cache vector')
+            except Exception:
+                self.valid = False
+                raise
+            del self.labels[label]
+        del self.exact[self.key(entry.query)]
+        del self.entries[cache_id]
+        self.check_consistency()

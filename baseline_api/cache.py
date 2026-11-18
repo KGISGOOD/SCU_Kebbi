@@ -1,5 +1,6 @@
 """Strict reviewed and explicit experimental cache routing; no auto-approval."""
 from datetime import datetime, timezone
+from collections import OrderedDict
 import hashlib
 import math
 import time
@@ -124,6 +125,7 @@ class ReviewedCacheA0:
         self.identity = {'adapter': adapter.identity, 'policy': self.options}
         self.cache = AnswerCache('semantic', self.identity, adapter.embedder.embedding_dim, options['threshold'])
         self.reviews, self.pending = {}, None
+        self.lru = OrderedDict()  # Oldest first; only accepted hits move existing entries.
         self.guard = resource_guard
         if self.guard is None and not options['verify_sources_each_request']:
             self.guard = ResourceGuard(adapter)
@@ -147,18 +149,49 @@ class ReviewedCacheA0:
                 and all(isinstance(d, dict) and isinstance(d.get('content'), str)
                         and d['content'].strip() and d.get('metadata') for d in docs))
 
+    def check_metadata(self):
+        self.cache.check_consistency()
+        if set(self.cache.entries) != set(self.reviews) or set(self.reviews) != set(self.lru):
+            raise RuntimeError('Cache reviews/LRU/entries inconsistent')
+
+    def remove(self, key):
+        self.cache.remove(key)
+        del self.reviews[key]
+        del self.lru[key]
+        self.check_metadata()
+
+    def purge_expired(self):
+        self.check_metadata()
+        now = time.monotonic()
+        for key in list(self.lru):
+            if now - self.reviews[key]['monotonic'] >= self.options['ttl_seconds']:
+                self.remove(key)
+
+    def lookup(self, query, vector):
+        self.purge_expired()
+        return self.cache.lookup(query, vector)
+
     def save(self, pending, status, reviewer='', evidence=''):
+        self.purge_expired()
         key = self.cache.key(pending['query'])
         existing = self.cache.entries.get(self.cache.exact.get(key))
         if existing and existing.answer != pending['answer']:
             return None, 'append_only_conflict'
+        # Validate before evicting useful entries for an invalid insertion.
+        if not isinstance(pending['answer'], str) or not pending['answer'].strip():
+            raise ValueError('empty/invalid generation must not be cached')
+        self.cache.vector(pending['vector'])
         if existing is None and len(self.cache.entries) >= self.options['max_entries']:
-            return None, 'capacity_reached'
+            self.remove(next(iter(self.lru)))
         key = self.cache.insert(pending['query'], pending['answer'], pending['vector'])
+        written_at = self.reviews[key]['monotonic'] if existing else time.monotonic()
         self.reviews[key] = {'status': status, 'reviewer': reviewer, 'evidence': evidence,
                              'reviewed_at': datetime.now(timezone.utc).isoformat() if status == 'approved' else None,
-                             'monotonic': time.monotonic(),
+                             'monotonic': written_at,
                              'answer_sha256': hashlib.sha256(pending['answer'].encode('utf-8')).hexdigest()}
+        if not existing:
+            self.lru[key] = None
+        self.check_metadata()
         return key, 'stored_' + status
 
     def answer(self, query, *, query_vector=None):
@@ -182,15 +215,16 @@ class ReviewedCacheA0:
             raise ValueError('Cache Miss: resource_version_unverified; RAG also refused; restart: ' + error)
         vector = (stage('embedding_seconds', self.adapter.embed, query)
                   if query_vector is None else query_vector)
-        entry, score, candidate = stage('cache_lookup_seconds', self.cache.lookup, query, vector)
+        entry, score, candidate = stage('cache_lookup_seconds', self.lookup, query, vector)
         reason = 'empty_cache' if candidate is None else 'below_threshold'
         hit, hit_type, review = False, None, None
         if entry is not None:
             review = self.reviews.get(entry.cache_id)
             if not review or (self.mode == 'strict' and review['status'] != 'approved'):
                 reason = 'not_reviewed'
-            elif time.monotonic() - review['monotonic'] > self.options['ttl_seconds']:
+            elif time.monotonic() - review['monotonic'] >= self.options['ttl_seconds']:
                 reason = 'expired'
+                self.remove(entry.cache_id)
             elif query.strip() == entry.query.strip():
                 hit, hit_type, reason = True, 'Exact', 'same_question'
             elif self.mode == 'experimental' and equivalent(query, entry.query):
@@ -199,6 +233,7 @@ class ReviewedCacheA0:
                 reason = 'intent_or_conditions_unverified'
         saved, save_status, detail = False, 'not_applicable', None
         if hit:
+            self.lru.move_to_end(entry.cache_id)
             answer = entry.answer
         else:
             if query_vector is None:
