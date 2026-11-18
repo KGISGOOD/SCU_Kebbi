@@ -62,18 +62,6 @@ class Settings:
     llm_repetition_penalty: float = 1.0
     llm_trust_remote_code: bool = True
 
-    # Prompt settings
-    prompt_template: str = """基於以下提供的資訊回答問題。
-如果提供的資訊中沒有答案，請說「根據現有資料，無法回答此問題」。
-
-{context}
-
-問題：{question}
-
-回答："""
-    # Alternative simple template
-    # prompt_template: str = "{context}\n\n{question}"
-
     # Generation
     seed: Optional[int] = 42
 

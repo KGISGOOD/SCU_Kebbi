@@ -21,8 +21,8 @@ def validate_speculative(config):
         raise ValueError('positive integer draft_tokens required')
     if config.get('device') != 'cuda' or config.get('precision') not in ('fp16', 'bf16', 'fp32'):
         raise ValueError('SD candidate requires explicit CUDA and floating precision; no fallback')
-    from experiments.baselines.rag_baseline.prompts import validate_senior_prompt_version
-    validate_senior_prompt_version(config.get('prompt_version'))
+    from experiments.baselines.rag_baseline.prompts import validate_prompt_version
+    validate_prompt_version(config.get('prompt_version'))
 
 
 def unused_statistics():

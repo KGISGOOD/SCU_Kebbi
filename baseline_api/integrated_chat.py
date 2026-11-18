@@ -16,13 +16,13 @@ def load_config(path):
     config = json.loads(path.read_text(encoding='utf-8-sig'))
     validate_faq_config(config.get('faq'))
     validate_options(config.get('cache'))
-    from experiments.baselines.rag_baseline.prompts import validate_senior_prompt_version
-    validate_senior_prompt_version(config.get('prompt_version'))
+    from experiments.baselines.rag_baseline.prompts import validate_prompt_version
+    validate_prompt_version(config.get('prompt_version'))
     if (config['faq'].get('acceptance_mode') != 'experimental'
             or config['faq']['threshold'] != 0.9 or config['faq'].get('min_margin') != 0.05
             or config['cache'].get('acceptance_mode') != 'experimental'
             or not config['cache'].get('auto_write') or config['cache']['threshold'] != 0.9):
-        raise ValueError('integrated candidate requires senior V2/V3, experimental FAQ/cache, 0.9 thresholds and FAQ margin 0.05')
+        raise ValueError('integrated candidate requires baseline_senior, experimental FAQ/cache, 0.9 thresholds and FAQ margin 0.05')
     from .speculative import validate_speculative
     validate_speculative(config)
     return config

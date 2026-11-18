@@ -4,7 +4,7 @@ import json
 import tempfile
 import time
 from pathlib import Path
-import subprocess
+import hashlib
 from types import SimpleNamespace as N
 import unittest
 from unittest.mock import Mock, patch
@@ -54,15 +54,16 @@ def measured(fn, *args, **kwargs):
 
 
 class PromptTests(unittest.TestCase):
-    def test_system_text_matches_git_before_change(self):
-        previous = subprocess.check_output(['git', 'show', 'HEAD:experiments/baselines/rag_baseline/prompts.py'], cwd=ROOT).decode('utf-8')
-        node = next(n for n in ast.parse(previous).body if isinstance(n, ast.Assign)
-                    and any(isinstance(t, ast.Name) and t.id == 'SENIOR_SYSTEM_PROMPT' for t in n.targets))
-        self.assertEqual(prompts.SENIOR_SYSTEM_PROMPT, ast.literal_eval(node.value))
+    def test_official_system_text_is_exact(self):
+        self.assertEqual(hashlib.sha256(prompts.SENIOR_SYSTEM_PROMPT.encode('utf-8')).hexdigest(),
+                         '61968a8199ea7e96743196a2103e54a8f5578da3248e765a2fc58c87f03a327d')
+        self.assertEqual(prompts.PROMPT_VERSION, 'baseline_senior')
+        self.assertFalse(hasattr(prompts, '_build_legacy_prompt'))
+        self.assertFalse(hasattr(prompts, 'SENIOR_V3_SYSTEM_PROMPT'))
 
     def test_roles_context_and_single_bos(self):
         tokenizer = Tokenizer()
-        rendered = prompts.build_prompt('REFERENCE', 'QUESTION', prompt_version=prompts.SENIOR_PROMPT_VERSION, tokenizer=tokenizer)
+        rendered = prompts.build_prompt('REFERENCE', 'QUESTION', prompt_version=prompts.PROMPT_VERSION, tokenizer=tokenizer)
         self.assertEqual(tokenizer.messages, prompts.build_messages('REFERENCE', 'QUESTION'))
         self.assertEqual(tokenizer.messages[0], {'role': 'system', 'content': prompts.SENIOR_SYSTEM_PROMPT})
         self.assertEqual(tokenizer.messages[1]['role'], 'user')
@@ -74,35 +75,32 @@ class PromptTests(unittest.TestCase):
 
     def test_missing_template_or_duplicate_bos_refused(self):
         with self.assertRaises(ValueError):
-            prompts.build_prompt('c', 'q', prompt_version=prompts.SENIOR_PROMPT_VERSION)
+            prompts.build_prompt('c', 'q', prompt_version=prompts.PROMPT_VERSION)
         tokenizer = Tokenizer()
         tokenizer.chat_template = None
         with self.assertRaises(ValueError):
-            prompts.build_prompt('c', 'q', prompt_version=prompts.SENIOR_PROMPT_VERSION, tokenizer=tokenizer)
+            prompts.build_prompt('c', 'q', prompt_version=prompts.PROMPT_VERSION, tokenizer=tokenizer)
         for text in ['<BOS><BOS>bad', 'no bos']:
             with self.assertRaises(ValueError):
                 prompts.encode_prompt(tokenizer, text)
 
-    def test_v2_v3_selection_preserves_roles_and_bos(self):
-        for version, system in [(prompts.SENIOR_PROMPT_VERSION, prompts.SENIOR_SYSTEM_PROMPT),
-                                (prompts.SENIOR_V3_PROMPT_VERSION, prompts.SENIOR_V3_SYSTEM_PROMPT)]:
-            tokenizer = Tokenizer()
-            rendered = prompts.build_prompt('CONTEXT', 'QUESTION', prompt_version=version, tokenizer=tokenizer)
-            self.assertEqual(tokenizer.messages, prompts.build_messages('CONTEXT', 'QUESTION', prompt_version=version))
-            self.assertEqual(tokenizer.messages[0], {'role': 'system', 'content': system})
-            self.assertEqual(tokenizer.messages[1]['content'], prompts.SENIOR_USER_TEMPLATE.format(context='CONTEXT', question='QUESTION'))
-            self.assertEqual(prompts.encode_prompt(tokenizer, rendered)['input_ids'], [1, 2, 3])
-            self.assertEqual(tokenizer.render_calls, 1)
-        with self.assertRaises(ValueError):
-            prompts.validate_senior_prompt_version('baseline_basic_v1')
-        with self.assertRaises(ValueError):
-            prompts.validate_prompt_version('unknown')
+    def test_only_official_prompt_allowed_and_roles_preserved(self):
+        tokenizer = Tokenizer()
+        rendered = prompts.build_prompt('CONTEXT', 'QUESTION', tokenizer=tokenizer)
+        self.assertEqual(tokenizer.messages, prompts.build_messages('CONTEXT', 'QUESTION'))
+        self.assertEqual(tokenizer.messages[0], {'role': 'system', 'content': prompts.SENIOR_SYSTEM_PROMPT})
+        self.assertEqual(tokenizer.messages[1]['content'], prompts.SENIOR_USER_TEMPLATE.format(context='CONTEXT', question='QUESTION'))
+        self.assertEqual(prompts.encode_prompt(tokenizer, rendered)['input_ids'], [1, 2, 3])
+        self.assertEqual(tokenizer.render_calls, 1)
+        for old in ('baseline_basic_v1', 'baseline_senior_v2', 'baseline_senior_v3', 'unknown'):
+            with self.assertRaises(ValueError):
+                prompts.validate_prompt_version(old)
 
-    def test_api_health_displays_selected_and_loaded_v2_v3(self):
+    def test_api_health_displays_official_prompt(self):
         from fastapi.testclient import TestClient
         from baseline_api import server
         base = json.loads((ROOT/'experiments/configs/integrated_baseline_v1.experimental.speculative.json').read_text(encoding='utf-8'))
-        for version in prompts.SENIOR_PROMPT_VERSIONS:
+        for version in (prompts.PROMPT_VERSION,):
             with tempfile.TemporaryDirectory() as directory:
                 folder = Path(directory)
                 config = dict(base, prompt_version=version)
@@ -132,7 +130,7 @@ class PromptTests(unittest.TestCase):
         tokenizer = Tokenizer()
         llm = N(tokenizer=tokenizer, strict_max_input_tokens=10000, max_new_tokens=256,
                 model=N(config=N(max_position_embeddings=20000)), generate=Mock(return_value='answer'))
-        pipeline.llm_loader, pipeline.prompt_version = llm, prompts.SENIOR_PROMPT_VERSION
+        pipeline.llm_loader, pipeline.prompt_version = llm, prompts.PROMPT_VERSION
         documents = [N(page_content='CONTEXT', metadata={'source_file': 'CPU fixture'})]
         pipeline.retrieve = Mock(return_value=(documents, [.9]))
         adapter = A0Adapter.__new__(A0Adapter)
@@ -160,7 +158,7 @@ class PromptTests(unittest.TestCase):
                     'generation_seconds': .1, 'tokens_per_second': 20, 'stop_reason': 'eos', 'reached_token_limit': False}
         wrapper.engine = N(tokenizer=tokenizer, target=N(config=N(max_position_embeddings=10000)),
                            draft=N(config=N(max_position_embeddings=10000)), draft_path='CPU Draft', generate=generate)
-        prompt = prompts.build_prompt('C', 'Q', prompt_version=prompts.SENIOR_PROMPT_VERSION, tokenizer=tokenizer)
+        prompt = prompts.build_prompt('C', 'Q', prompt_version=prompts.PROMPT_VERSION, tokenizer=tokenizer)
         self.assertEqual(wrapper.generate(prompt), 'CPU answer')
         self.assertEqual([s[0] for s in seen], ['SD2-1', 'SD0'])
         self.assertIs(seen[0][1], seen[1][1])

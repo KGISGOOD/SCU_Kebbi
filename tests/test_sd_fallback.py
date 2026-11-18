@@ -13,7 +13,7 @@ import numpy as np
 from baseline_api import speculative, server
 from baseline_api.cache import ReviewedCacheA0
 from baseline_api.integrated_chat import IntegratedQA
-from experiments.baselines.rag_baseline.prompts import build_prompt, SENIOR_PROMPT_VERSION
+from experiments.baselines.rag_baseline.prompts import build_prompt
 from test_prompt_encoding import Tokenizer
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -364,7 +364,7 @@ def create_app(config_path, run_dir=None):
                     raise
                 if not isinstance(answer, str) or not answer.strip():
                     raise RuntimeError("A0 returned an empty answer")
-                if config.get("prompt_version") in ("baseline_senior_v2", "baseline_senior_v3") and len(answer) > 100:
+                if len(answer) > 100:
                     # Observe compliance only: never slice an answer or drop conditions.
                     LOG.warning("request=%s answer_length=%s exceeds 100 characters; answer preserved",
                                 request_id, len(answer))

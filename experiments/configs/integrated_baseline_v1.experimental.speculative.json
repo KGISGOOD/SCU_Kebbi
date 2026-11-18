@@ -8,7 +8,7 @@
   "max_input_tokens": 4096,
   "max_new_tokens": 256,
   "request_timeout_seconds": 120,
-  "prompt_version": "baseline_senior_v3",
+  "prompt_version": "baseline_senior",
   "faq": {
     "review_file": "experiments/datasets/faq_csv_review.csv",
     "faq_file": "experiments/datasets/faq_精簡問答_138筆.csv",
