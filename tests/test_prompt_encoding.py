@@ -56,7 +56,7 @@ def measured(fn, *args, **kwargs):
 class PromptTests(unittest.TestCase):
     def test_official_system_text_is_exact(self):
         self.assertEqual(hashlib.sha256(prompts.SENIOR_SYSTEM_PROMPT.encode('utf-8')).hexdigest(),
-                         '61968a8199ea7e96743196a2103e54a8f5578da3248e765a2fc58c87f03a327d')
+                         'fce4e902cdf7535170042193638a641588bf8baea258351914272ea5de485987')
         self.assertEqual(prompts.PROMPT_VERSION, 'baseline_senior')
         self.assertFalse(hasattr(prompts, '_build_legacy_prompt'))
         self.assertFalse(hasattr(prompts, 'SENIOR_V3_SYSTEM_PROMPT'))

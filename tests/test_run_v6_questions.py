@@ -79,7 +79,7 @@ class RunnerTests(unittest.TestCase):
         rows = runner.read_csv(self.output, runner.HEADER)
         self.assertEqual([r[:2] for r in rows], [list(p) for p in self.plan])
         self.assertEqual(rows[0][2], '回答, "引號"\n下一行')
-        self.assertEqual(rows[0][-2:], ['.031', ''])
+        self.assertEqual(rows[0][-2:], ['0.0310', ''])
         self.assertEqual(self.api.calls[0][:2], ('GET', '/health'))
         self.assertEqual([p['question'] for m, e, p in self.api.calls if m == 'POST'], [p[1] for p in self.plan])
         self.assertIn('[2/2]', self.stdout.getvalue())

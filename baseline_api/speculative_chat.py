@@ -8,6 +8,7 @@ import uuid
 
 from .server import load_settings, ROOT
 from .speculative import validate_speculative
+from .timing_output import seconds_text, timing_json, executed_stage_timings
 
 
 def main():
@@ -54,23 +55,23 @@ def main():
                     sd = detail['speculative']
                     print('回答:', answer)
                     print('來源:', detail.get('answer_source', 'rag'), '字數:', len(answer),
-                          '超過100字:', len(answer)>100, '總秒數:', record['total_seconds'])
-                    print('SD:', {k: v for k, v in sd.items() if k not in
-                                  ('raw_generation', 'paired_greedy', 'output_token_ids')})
-                    print('階段秒數:', detail.get('timings') or {k: detail.get(k) for k in
-                          ('embedding_seconds', 'retrieval_seconds', 'generation_seconds')})
+                          '超過100字:', len(answer)>100, '總秒數:', seconds_text(record['total_seconds']))
+                    print('SD:', timing_json({k: v for k, v in sd.items() if k not in
+                                  ('raw_generation', 'paired_greedy', 'output_token_ids')}))
+                    print('階段秒數:', timing_json(executed_stage_timings(detail)))
                     cache = detail.get('cache') or {}
                     rag = cache.get('rag_detail') or detail
                     if sd['used']:
-                        print('RAG 檢索秒數:', rag.get('retrieval_seconds'),
-                              'SD 生成秒數:', sd['generation_seconds'],
-                              '額外 Greedy 驗證秒數:', sd['greedy_verification_seconds'])
+                        print('RAG 檢索秒數:', seconds_text(rag.get('retrieval_seconds')),
+                              'SD 生成秒數:', seconds_text(sd['generation_seconds']),
+                              '額外 Greedy 驗證秒數:', seconds_text(sd['greedy_verification_seconds']))
+                    record['detail'] = dict(detail, timings=executed_stage_timings(detail))
                 except Exception as exc:
                     record = dict(status='failed', question=question, error=str(exc),
                                   speculative_failure=getattr(exc, 'speculative_failure', None),
                                   total_seconds=time.perf_counter()-start)
                     print('失敗，未回傳或快取答案:', exc)
-                stream.write(json.dumps(record, ensure_ascii=False, allow_nan=False)+'\n')
+                stream.write(timing_json(record)+'\n')
                 stream.flush()
     finally:
         if engine is not None:

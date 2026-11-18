@@ -12,6 +12,9 @@ import urllib.request
 from contextlib import contextmanager
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from baseline_api.timing_output import seconds_text, timing_json
 FILES = [('A', 'A_standard.csv', 25), ('B', 'B_similar_same.csv', 25),
          ('C', 'C_similar_different.csv', 25), ('D', 'D_no_answer.csv', 15),
          ('E', 'E_unrelated.csv', 10), ('F', 'F_ambiguous.csv', 20)]
@@ -19,6 +22,18 @@ HISTORY_HEADER = ['問題', '答案', '回答來源', 'Embedding 耗時（秒）
                   'Cache 耗時（秒）', 'RAG 檢索耗時（秒）', 'SD 生成耗時（秒）',
                   'Greedy 驗證耗時（秒）', '資源驗證耗時（秒）', '總耗時（秒）', 'Output Tokens']
 HEADER = ['問題分類'] + HISTORY_HEADER
+
+
+def expectations(directory, category=None):
+    """Client-side references only; bind this fixed suite to its FAQ snapshot."""
+    manifest = json.loads((Path(directory) / 'expectations.json').read_text(encoding='utf-8'))
+    faq = ROOT / manifest['faq_file']
+    if hashlib.sha256(faq.read_bytes()).hexdigest() != manifest['faq_sha256']:
+        raise ValueError('FAQ 已更新，請先重新核對固定題庫與預期答案，不能沿用舊對應')
+    records = manifest['questions']
+    if [(r['category'], r['question']) for r in records] != questions(directory):
+        raise ValueError('預期資訊與題庫分類、順序不一致')
+    return [r for r in records if category is None or r['category'] == category]
 
 
 def questions(directory, category=None):
@@ -69,7 +84,7 @@ def http_json(base_url, method, endpoint, timeout, payload=None):
 def write_state(path, state):
     temporary = path.with_suffix(path.suffix + '.tmp')
     with temporary.open('w', encoding='utf-8') as stream:
-        json.dump(state, stream, ensure_ascii=False, allow_nan=False)
+        stream.write(timing_json(state))
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(str(temporary), str(path))
@@ -100,7 +115,9 @@ def exclusive(path):
 
 
 def run(plan, output, history, base_url, timeout=180, resume=False, restart=False,
-        retry_uncertain=False, client=http_json):
+        retry_uncertain=False, client=http_json, references=None):
+    if references is not None and [(r['category'], r['question']) for r in references] != list(plan):
+        raise ValueError('參考資料與執行題目不符')
     output, history = Path(output).resolve(), Path(history).resolve()
     if output == history or output.with_suffix('.state.json') == history:
         raise ValueError('結果路徑不可指向 API 歷史紀錄')
@@ -111,6 +128,8 @@ def run(plan, output, history, base_url, timeout=180, resume=False, restart=Fals
     with exclusive(output.with_suffix('.lock')):
         digest = hashlib.sha256(json.dumps(plan, ensure_ascii=False).encode('utf-8')).hexdigest()
         expected = {'plan_sha256': digest, 'base_url': base_url, 'history_file': str(history)}
+        if references is not None:
+            expected['expectations_sha256'] = hashlib.sha256(json.dumps(references, ensure_ascii=False).encode('utf-8')).hexdigest()
         if output.exists() and not (resume or restart):
             raise ValueError('結果已存在：使用 --resume 續跑，或 --restart 明確重測並覆寫結果')
         if restart:
@@ -152,7 +171,7 @@ def run(plan, output, history, base_url, timeout=180, resume=False, restart=Fals
         health = client(base_url, 'GET', '/health', min(timeout, 15))
         if (health.get('status') != 'ready' or health.get('api_mode') != 'integrated_speculative'
                 or health.get('models_ready') is not True or health.get('accepting_requests') is not True):
-            raise ValueError('V6 API 尚未 ready 或仍忙碌，停止測試')
+            raise ValueError('V6 API 尚未 ready 或仍忙碌，停止測試；初始化失敗請查 API 日誌，不能判定為 FAQ 相似度不足')
         with output.open('a', encoding='utf-8', newline='') as stream:
             writer = csv.writer(stream)
             for index in range(len(saved), len(plan)):
@@ -177,6 +196,8 @@ def run(plan, output, history, base_url, timeout=180, resume=False, restart=Fals
                     validate_record(row)
                     if row[:3] != [question, answer, source]:
                         raise ValueError('API 回應與歷史 CSV 不一致')
+                    row = list(row)
+                    row[3:11] = [seconds_text(v) for v in row[3:11]]
                     offset = stream.tell()
                     try:
                         writer.writerow([category] + row)
@@ -187,9 +208,21 @@ def run(plan, output, history, base_url, timeout=180, resume=False, restart=Fals
                         stream.truncate()
                         raise
                     state['pending'] = None
+                    diagnostic = {'request_id': response['request_id'], 'category': category,
+                                  'question': question, 'actual': response}
+                    if references is not None:
+                        diagnostic['expected'] = references[index]
+                        if category == 'A':
+                            diagnostic['reference_answer_exact_match'] = answer == references[index]['reference_answer']
+                    state.setdefault('diagnostics', {})[str(index)] = diagnostic
                     write_state(state_path, state)
                     print('[%d/%d] %s 完成｜%s｜%s 秒｜%s' %
                           (index+1, len(plan), category, source, row[10], question), flush=True)
+                    if category == 'A' and response.get('faq_accepted') is not True:
+                        print('FAQ未命中：%s；Top1=%s Top2=%s margin=%s' %
+                              (response.get('faq_rejection_reason') or 'not_exposed_by_api',
+                               response.get('faq_top1_score'), response.get('faq_top2_score'),
+                               response.get('faq_score_margin')), flush=True)
                 except BaseException:
                     print('已停止，成功資料已保留。請求可能已執行；尤其 timeout 後 Cache 狀態可能已改變。不要直接重送。', file=sys.stderr)
                     raise
@@ -212,7 +245,8 @@ def main():
         parser.error('timeout 必須為正數；retry-uncertain 必須搭配 resume')
     try:
         run(questions(ROOT/'tests/questions', args.category), ROOT/'tests/results/v6_test_results.csv',
-            args.history_file, args.base_url, args.timeout, args.resume, args.restart, args.retry_uncertain)
+            args.history_file, args.base_url, args.timeout, args.resume, args.restart, args.retry_uncertain,
+            references=expectations(ROOT/'tests/questions', args.category))
     except (Exception, KeyboardInterrupt) as exc:
         parser.exit(1, '測試停止: %s\n' % exc)
 

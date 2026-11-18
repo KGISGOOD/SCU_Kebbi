@@ -255,6 +255,17 @@ class CacheTests(unittest.TestCase):
                 self.assertEqual(rows[0], expected)
                 self.assertEqual(len(rows), 4)
                 self.assertEqual([r[-1] for r in rows[1:]], ['', '2', ''])
+                for row in rows[1:]:
+                    for value in row[3:11]:
+                        if value:
+                            self.assertRegex(value, r'^\d+\.\d{4}$')
+                for response in responses:
+                    self.assertRegex(response.text, r'"latency_seconds":\d+\.\d{4}[,}]')
+                    self.assertIsInstance(response.json()['latency_seconds'], float)
+                self.assertIsNone(responses[0].json()['stage_timings']['cache_lookup_seconds'])
+                self.assertIsNone(responses[0].json()['stage_timings']['rag_llm_seconds'])
+                self.assertIsNone(responses[2].json()['stage_timings']['rag_llm_seconds'])
+                self.assertIsNone(responses[2].json()['stage_timings']['cache_write_seconds'])
 
 
 if __name__ == '__main__':

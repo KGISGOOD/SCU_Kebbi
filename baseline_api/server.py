@@ -23,6 +23,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, StrictStr
+from baseline_api.timing_output import seconds_text, timing_json, executed_stage_timings
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,6 +33,11 @@ V6_CSV_COLUMNS = ['問題', '答案', '回答來源', 'Embedding 耗時（秒）
                   'Cache 耗時（秒）', 'RAG 檢索耗時（秒）', 'SD 生成耗時（秒）',
                   'Greedy 驗證耗時（秒）', '資源驗證耗時（秒）', '總耗時（秒）', 'Output Tokens']
 _CSV_LOCK = threading.Lock()
+
+
+class TimingJSONResponse(JSONResponse):
+    def render(self, content):
+        return timing_json(content).encode('utf-8')
 
 
 class V6History:
@@ -117,6 +123,7 @@ class V6History:
                sd.get('greedy_verification_seconds') if sd.get('used') else None,
                stages.get('resource_validation_seconds'), total,
                sd.get('output_token_count') if sd.get('used') else None]
+        row[3:11] = [seconds_text(value) for value in row[3:11]]
         self._write(request_id, row)
         return row
 
@@ -309,7 +316,7 @@ def create_app(config_path, run_dir=None):
                                      "models_ready": ready, "busy": busy,
                                      "accepting_requests": ready and not busy})
 
-    @app.post("/chat", response_model=ChatResponse)
+    @app.post("/chat", response_model=ChatResponse, response_class=TimingJSONResponse)
     async def chat(body: ChatRequest):
         request_id = uuid.uuid4().hex
         if not body.question.strip():
@@ -340,7 +347,9 @@ def create_app(config_path, run_dir=None):
             # The sole inference worker writes before completing its future.
             # Recording failure therefore cannot masquerade as a successful call.
             with state.records_path.open("a", encoding="utf-8", newline="\n") as stream:
-                stream.write(json.dumps(record, ensure_ascii=False, allow_nan=False) + "\n")
+                if record['timings'] is not None:
+                    record['timings'] = dict(record['timings'], timings=executed_stage_timings(record['timings']))
+                stream.write(timing_json(record) + "\n")
 
         def infer():
             try:
@@ -385,9 +394,9 @@ def create_app(config_path, run_dir=None):
         def finished(result):
             try:
                 _, timings = result.result()
-                LOG.info("request=%s inference_done elapsed=%.3f retrieval=%s generation=%s input_tokens=%s",
-                         request_id, time.perf_counter() - start, timings["retrieval_seconds"],
-                         timings["generation_seconds"], timings["input_tokens"])
+                LOG.info("request=%s inference_done elapsed=%.4f retrieval=%s generation=%s input_tokens=%s",
+                         request_id, time.perf_counter() - start, seconds_text(timings["retrieval_seconds"]),
+                         seconds_text(timings["generation_seconds"]), timings["input_tokens"])
             except asyncio.CancelledError:
                 LOG.warning("request=%s cancelled during API shutdown", request_id)
             except InputRejected:
@@ -430,8 +439,7 @@ def create_app(config_path, run_dir=None):
                             latency_seconds=time.perf_counter() - start, api_mode=api_mode,
                             answer_char_count=len(answer), exceeds_100_characters=len(answer)>100,
                             speculative=timings.get('speculative'),
-                            stage_timings=timings.get('timings') or {k: timings.get(k) for k in
-                                ('retrieval_seconds', 'prompt_check_seconds', 'generation_seconds')}, **routing)
+                            stage_timings=executed_stage_timings(timings), **routing)
 
     return app
 
