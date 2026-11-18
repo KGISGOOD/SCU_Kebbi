@@ -35,8 +35,6 @@ class IntegratedQA:
         self.faq = FAQFallback(root, config, self.adapter)
         faq_identity = self.faq.identity['faq']
         hashes = dict(faq_identity['input_sha256'])
-        if faq_identity['review']:
-            hashes[faq_identity['review']['path']] = faq_identity['review']['sha256']
         # Pin routing code and FAQ resources as well as the existing A0 resources.
         hashes.update({str(p.resolve()): file_hash(p) for p in Path(__file__).parent.glob('*.py')})
         self.guard = ResourceGuard(self.adapter, extra_hashes=hashes)

@@ -24,7 +24,7 @@ baseline_api/
   integrated_chat.py           # V6 共用路由 runtime
   speculative_chat.py          # 選用 V6 CLI，與 API 共用流程
   speculative.py               # SD Adapter 與 Greedy 對照
-  faq.py / faq_review.py        # FAQ CSV、審核、接受規則
+  faq.py / faq_data.py          # 唯一 FAQ CSV 載入與接受規則
   cache.py                     # 快取安全規則、期限、資源保護
   client_example.py            # HTTP 呼叫範例，不操作硬體
 experiments/
@@ -34,7 +34,7 @@ experiments/
   algorithms/speculative_decoding/ # 原有 Target 驗證引擎
   shared/                      # 模型、Embedding、FAISS、資料與身分驗證
   configs/integrated_baseline_v1.experimental.speculative.json
-  datasets/                    # 138筆 FAQ CSV 與獨立審核檔
+  datasets/                    # 唯一138筆 FAQ CSV
   models/                      # 本機模型，Git 忽略
   vector_stores/                # 本機索引，Git 忽略
   results/                     # 執行紀錄，Git 忽略
@@ -76,10 +76,14 @@ python -c "from huggingface_hub import snapshot_download; snapshot_download('met
 
 新下載的 Llama 預設使用模型儲存庫當時版本；若要重現既有部署，使用既有模型副本或明確加入既有身分紀錄中的 `revision`，不要把新下載等同於舊模型版本。BGE 仍須通過既有內容 Hash，不能降低驗證以配合下載結果。不要把 Hugging Face 存取權杖寫入設定或 Git。
 
-FAQ 不需要另跑舊版建置器。啟動 V6 時，`FAQFallback` 讀取兩欄 `experiments/datasets/faq_精簡問答_138筆.csv` 及 `faq_csv_review.csv`，驗證138筆與審核 Hash，使用共用 BGE-M3 建立一次**記憶體 IndexFlatIP**；不從 Frozen 母資料取題，不保存 FAQ 磁碟索引。可先做不載入模型的資料檢查：
+V6 唯一 FAQ 題庫為 `experiments/datasets/faq_精簡問答_138筆.csv`，只有「問題、答案」兩欄，共138筆。FAQ 不使用人工審核狀態或舊 ID 對照，不需要額外審核／對照檔。啟動時 `FAQFallback` 讀取最新 CSV，驗證欄位、題數、問題唯一性及內容 Hash，使用共用原始 BGE-M3 建立一次**記憶體 IndexFlatIP**；問題向量與答案來自同一份載入快照。FAQ 不保存或載入磁碟索引，不會自動覆寫題庫。
+
+修改 FAQ 後必須重新啟動 API，才會讀取新版並重建記憶體索引；請先停止服務再編輯，執行中的資源保護會防止題庫被修改。門檻0.90、Top-1／Top-2分差0.05、數字與有限詞彙意圖檢查保持不變，命中直接回傳CSV答案，未命中繼續進入Cache。移除人工審核依賴不代表答案已被自動證明正確。
+
+從舊部署同步時，請刪除 GPU `.local.json` 內 `faq.review_file` 欄位，保留其他模型、索引、門檻與路徑；舊欄位會被設定驗證拒絕。可先執行無GPU的載入／索引替身測試：
 
 ```powershell
-python -m baseline_api.faq_review --check-only
+python -B -m unittest discover -s tests -p test_faq_csv.py -v
 ```
 
 保留 `畢業專題_爬蟲/type1/`、`type2/` 的原始檔案與相對路徑。無關爬蟲及舊研究入口已移除，部署服務只使用這兩個知識資料目錄。

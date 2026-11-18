@@ -45,7 +45,6 @@ class FAQMatcher:
                     "answer": faq.get("answer"),
                     "source_file": faq.get("source_file"),
                     "source_type": faq.get("source_type"),
-                    "review_status": faq.get("review_status"),
                 }
             )
             documents.append(doc)
