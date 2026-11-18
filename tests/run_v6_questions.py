@@ -44,7 +44,7 @@ def read_csv(path, header):
 
 
 def validate_record(row):
-    if len(row) != 12 or not row[0].strip() or not row[1].strip() or row[2] not in ('FAQ', 'Cache', 'RAG + SD'):
+    if len(row) != 12 or not row[0].strip() or not row[1].strip() or row[2] not in ('FAQ', 'Cache', 'RAG + SD', 'RAG + Target Greedy Fallback'):
         raise ValueError('不完整或不成功的歷史紀錄')
     for value in row[3:]:
         if value and (not math.isfinite(float(value)) or float(value) < 0):
@@ -172,6 +172,8 @@ def run(plan, output, history, base_url, timeout=180, resume=False, restart=Fals
                         raise ValueError('歷史 CSV 未恰好追加一筆或有其他請求，拒絕配對')
                     row = after[-1]
                     source = {'faq': 'FAQ', 'cache': 'Cache', 'rag': 'RAG + SD'}.get(response.get('answer_source'))
+                    if response.get('answer_source') == 'rag' and (response.get('speculative') or {}).get('final_generation_source') == 'target_greedy_fallback':
+                        source = 'RAG + Target Greedy Fallback'
                     validate_record(row)
                     if row[:3] != [question, answer, source]:
                         raise ValueError('API 回應與歷史 CSV 不一致')

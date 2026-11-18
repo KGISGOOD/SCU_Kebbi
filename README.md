@@ -16,7 +16,7 @@ POST /chat → 共用 BGE-M3（同題只計算一次 Embedding）
            → 回答；符合原有寫入條件才自動加入 Cache
 ```
 
-FAQ 命中不查 Cache，也不呼叫 Draft/Target；Cache 命中不呼叫生成模型。Token 對照失敗拒絕回傳與快取，沒有複製 Target Greedy 答案來假裝通過。
+FAQ 命中不查 Cache，也不呼叫 Draft/Target；Cache 命中不呼叫生成模型。Token 對照相同使用 SD 答案；不同時使用當次已完成的 Target Greedy 答案備援，不再生成第三次。此時 `lossless_status=failed`、`token_mismatch=true`、`final_generation_source=target_greedy_fallback`，不能算作 SD 驗證成功或加速成果。Cache 只嘗試保存最終答案，仍受原有資格與截斷檢查限制；Greedy 生成失敗或答案空白仍拒絕回傳與快取。
 
 ```text
 baseline_api/
@@ -103,7 +103,7 @@ Copy-Item experiments/configs/integrated_baseline_v1.experimental.speculative.js
 
 完整 System Prompt 在 `experiments/baselines/rag_baseline/prompts.py`，以 `{context}` 填入檢索內容，沒有傳入對話歷史。100字目前是 Prompt 約束及超長觀測，不會直接截斷回答。
 
-預設 FP16 沿用原設定；不同前向路徑仍可能產生 Token 分歧，由 Guard 阻擋。另行使用 FP32 時，既有政策會停用 TF32，但仍須驗證 VRAM 與 Token 等價性。
+預設 FP16 沿用原設定；不同前向路徑仍可能產生 Token 分歧，Guard 會記錄失敗並使用已完成的 Target Greedy 備援，不代表分歧根因已修復。另行使用 FP32 時，既有政策會停用 TF32，但仍須驗證 VRAM 與 Token 等價性。
 
 GPU PowerShell：
 
@@ -133,6 +133,8 @@ python -m baseline_api.speculative_chat --config experiments/configs/integrated_
 每筆成功 HTTP 問答自動追加至 **`experiments/results/api_logs/v6_chat_history.csv`**，無須 `--run-dir`。UTF-8 BOM、12欄，處理逗號、引號及換行，重啟不清空。終端機顯示問題、答案、來源、各階段耗時、總耗時及 Output Tokens。
 
 FAQ/Cache 命中沒有新 LLM Token，Output Tokens 與未執行的生成階段留空。沿用既有測量，Cache 欄為查詢加寫入耗時。總耗時使用共用引擎的 `total_seconds`，排除初次載入及 CSV 寫入，包含額外 Greedy 驗證；不能將它當成純 SD 效能。
+
+CSV 欄位不變。備援回答的來源為 `RAG + Target Greedy Fallback`，Output Tokens 記錄最終 Greedy 輸出長度；SD 與 Greedy 耗時分開保留。API 的 `answer_source` 仍是 `rag`，細分來源與 mismatch 狀態在既有 `speculative` 物件內。120題執行器接受這個新來源值，仍可讀取先前的成功列，不改寫舊結果。
 
 CSV 有寫入鎖、防止同一請求重複追加與欄位檢查。失敗回傳 `csv_recording_failed`，不宣稱紀錄成功。HTTP timeout 後才完成的推論不會當成成功 HTTP 問答追加 CSV。
 

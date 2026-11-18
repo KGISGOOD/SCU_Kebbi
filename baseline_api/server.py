@@ -106,7 +106,10 @@ class V6History:
         cache_seconds = stages.get('cache_lookup_seconds') if detail.get('cache') is not None else None
         if cache_seconds is not None and stages.get('cache_write_seconds') is not None:
             cache_seconds += stages['cache_write_seconds']  # Disjoint existing measurements, not RAG time.
-        row = [question, answer, {'faq': 'FAQ', 'cache': 'Cache', 'rag': 'RAG + SD'}[source],
+        source_label = {'faq': 'FAQ', 'cache': 'Cache', 'rag': 'RAG + SD'}[source]
+        if source == 'rag' and sd.get('final_generation_source') == 'target_greedy_fallback':
+            source_label = 'RAG + Target Greedy Fallback'
+        row = [question, answer, source_label,
                stages.get('embedding_seconds'), stages.get('faq_seconds'),
                cache_seconds,
                rag.get('retrieval_seconds') if source == 'rag' else None,
@@ -365,6 +368,8 @@ def create_app(config_path, run_dir=None):
                     # Observe compliance only: never slice an answer or drop conditions.
                     LOG.warning("request=%s answer_length=%s exceeds 100 characters; answer preserved",
                                 request_id, len(answer))
+                if (timings.get('speculative') or {}).get('token_mismatch'):
+                    LOG.warning('request=%s SD token_mismatch; final_generation_source=target_greedy_fallback; lossless_status=failed', request_id)
             except Exception as exc:
                 record_outcome(error=exc)
                 raise

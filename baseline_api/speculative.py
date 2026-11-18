@@ -102,9 +102,21 @@ class SpeculativeA0:
             self.last.update(exact_token_match_greedy=match,
                              greedy_verification_seconds=baseline['generation_seconds'],
                              paired_greedy=baseline, lossless_status='passed_this_request' if match else 'failed')
-            if not match:
-                raise ValueError('SD token-equivalence failed against paired Target greedy; answer not served or cached')
-        return sd['output_text']
+            selected = sd if match else baseline
+            if not isinstance(selected['output_text'], str) or not selected['output_text'].strip():
+                raise ValueError('verified Target generation returned an empty answer')
+            self.last.update(token_mismatch=not match,
+                             final_generation_source='sd' if match else 'target_greedy_fallback',
+                             sd_speedup_eligible=match,
+                             sd_output_token_count=sd['generated_token_count'],
+                             sd_tokens_per_second=sd['tokens_per_second'],
+                             output_token_count=selected['generated_token_count'],
+                             output_token_ids=selected['output_token_ids'],
+                             stop_reason=selected['stop_reason'], truncated=selected['reached_token_limit'],
+                             tokens_per_second=sd['tokens_per_second'] if match else None,
+                             total_generation_seconds=time.perf_counter()-start)
+            return selected['output_text']
+        raise ValueError('Target Greedy verification is required before serving an answer')
 
     def answer(self, query, *, query_vector=None):
         self.last, self.question = None, query

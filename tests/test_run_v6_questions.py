@@ -154,6 +154,27 @@ class RunnerTests(unittest.TestCase):
             self.run_plan()
         self.assertEqual(runner.read_csv(self.output, runner.HEADER), [])
 
+    def test_target_fallback_source_is_preserved_without_extra_columns(self):
+        original = self.api
+        def fallback(*args, **kwargs):
+            response = original(*args, **kwargs)
+            if args[1] == 'POST':
+                rows = runner.read_csv(self.history, runner.HISTORY_HEADER)
+                rows[-1][2] = 'RAG + Target Greedy Fallback'
+                rows[-1][-1] = '3'
+                with self.history.open('w', encoding='utf-8-sig', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(runner.HISTORY_HEADER)
+                    writer.writerows(rows)
+                response.update(answer_source='rag', speculative={'final_generation_source': 'target_greedy_fallback'})
+            return response
+        self.api = fallback
+        self.run_plan()
+        rows = runner.read_csv(self.output, runner.HEADER)
+        self.assertEqual(len(rows[0]), 13)
+        self.assertEqual(rows[0][3], 'RAG + Target Greedy Fallback')
+        self.assertEqual(rows[0][-1], '3')
+
     def test_unready_health_sends_no_question(self):
         calls = []
         def busy(*args):
