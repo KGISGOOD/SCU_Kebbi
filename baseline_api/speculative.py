@@ -11,10 +11,13 @@ from experiments.algorithms.speculative_decoding.engine import SDEngine
 
 def validate_speculative(config):
     options = config.get('speculative')
-    if not isinstance(options, dict) or set(options) != {'enabled', 'draft_model', 'draft_tokens', 'verify_greedy'}:
+    if not isinstance(options, dict) or set(options) - {'mode'} != {'enabled', 'draft_model', 'draft_tokens', 'verify_greedy'}:
         raise ValueError('invalid speculative configuration')
-    if options['enabled'] is not True or options['verify_greedy'] is not True:
-        raise ValueError('enabled and verify_greedy must be true; Token equivalence guard cannot be disabled')
+    mode = options.get('mode', 'verified')
+    if mode not in ('verified', 'sd_only') or options['enabled'] is not True:
+        raise ValueError('explicit enabled speculative mode must be verified or sd_only')
+    if options['verify_greedy'] is not (mode == 'verified'):
+        raise ValueError('verified requires verify_greedy=true; explicit sd_only requires verify_greedy=false')
     if not isinstance(options['draft_model'], str) or not options['draft_model'].strip():
         raise ValueError('local 1B draft_model path required')
     if type(options['draft_tokens']) is not int or options['draft_tokens'] < 1:
@@ -50,6 +53,7 @@ class SpeculativeA0:
             bind(self.engine)
         self.paths = dict(self.base.paths, draft_model=self.engine.draft_path)
         self.identity = dict(self.base.identity, speculative=self.engine.identity,
+                             speculative_mode=self.options.get('mode', 'verified'),
                              greedy_verification_enabled=self.options['verify_greedy'],
                              speculative_adapter_sha256=file_hash(Path(__file__)))
         self.original_generate = self.base.llm.generate
@@ -95,6 +99,7 @@ class SpeculativeA0:
                      'generation_seconds': sd['generation_seconds'], 'tokens_per_second': sd['tokens_per_second'],
                      'stop_reason': sd['stop_reason'], 'truncated': sd['reached_token_limit'],
                      'exact_token_match_greedy': None, 'greedy_verification_seconds': None,
+                     'greedy_verification_enabled': self.options['verify_greedy'],
                      'lossless_status': 'not_verified', 'raw_generation': sd}
         if self.options['verify_greedy']:
             baseline = self.engine.generate(snapshot, inputs, 'SD0', None, 0, False, self.config['seed'])
@@ -116,7 +121,15 @@ class SpeculativeA0:
                              tokens_per_second=sd['tokens_per_second'] if match else None,
                              total_generation_seconds=time.perf_counter()-start)
             return selected['output_text']
-        raise ValueError('Target Greedy verification is required before serving an answer')
+        if self.options.get('mode', 'verified') != 'sd_only':
+            raise ValueError('Target Greedy verification is required outside explicit sd_only mode')
+        if not isinstance(sd['output_text'], str) or not sd['output_text'].strip():
+            raise ValueError('Target-verified SD generation returned an empty answer')
+        self.last.update(final_generation_source='sd', token_mismatch=None, paired_greedy=None,
+                         lossless_status='not_checked_sd_only', sd_speedup_eligible=None,
+                         sd_output_token_count=sd['generated_token_count'], sd_tokens_per_second=sd['tokens_per_second'],
+                         total_generation_seconds=time.perf_counter()-start)
+        return sd['output_text']
 
     def answer(self, query, *, query_vector=None):
         self.last, self.question = None, query

@@ -208,7 +208,10 @@ def create_app(config_path, run_dir=None):
     config = load_settings(config_path)
     from experiments.baselines.rag_baseline.prompts import PROMPT_VERSION
     selected_prompt = config.get("prompt_version", PROMPT_VERSION)
-    api_mode = 'integrated_speculative'
+    api_mode = ('integrated_speculative_sd_only' if config['speculative'].get('mode', 'verified') == 'sd_only'
+                else 'integrated_speculative')
+    history_filename = ('v6_sd_only_chat_history.csv' if api_mode == 'integrated_speculative_sd_only'
+                        else 'v6_chat_history.csv')
 
     @asynccontextmanager
     async def lifespan(app):
@@ -218,7 +221,7 @@ def create_app(config_path, run_dir=None):
         state.status = "loading"
         state.closing = False
         state.records_path = None
-        state.v6_history = V6History(ROOT / 'experiments/results/api_logs/v6_chat_history.csv')
+        state.v6_history = V6History(ROOT / 'experiments/results/api_logs' / history_filename)
         if run_dir is not None:
             raw = Path(run_dir).expanduser()
             output = (raw if raw.is_absolute() else ROOT / raw).resolve()
@@ -313,6 +316,7 @@ def create_app(config_path, run_dir=None):
                             content={"service": "a0_baseline", "status": state.status, "api_mode": api_mode,
                                      "prompt_version": selected_prompt,
                                      "loaded_prompt_version": state.adapter.adapter.identity["prompt_version"] if ready else None,
+                                     "greedy_verification_enabled": config['speculative']['verify_greedy'],
                                      "models_ready": ready, "busy": busy,
                                      "accepting_requests": ready and not busy})
 
